@@ -112,9 +112,11 @@
                 description="Search for a name or NetID.",
                 placeholder='rf377 or Reid Fleishman' ) }}
 
-                <input type="text" class="form-control w-25" id="people-search-input"
+                <div class="col-12 col-md-3">
+                    <input type="text" class="form-control" id="people-search-input"
                     placeholder="rf377 or Reid Fleishman"
                     oninput="handlePeopleSearchInputChange('{{current_user.id}}')" />
+                </div>
 
                 <div id="selected-person-status" class="alert alert-danger mt-4" role="alert">
                     No recipient selected.
