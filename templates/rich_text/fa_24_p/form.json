@@ -1,0 +1,150 @@
+{
+    "ops": [
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Lifted Fall 2024"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px"
+            },
+            "insert": "Surprise!  We're back for Fall 2024, our first time during a Fall semester!  Show your appreciation and lift some spirits!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Fill out the form here to send a thank you message to someone who has lifted you at Cornell.  "
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px"
+            },
+            "insert": "Messages will be displayed in "
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "underline": true
+            },
+            "insert": "Willard Straight Hall"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px"
+            },
+            "insert": " to be picked up on the last day of classes ("
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Monday, December 9th"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px"
+            },
+            "insert": "), along with some sweet treats and winter lights! \u2744\ufe0f"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "italic": true,
+                "font": "verdana",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "The form will close either after 2,000 submissions (due to space constraints) or on Sunday, December 1st at 11:59 PM!  Any messages submitted after will be sent virtually to your recipient."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px"
+            },
+            "insert": "Instagram: "
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "link": "https://www.instagram.com/cornelllifted"
+            },
+            "insert": "@cornelllifted"
+        },
+        {
+            "insert": "\n"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px"
+            },
+            "insert": "YouTube feature 2021: "
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "link": "https://www.youtube.com/watch?v=ewJ3UY5mTYA"
+            },
+            "insert": "youtube.com/watch?v=ewJ3UY5mTYA"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px"
+            },
+            "insert": "If you have any questions, feel free to contact us at "
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "link": "mailto:lifted@cornell.edu"
+            },
+            "insert": "lifted@cornell.edu"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "size": "16px",
+                "italic": true
+            },
+            "insert": "Note: In order to send a Lifted message through this form, you need to sign in with your Cornell NetID.  If you don't have one (e.g., you're a parent), send us an email and we'll send your message for you :)"
+        },
+        {
+            "insert": "\n"
+        }
+    ]
+}

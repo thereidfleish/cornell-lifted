@@ -1,0 +1,39 @@
+{
+    "message_group_list_map": {
+        "fa_24_p": "Fall 2024 Physical Lifted",
+        "fa_24_e": "Fall 2024 eLifted",
+        "sp_24_p": "Spring 2024 Physical Lifted",
+        "sp_24_e": "Spring 2024 eLifted",
+        "sp_23_p": "Spring 2023 Physical Lifted",
+        "sp_23_e": "Spring 2023 eLifted",
+        "sp_22_p": "Spring 2022 Physical Lifted",
+        "sp_21_p": "Spring 2021 Physical Lifted",
+        "sp_21_e": "Spring 2021 eLifted",
+        "sp_20_e": "Spring 2020 eLifted",
+        "sp_19_p": "Spring 2019 Physical Lifted",
+        "sp_18_p": "Spring 2018 Physical Lifted"
+    },
+    "form_message_group": "none",
+    "hidden_cards": [
+        "sp_23_p",
+        "sp_22_p",
+        "sp_19_p",
+        "sp_18_p"
+    ],
+    "swap_from": "none",
+    "swap_to": "fa_24_e",
+    "swap_text": "<b>Can't make it on the last day of classes?</b> <a href=\"/swap-messages\">Click here</a> to have all your physical Lifted messages delivered as virtual eLifted messages on the last day of classes instead.  Hard deadline to do this is <b>4/27/25</b> since we send our print order the following day.",
+    "rich_text_types": {
+        "form": "Form Description",
+        "sender": "Sender Confirmation Email",
+        "recipient": "Recipient You've Been Lifted! Email"
+    },
+    "admin_tabs": {
+        "lifted_config": "Lifted Configuration",
+        "message_tools": "Message Tools",
+        "advanced": "Advanced"
+    },
+    "admins": [
+        "rf377"
+    ]
+}

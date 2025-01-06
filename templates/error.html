@@ -1,0 +1,35 @@
+<html lang="en">
+
+{% import 'components.html' as components with context %}
+
+<head>
+    {{ components.header("Lifted - Error " + error_code |string ) }}
+</head>
+
+<body class="container-fluid">
+    <main>
+        {{ components.navbar() }}
+
+        <h3 class="mt-3 text-center">Error {{ error_code }}</h3>
+        <h6 class="text-center">{{ error_message_title }}</h6>
+
+        <img class="img-fluid mx-auto d-block rounded mt-3" src="/static/images/sad_balloon.jpg" width=""
+            alt="Sad Balloon" />
+
+        <p class="mt-3 text-center">{{ error_message_body }}</p>
+
+        <p class="mt-3 text-center">{{ error_message_human_body }}</p>
+
+        <p class="mt-3 text-center">If you think this is an error or you are still having issues, please email <a
+                href="mailto:lifted@cornell.edu">lifted@cornell.edu</a></p>
+
+    </main>
+    <footer>
+        {{ components.footer() }}
+    </footer>
+</body>
+
+<script src="/static/scripts/scripts.js"></script>
+<script src="/static/scripts/bootstrap.bundle.min.js"></script>
+
+</html>

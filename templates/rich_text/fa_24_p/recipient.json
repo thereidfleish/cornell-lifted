@@ -1,0 +1,220 @@
+{
+    "ops": [
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "{{LOGO}}"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Someone at Cornell wrote you a Lifted message! \ud83d\udc8c"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "We can't tell you who it is yet (it's a secret), but we can tell you that you're appreciated!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "Your message will be posted on a notecard (for you to keep!) in "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "underline": true
+            },
+            "insert": "Willard Straight Hall"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": " on the last day of classes ("
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Monday, December 9th"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "), along with a sweet treat and winter lights to celebrate the end of the semester."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Can't make it on the last day of classes?"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "  "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "link": "https://cards.cornelllifted.com/"
+            },
+            "insert": "Click here to get your messages delivered virtually instead"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": ".  Hard deadline to do this is 4/27/25."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "Spread the love by writing your own Lifted message to a friend, staff, or faculty member who has made your year better. "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "The form closes either after 2,000 submissions (due to space constraints) or on Sunday, December 1st at 11:59 PM!"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": " Any messages submitted after will be sent virtually to your recipient."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "link": "https://cornell.ca1.qualtrics.com/jfe/form/SV_0lGgQShCv7oezoG",
+                "underline": true,
+                "font": "georgia",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Send a Lifted Message"
+        },
+        {
+            "attributes": {
+                "align": "center"
+            },
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "See you then,"
+        },
+        {
+            "insert": "\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "Cornell Lifted \ud83c\udf88"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "Check us out at our Instagram "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "link": "https://www.instagram.com/cornelllifted"
+            },
+            "insert": "@cornelllifted"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": " and on our website "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "link": "https://cornelllifted.com/"
+            },
+            "insert": "cornelllifted.com"
+        },
+        {
+            "insert": "\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px"
+            },
+            "insert": "Read more about Lifted here: "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "size": "16px",
+                "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+            },
+            "insert": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+        },
+        {
+            "insert": "\n"
+        }
+    ]
+}

@@ -1,0 +1,259 @@
+{% macro header(title) -%}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{ title }}</title>
+<link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/static/styles/site.css" />
+
+<!-- <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest"> -->
+{%- endmacro %}
+
+{% macro navbar() -%}
+<img class="mx-auto d-block mb-4" src="/static/images/logo.png" width="300" alt="Cornell Lifted Logo" />
+
+<nav class="navbar navbar-expand-sm nav-bg-color">
+    <a class="navbar-brand d-sm-none mx-2" href="/">Home</a>
+    <button class="navbar-toggler mx-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse mx-2" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item d-none d-sm-block">
+                <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/">About</a>
+            </li>
+            {% if current_user.is_authenticated and is_admin() %}
+            <li class="nav-item">
+                <a class="nav-link" href="/admin">Admin Dashboard</a>
+            </li>
+            {% endif %}
+        </ul>
+        <a class="btn btn-outline-success m-1" href="/send-message">Send a Lifted Message</a>
+        <a class="btn btn-outline-danger m-1" href="/">View My Messages</a>
+    </div>
+</nav>
+
+{% if get_impersonating_status() %}
+<div class="alert alert-warning mt-2" role="alert">
+    <h5 class="alert-heading">You are impersonating as {{ current_user.id }}</h5>
+    <a href="/end-impersonate" class="mb-0 download">End Impersonation
+    </a>
+</div>
+{% endif %}
+{%- endmacro %}
+
+{% macro footer() -%}
+<div class="text-center">
+    <div class="row justify-content-center">
+        <div class="col-md">
+            <p class="float-md-start">© 2025 Lifted at Cornell</p>
+        </div>
+        <div class="col-md">
+            <a class="float-md-end" href="https://www.instagram.com/cornelllifted" target="_blank">
+                <img class="" src="/static/images/ig.png" width="30" height="30" alt="Instagram Logo">
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md">
+            <p class="float-md-start"><a href="https://server.reidf.net/system-status/">System Status</a></p>
+            <!-- If you see this, email me at reidfleishman5@gmail.com :) -->
+        </div>
+        <div class="col-md">
+        </div>
+    </div>
+    <p class="mt-2">This organization is a registered student organization of Cornell University.</p>
+</div>
+{%- endmacro %}
+
+{% macro render_form_field(field, description, placeholder) %}
+<h5 class="mb-0">{{ field.label(class_="form-label") }}</h5>
+<p><i>{{ description }}</i></p>
+{% if field.type == "TextAreaField" %}
+{{ field(class_="form-control", placeholder_=placeholder, rows_=6)|safe }}
+{% else %}
+<div class="col-12 col-md-3">
+    {{ field(class_="form-control", placeholder_=placeholder)|safe }}
+</div>
+{% endif %}
+{% if field.errors %}
+{% for error in field.errors %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}
+</div>
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+{% macro tab_bar(tab_bar_id, tab_ids, tab_names) -%}
+<ul class="nav nav-tabs" id="{{tab_bar_id}}" role="tablist">
+    {% for tab_id, tab_name in zip(tab_ids, tab_names) %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link {{'active' if loop.index0 == 0 }}" id="{{tab_id}}-tab" data-bs-toggle="tab"
+            data-bs-target="#{{tab_id}}-tab-pane" type="button" role="tab"
+            aria-controls="{{tab_id}}-tab-pane">{{tab_name}}</button>
+    </li>
+    {% endfor %}
+</ul>
+{%- endmacro %}
+
+{% macro message_group_dropdown(dropdown_id, keys, values, default_key, default_value, onclick_fn, show_all_time) -%}
+<div class="dropdown">
+    <button id="{{dropdown_id}}" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+        aria-expanded="false" data-short_name="{{ default_key }}">
+        {{ default_value }}
+    </button>
+    <ul class="dropdown-menu">
+        {% for key, value in
+        zip(keys, values) %}
+        <li><button class="dropdown-item" type="button"
+                onclick="document.getElementById('{{dropdown_id}}').dataset.short_name = '{{ key }}'; document.getElementById('{{dropdown_id}}').textContent = '{{ value }}'; {{onclick_fn}}">{{
+                value }}</button></li>
+        {% endfor %}
+        {% if show_all_time %}
+        <li><button class="dropdown-item" type="button"
+                onclick="document.getElementById('{{dropdown_id}}').dataset.short_name = 'all'; document.getElementById('{{dropdown_id}}').textContent = 'All-Time'; {{onclick_fn}}">
+                All-Time</button></li>
+        {% endif %}
+    </ul>
+</div>
+{%- endmacro %}
+
+{% macro message_group_radio(id, onclick_fn, checked_expr, disabled_expr, show_none) -%}
+<div class="mb-3 border border-2 rounded p-2" style="display: inline-block; max-height: 150px; overflow: auto">
+    {% if show_none %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="{{ id }}" value="none" id="{{ id }}_{{message_group_short_name}}"
+            onchange="{{ onclick_fn }}" required {{ "checked" if checked_expr == "none" }} {{ "disabled" if disabled_expr == "none" }}>
+        <label class="form-check-label" for="{{id}}_{{message_group_short_name}}">
+            None
+        </label>
+    </div>
+    {% endif %}
+    {% for message_group_short_name, message_group_long_name in
+    lifted_config.message_group_list_map.items() %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="{{ id }}" value="{{message_group_short_name}}" id="{{ id }}_{{message_group_short_name}}"
+            onchange="{{ onclick_fn }}" required {{ "checked" if checked_expr == message_group_short_name }} {{ "disabled" if disabled_expr == message_group_short_name }}>
+        <label class="form-check-label" for="{{id}}_{{message_group_short_name}}">
+            {{message_group_long_name}}
+        </label>
+    </div>
+    {% endfor %}
+</div>
+{%- endmacro %}
+
+{% macro rich_text_editor(type_short_name) -%}
+<div id="toolbar_{{ type_short_name }}">
+    <span class="ql-formats">
+        <select class="ql-font">
+            <option value="georgia">Georgia</option>
+            <option value="arial">Arial</option>
+            <option value="verdana">Verdana (use for form)</option>
+        </select>
+
+        <select class="ql-size">
+            <option value="10px">10px</option>
+            <option value="11px">11px</option>
+            <option value="12px">12px</option>
+            <option value="14px">14px</option>
+            <option value="16px">16px</option>
+            <option value="18px">18px</option>
+            <option value="20px">20px</option>
+        </select>
+    </span>
+
+    <span class="ql-formats">
+        <button class="ql-bold"></button>
+        <button class="ql-italic"></button>
+        <button class="ql-underline"></button>
+        <button class="ql-strike"></button>
+    </span>
+
+    <span class="ql-formats">
+        <button class="ql-align" value=""></button>
+        <button class="ql-align" value="center"></button>
+        <button class="ql-align" value="right"></button>
+        <button class="ql-align" value="justify"></button>
+    </span>
+
+    <span class="ql-formats">
+        <button class="ql-link"></button>
+    </span>
+
+    <span class="ql-formats">
+        <button class="ql-list" value="ordered"></button>
+        <button class="ql-list" value="bullet"></button>
+        <select class="ql-color"></select>
+        <select class="ql-background"></select>
+    </span>
+
+    <span class="ql-formats">
+        <button class="ql-clean"></button>
+    </span>
+
+</div>
+
+<div id="quill-{{ type_short_name }}">
+</div>
+
+<button id="save-rich-text-btn" type="button" class="btn btn-primary mt-2"
+    onclick="saveRichText('{{ type_short_name }}', send_email=false)">Save</button>
+
+{% if type_short_name != "form" %}
+<button id="save-rich-text-btn" type="button" class="btn btn-outline-secondary mt-2"
+    onclick="saveRichText('{{ type_short_name }}', send_email=true)">Save and Send Test Email to Yourself</button>
+{% endif %}
+
+<script>
+    quills["{{type_short_name}}"] = new Quill("#quill-{{ type_short_name }}", {
+        modules: {
+            toolbar: "#toolbar_{{ type_short_name }}",
+            clipboard: {
+                matchVisual: false
+            }
+        },
+        theme: 'snow'
+    });
+
+    function getRichText(type_short_name) {
+        const message_group = document.getElementById('rich-text-query-dropdown').dataset.short_name
+        fetch(`/get-rich-text/${message_group}/${type_short_name}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Data for ${type_short_name}: ${data.status}`)
+                const subject = document.getElementById(`${type_short_name}-subject-input`)
+                if (data.status == "found") {
+                    const delta = JSON.parse(data.delta);
+                    quills[type_short_name].setContents(delta)
+                    if (subject) {
+                        subject.value = data.subject
+                    }
+                } else {
+                    console.log(type_short_name)
+                    quills[type_short_name].setContents([
+                        { insert: "Hello!  To get started, I'd suggest you copy/paste from a previous template" },
+                    ]);
+                    if (subject) {
+                        subject.value = ""
+                    }
+                }
+            });
+    }
+
+    getRichText('{{type_short_name}}')
+
+    function updateRichTextOnDropdownChange() {
+        Object.keys(quills).forEach(quill => {
+            getRichText(quill)
+        });
+    }
+</script>
+{%- endmacro %}

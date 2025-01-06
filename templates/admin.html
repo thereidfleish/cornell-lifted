@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% import 'components.html' as components with context %}
+
+<head>
+    {{ components.header("Admin Dashboard") }}
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+</head>
+
+<body class="mx-2">
+    <main>
+        {{ components.navbar() }}
+
+        <h3 class="mt-3">Admin Dashboard</h3>
+
+        {{ components.tab_bar("admin-tab-bar", lifted_config.admin_tabs.keys(),
+        lifted_config.admin_tabs.values()) }}
+
+        <div class="tab-content pt-2" id="nav-tabContent">
+
+            <div class="tab-pane fade show active" id="lifted_config-tab-pane" role="tabpanel"
+                aria-labelledby="lifted_config-tab" tabindex="0">
+                <h5>Message Groups</h5>
+                <p>To start a new Lifted iteration, first add the required message groups. Usually, this means
+                    adding
+                    <b>both the physical Lifted and eLifted message groups for a semester</b>, which is the default.
+                    If you know for a fact you will only be doing either physical Lifted or eLifted for a given
+                    semester, you can delete the other one after adding both.
+                </p>
+
+                <p class="mb-1"><b>Add physical and eLifted message groups</b></p>
+                <form method="post" action="/add-message-group">
+                    <div class="d-inline-flex border border-2 rounded mb-2 p-2">
+                        <div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="sem" value="sp" id="sem_spring"
+                                    required>
+                                <label class="form-check-label" for="sem_spring">
+                                    Spring
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="sem" value="fa" id="sem_fall"
+                                    required>
+                                <label class="form-check-label" for="sem_fall">
+                                    Fall
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center ms-4">
+                            <label for="year-input" class="form-label m-2">Year</label>
+                            <input type="number" class="form-control" id="year" name="year"
+                                min="20{{ (lifted_config.message_group_list_map.keys()|first).split('_')[1] }}"
+                                max="2099" required />
+                            <button type="submit" class="btn btn-primary ms-4 mx-2" onclick="">Add</button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <p class="mt-2 mb-1">After adding your message groups, you can configure them:</p>
+                <ul>
+                    <li>Select <b>Hide Cards</b> to hide the cards from the user on the website and prevent them from
+                        accessing them. Do not unhide before Lifted Day!</li>
+                    <li>
+                        Upload a card template in PPTX format with the proper placeholder (download a previous example
+                        to see them). You can make one in Google Slides and then download as PPTX if you'd like. Be sure
+                        to also set the <a href="https://support.google.com/docs/answer/10364036?hl=en">AutoFit settings
+                            for the textbox to <b>Shrink text on overflow</b></a>.
+                        <ul>
+                            <li>Be sure to test your template with the example cards!</li>
+
+                        </ul>
+                    </li>
+
+                    <li>Delete a message group. You shouldn't ever need to do this unless you are not doing both
+                        physical
+                        and eLifted for a semester. Note this will delete any cards submitted under this group, so be
+                        sure to move them first.</li>
+                </ul>
+                <p></p>
+
+
+                <div class="table-responsive mb-4">
+                    <table id="message-groups-table" class="table table-striped"
+                        style="display: block; max-height: 400px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">Message Group</th>
+                                <th scope="col">Hide Cards</th>
+                                <th scope="col">Card PPTX Template</th>
+                                <th scope="col">Internal Name</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for message_group_short_name, message_group_long_name in
+                            lifted_config.message_group_list_map.items() %}
+                            <tr>
+                                <td>{{message_group_long_name}}</td>
+                                <td>
+                                    <form method="post" action="/update-hidden-cards/{{message_group_short_name}}">
+                                        <input class="form-check-input" type="checkbox" name="hidden-cards"
+                                            value="{{message_group_short_name}}" id="{{message_group_short_name}}"
+                                            onchange="this.form.submit();" {{ "disabled" if message_group_short_name not
+                                            in pptx_templates_files }} {{ "checked" if message_group_short_name in
+                                            lifted_config.hidden_cards }}>
+                                    </form>
+                                </td>
+                                <td>
+                                    {% if message_group_short_name in pptx_templates_files %}
+                                    <a class="download d-block"
+                                        href="/get-pptx-template/{{message_group_short_name}}.pptx"
+                                        target="_blank">Download PPTX</a>
+                                    <a class="download my-2 d-block"
+                                        href="/get-card-pdf/12870?override-template={{message_group_short_name}}"
+                                        target="_blank">Test PDF (short card)</a>
+                                    <a class="download my-2 d-block"
+                                        href="/get-card-pdf/16193?override-template={{message_group_short_name}}"
+                                        target="_blank">Test PDF (long card)</a>
+                                    {% endif %}
+                                    <form method="post" enctype="multipart/form-data"
+                                        action="/upload-pptx-template/{{message_group_short_name}}">
+                                        <input class="form-control form-control-sm" type="file" name="file"
+                                            id="pptx_template_upload" onchange="this.form.submit();"
+                                            accept="application/vnd.openxmlformats-officedocument.presentationml.presentation">
+
+                                    </form>
+                                </td>
+                                <td>{{message_group_short_name}}</td>
+                                <td><a href="/remove-message-group/{{message_group_short_name}}">🗑️</a></td>
+
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5>Form Options</h5>
+                <p>This is the message group that the form will be actively accepting submissions for. Usually, you
+                    will
+                    first set this to the physical version, and then switch to the eLifted version once you decide
+                    to
+                    end the physical form.</p>
+                <p>Set this to <b>None</b> to close the form entirely.</p>
+
+                <form method="post" action="/update-form-message-group">
+                    {{ components.message_group_radio(id="form-message-group",
+                    onclick_fn="this.form.submit()",
+                    checked_expr=lifted_config.form_message_group,
+                    show_none=True) }}
+                </form>
+
+                <h5 class="mt-3">Message Swapping</h5>
+                <p>Allow recipients to choose to receive their Lifted messages sent to one message group to another
+                    message group
+                    instead. This will essentially "move" their messages from one message group to the other
+                    message group.</p>
+                    <p>Currently, only swapping from the physical Lifted group to the eLifted group for a particular semester is supported.</p>
+                    <p>Set to <b>None</b> to disable.  <b>Be sure to turn this off right before you export the cards as PDFs!</b></p>
+                
+                    <form method="post" action="/update-swapping-config">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <p><b>Swap From</b></p>
+                                {{ components.message_group_radio(id="swap-from",
+                                onclick_fn="this.form.submit()",
+                                checked_expr=lifted_config.swap_from,
+                                disabled_expr=lifted_config.swap_to,
+                                show_none=True) }}
+                            </div>
+                            
+                            <div>
+                                <p><b>Swap To</b></p>
+                                {{ components.message_group_radio(id="swap-to",
+                                onclick_fn="this.form.submit()",
+                                checked_expr=lifted_config.swap_to,
+                                disabled_expr=lifted_config.swap_from,
+                                show_none=False) }}
+                            </div>
+                        </div>
+
+                        <label for="swap-text"><b>Message Swap Instructional Text</b></label>
+                        <p>This text is shown on the homepage to the user.  You can use HTML to style this.</p>
+                        <div class="d-flex">
+                            <input type="text" class="form-control" id="swap-text" name="swap-text" value="{{ lifted_config.swap_text }}"/>
+                            <button type="submit" class="btn btn-primary ms-4 mx-2">Save</button>
+                        </div>
+
+                    </form>
+
+
+                <h5 class="mt-3">Form and Email Text</h5>
+                <div class="row">
+                    <div class="col-3">
+                        {{ components.message_group_dropdown(dropdown_id="rich-text-query-dropdown",
+                        keys=lifted_config.message_group_list_map.keys(),
+                        values=lifted_config.message_group_list_map.values(),
+                        default_key=lifted_config.message_group_list_map.keys()|first,
+                        default_value=lifted_config.message_group_list_map.values()|first,
+                        onclick_fn="updateRichTextOnDropdownChange()", show_all_time=False) }}
+
+                        <p class="pt-2">Use this section to update the following rich text fields:</p>
+                        <ul>
+                            <li><b>Form Description: </b>The description shown at the top of the Send Message form.</li>
+                            <li><b>Recipient "You've Been Lifted!" Email: </b>The email sent to recipients after they've
+                                been Lifted.</li>
+                        </ul>
+                    </div>
+
+                    <script>const quills = {};</script>
+
+                    <div class="col-9">
+                        {{ components.tab_bar("rich-text-type-tab-bar", lifted_config.rich_text_types.keys(),
+                        lifted_config.rich_text_types.values()) }}
+
+                        <div class="tab-content pt-2" id="rich-text-type-tab-content">
+                            {% for type_short_name, type_long_name in lifted_config.rich_text_types.items() %}
+
+                            <div class="tab-pane fade{% if loop.index0 == 0 %} show active{% endif %} mt-2"
+                                id="{{type_short_name}}-tab-pane" role="tabpanel"
+                                aria-labelledby="{{type_short_name}}-tab-pane" tabindex="0">
+                                {% if type_short_name != "form" %}
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="{{type_short_name}}-subject-input"
+                                        placeholder="Email Subject" />
+                                </div>
+                                {% endif %}
+                                {{ components.rich_text_editor(type_short_name) }}
+                            </div>
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane fade" id="message_tools-tab-pane" role="tabpanel" aria-labelledby="message_tools-tab"
+                tabindex="0">
+                <h5>Browse Cards</h5>
+                <p>Use this tool to browse and manage Lifted messages, including viewing, editing, deleting, and
+                    downloading
+                    messages. You can sort by multiple filters such as message group, and date submitted.</p>
+
+                <div class="mb-4 row">
+                    <div class="col">
+                        <p class=""><i>Filter by NetID.</i></p>
+                        <input type="text" class="form-control" id="message-query-input" placeholder="rf377"
+                            oninput="handleMessagesQueryInputChange()" />
+                    </div>
+                    <div class="col">
+                        <p class=""><i>Filter by message group.</i></p>
+
+                        {{ components.message_group_dropdown(dropdown_id="message-query-dropdown",
+                        keys=lifted_config.message_group_list_map.keys(),
+                        values=lifted_config.message_group_list_map.values(),
+                        default_key=lifted_config.message_group_list_map.keys()|first,
+                        default_value=lifted_config.message_group_list_map.values()|first,
+                        onclick_fn="handleMessagesQueryInputChange()", show_all_time=True) }}
+
+                    </div>
+
+                </div>
+
+                <p class="mb-1" id="message-query-status">Search for a name or NetID above.</p>
+
+                <div class="table-responsive mb-4">
+                    <table id="messages-info-table" class="table table-striped"
+                        style="display: block; max-height: 600px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">Tools</th>
+                                <th scope="col">Timestamp</th>
+                                <th scope="col">Message Group</th>
+                                <th scope="col">Sender Email</th>
+                                <th scope="col">Recipient Email</th>
+                                <th scope="col">Sender Name</th>
+                                <th scope="col">Recipient Name</th>
+                                <th scope="col">Message</th>
+                                <th scope="col">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Results will appear here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5>Download All Cards as CSV, PPTX, and PDF</h5>
+                <p>Use this tool to download all cards for a specific message group in these formats. Downloading as a
+                    PDF will be necessary for
+                    sending the cards to Cornell Print Services. In most cases, downloading the PDF is enough; however,
+                    you can
+                    also download a PPTX to later convert to PDF on your computer (this is useful if you want to use
+                    Apple's
+                    emojies instead of Microsoft's).</p>
+                <p><b>Important: </b>After clicking the "Process" button, DO NOT click it again!! Processing the
+                    PPTX/PDFs can take up to a
+                    few
+                    hours, depending on how many cards there are and how large/complex your PPTX template is. You can
+                    refresh
+                    this page to see an updated status of the PPTX
+                    processing; the PDF doesn't have a progress percent but will take a while. Please just be patient;
+                    it will complete
+                    eventually :)</p>
+                <p>If this doesn't work for some reason, there is an alternative that is a bit more cumbersome, using
+                    CSVs and Google
+                    AppScript. Contact Reid for instructions on how to do this.</p>
+
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="alphabetical-checkbox">
+                    <label class="form-check-label" for="alphabetical-checkbox">
+                        Sort cards alphabetically by recipient NetID (you want this in most cases for PDF downloads;
+                        uncheck to sort them in submission order)
+                    </label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="" id="pptx-pdf-checkbox">
+                    <label class="form-check-label" for="pptx-pdf-checkbox">
+                        Download PPTX and PDF in addition to CSV (check this to enable PPTX/PDF downloads, but uncheck
+                        this if you only want a CSV)
+                    </label>
+                </div>
+
+                <p class="mb-1" id="process-all-cards-status">Error. Please contact Reid.</p>
+                <button id="process-all-cards-btn" type="button" class="btn btn-primary mb-2"
+                    onclick="this.disabled=true; this.textContent='Loading...'; processAllCards()">Process</button>
+
+                <div class="table-responsive mb-4">
+                    <table id="process-all-cards-table" class="table table-striped"
+                        style="display: block; max-height: 300px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">Message Group</th>
+                                <th scope="col">Timestamp</th>
+                                <th scope="col">Download CSV</th>
+                                <th scope="col">Download PPTX</th>
+                                <th scope="col">Download PDF</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stem, info in all_cards_files_dict.items() %}
+                            <tr>
+                                <td>{{ lifted_config.message_group_list_map[stem.split(" ")[0]] }}</td>
+                                <td>{{ " ".join(stem.split(" ")[1:]) }}</td>
+                                <td>{% if ".csv" in info["to_process"] %}
+                                    {% if ".csv" in info["done"] %}
+                                    <a class="download" href="/get-all-cards/{{stem}}.csv" target="_blank">Download</a>
+                                    {% else %}Processing...
+                                    {% endif %}
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                                <td>{% if ".pptx" in info["to_process"] %}
+                                    {% if ".pptx" in info["done"] %}
+                                    <a class="download" href="/get-all-cards/{{stem}}.pptx" target="_blank">Download</a>
+                                    {% else %}Processing... ({{info["pptx_progress"]}})
+                                    {% endif %}
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                                <td>{% if ".pdf" in info["to_process"] %}
+                                    {% if ".pdf" in info["done"] %}
+                                    <a class="download" href="/get-all-cards/{{stem}}.pdf" target="_blank">Download</a>
+                                    {% else %}Processing...
+                                    {% endif %}
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="advanced-tab-pane" role="tabpanel" aria-labelledby="advanced-tab"
+                tabindex="0">
+                <h5>Impersonate User</h5>
+                <p>Enter a NetID to "impersonate" another user. This will "sign you in" as this user, so you can see
+                    what they see. This is useful for testing purposes.</p>
+                <form method="post" action="/impersonate">
+                    <div class="d-flex align-items-center mb-4">
+                        <input type="text" class="form-control w-25" id="impersonate_netid" name="impersonate_netid"
+                            placeholder="atn45" required />
+                        <button type="submit" class="btn btn-primary ms-4">Impersonate</button>
+                    </div>
+                </form>
+
+                <h5>Admins</h5>
+                <p>Add and remove admins by NetID. Admins have access to the Admin Dashboard, and can view, edit, and
+                    delete any and all Lifted messages. In other words, you have a lot of power - admins should only be
+                    (trusted) CP members!</p>
+                <form method="post" action="/add-admin">
+                    <div class="d-flex align-items-center mb-4">
+                        <input type="text" class="form-control w-25" id="admin_add" name="admin_add" placeholder="rf377"
+                            required />
+                        <button type="submit" class="btn btn-primary ms-4">Add Admin</button>
+                    </div>
+                </form>
+                <div class="table-responsive mb-4">
+                    <table id="admins-table" class="table table-striped"
+                        style="display: block; max-height: 300px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">NetID</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin in lifted_config.admins %}
+                            <tr>
+                                <td>{{ admin }}</td>
+                                <td><a href="/remove-admin/{{admin}}">🗑️</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5>Swap Prefs Table</h5>
+                <p>The swap_prefs table.  Num entries: {{ swap_prefs | length }}</p>
+                <p>Deleting will remove the pref (so no future messages will be moved), but you will have to manually move the existing messages back.</p>
+                <div class="table-responsive mb-4">
+                    <table id="admins-table" class="table table-striped"
+                        style="display: block; max-height: 300px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">ID</th>
+                                <th scope="col">Recipient Email</th>
+                                <th scope="col">Message Group From</th>
+                                <th scope="col">Message Group To</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in swap_prefs %}
+                            <tr>
+                                <td>{{ record["id"] }}</td>
+                                <td>{{ record["recipient_email"] }}</td>
+                                <td>{{ record["message_group_from"] }}</td>
+                                <td>{{ record["message_group_to"] }}</td>
+                                <td><a href="/delete-swap-pref/{{record['id']}}">🗑️</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+    </main>
+    <footer>
+        {{ components.footer() }}
+    </footer>
+</body>
+
+<!-- <script src="/static/scripts/scripts.js"></script> -->
+<script src="/static/scripts/admin.js"></script>
+<script src="/static/scripts/bootstrap.bundle.min.js"></script>
+
+
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% import 'components.html' as components with context %}
+
+<head>
+    {{ components.header("Cornell Lifted") }}
+</head>
+
+<body class="container-fluid">
+    <main>
+        {{ components.navbar() }}
+
+        <h3 class="mt-3">View your Lifted messages!</h3>
+
+        <p>Sign in with your Cornell NetID to
+            view and manage Lifted messages you've sent and received!</p>
+
+        {% if current_user.is_authenticated %}
+        <p>Hi, {{ current_user.name }}! You are signed in as {{ current_user.email }}</p>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received"
+                    type="button" role="tab" aria-controls="received-tab-pane" aria-selected="true">Received</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button"
+                    role="tab" aria-controls="sent-tab-pane" aria-selected="false">Sent</button>
+            </li>
+        </ul>
+
+        <div class="tab-content pt-2" id="myTabContent">
+            {% for direction, cards in cards_dict.items() %}
+            <div class="tab-pane fade{% if direction == 'received' %} show active{% endif %}" id="{{direction}}"
+                role="tabpanel" aria-labelledby="{{direction}}-tab-pane" tabindex="0">
+                {% for message_group_short_name, message_group_long_name in lifted_config.message_group_list_map.items() %}
+
+                {% if loop.previtem == undefined or "_".join(message_group_short_name.split("_")[0:2]) !=
+                "_".join(loop.previtem[0].split("_")[0:2]) %}
+                <h4>
+                    {% if "sp" in message_group_short_name %}Spring{% else %}Fall{% endif %} 20{{ message_group_short_name.split("_")[1]
+                    }}
+                </h4>
+                {% endif %}
+
+                <p class="{{'mb-0' if message_group_short_name in cards }}">
+                    {% if message_group_short_name not in cards %}
+                    You did not {% if direction == "received" %}receive{% else %}send{% endif %} any {% if "e" in
+                    message_group_short_name
+                    %}e{% else %}physical {% endif %}Lifted messages.
+                    {% else %}
+                    You {{ direction }} {{ cards[message_group_short_name] | length }} {% if
+                    "e" in message_group_short_name %}e{% else %}physical {% endif %}Lifted message{% if cards[message_group_short_name]
+                    |length > 1 %}s{%
+                    endif %}!
+                    {% endif %}
+                </p>
+
+                {% if ranks_dict[direction].get(message_group_short_name, 99) <= 3 %} <div class="alert alert-success mt-1"
+                    role="alert">
+                    <h5 class="alert-heading">🏆 Congrats!</h5>
+                    <p class="mb-0">You {{ direction }} the <b>{{ ranks_dict[direction][message_group_short_name] | int |
+                            ordinal }}</b> most messages out of all Cornellians!</p>
+            </div>
+            {% endif %}
+
+            {% if direction == "received" and message_group_short_name in cards and "_p" in message_group_short_name and message_group_short_name in lifted_config.hidden_cards %}
+            <div class="alert alert-success mt-1" role="alert">
+                <h5 class="alert-heading">Pick up your physical cards on the last day of classes!</h5>
+                <p class="mb-0">Check your "You've been Lifted!" email for location and time specifics :)</p>
+                {% if lifted_config.swap_from == message_group_short_name %}
+                <hr>
+                <p class="mt-2 mb-0">{{ lifted_config.swap_text | safe }}</p>
+                {% endif %}
+            </div>
+            {% elif direction == "received" and message_group_short_name in cards and "_e" in message_group_short_name and message_group_short_name in lifted_config.hidden_cards %}
+            <div class="alert alert-success mt-1" role="alert">
+                <h5 class="alert-heading">Check back here on the last day of classes for your eLifted messages!</h5>
+                <p class="mb-0">You'll get an email when your eLifted messages are ready :)</p>
+              </div>
+            {% else %}
+            {% for card in cards[message_group_short_name] %}
+            <a class="me-3" href="/get-card-html/{{ card['id'] }}" target="_blank"
+                onclick="change_color('{{ card.id }}')">
+                <img id="{{ card['id'] }}" class="mt-1 mb-4" src="/static/images/mail-with-heart-colored-red.png"
+                    alt="Lifted Message" width="75">
+            </a>
+            {% endfor %}
+            {% endif %}
+
+            {% endfor %}
+            <h4>Spring 2017 and Spring 2016</h4>
+            <p>Please send us an email to access your messages from Spring 2017 and Spring 2016. We'll try our
+                best to
+                find them!</p>
+        </div>
+        {% endfor %}
+        <div class="alert alert-danger" role="alert">
+            <h5 class="alert-heading">Missing messages?</h5>
+            <p>If you think you're missing a message, send us an email at <a
+                    href="mailto:lifted@cornell.edu">lifted@cornell.edu</a> and we'll help you find your
+                messages!</p>
+            <hr>
+            <p class="mb-0">If you received a message to a non-NetID email (such as touchdown@cornell.edu or
+                i.love.lifted@gmail.com), you won't see it here. Send us an email and we'll find your message!
+            </p>
+        </div>
+
+        {% else %}
+        <a href="/login?next={{ url_for(request.endpoint) }}" class="btn btn-danger mb-3">Sign In with Cornell
+            NetID</a>
+        {% endif %}
+
+        <h3 class="mt-3">About Lifted</h3>
+        <p>
+            Lifted is a fully student-run annual (and perhaps going forward, semesterly!) tradition where
+            Cornellians come
+            together to lift the spirits of their friends, faculty, and staff at Cornell on the last day of classes! It's a time to express
+            gratitude,
+            spread positivity, and watch Cornell transform into a vibrant landscape of heartfelt messages on the
+            last day of
+            classes. This uplifting event is a beautiful reminder of the connections we've made, the support we've
+            received,
+            and the unforgettable moments we've shared each semester.
+            <br><br>
+            Lifted was created in Spring 2016, and since 2018, <b>{{ "{:,}".format(stats["unique_sent"]) }}</b>
+            individual Cornellians
+            have Lifted <b>{{ "{:,}".format(stats["unique_received"]) }}</b> individual fellow classmates, faculty, and staff,
+            sending
+            a total of <b>{{ "{:,}".format(stats["total_received"]) }}</b> messages!
+            <br><br>
+            Lifted is made possible through the generous support of SAFC and our supporters through <a
+                href="https://givingday.cornell.edu/campaigns/lifters-at-cornell-university">Cornell Giving Day</a>.
+        </p>
+    </main>
+
+    <footer>
+        {{ components.footer() }}
+    </footer>
+</body>
+
+<script src="/static/scripts/scripts.js"></script>
+<script src="/static/scripts/bootstrap.bundle.min.js"></script>
+
+</html>

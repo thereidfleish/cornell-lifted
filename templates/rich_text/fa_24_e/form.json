@@ -1,0 +1,135 @@
+{
+    "ops": [
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana",
+                "bold": true
+            },
+            "insert": "eLifted Fall 2024"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana"
+            },
+            "insert": "Surprise!  We're back for Fall 2024, our first time during a Fall semester!  Show your appreciation and lift some spirits!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana",
+                "bold": true
+            },
+            "insert": "Fill out the form here to send a thank you message to someone who has lifted you at Cornell."
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana"
+            },
+            "insert": " Since the physical Lifted message form closed on December 1st at 11:59 PM, your message will be sent virtually to your recipient on the last day of classes ("
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana",
+                "bold": true
+            },
+            "insert": "Monday, December 9th"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana"
+            },
+            "insert": ")! They will receive a PDF of a card that they can print out! \u2744\ufe0f"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "italic": true,
+                "size": "16px",
+                "font": "verdana",
+                "bold": true
+            },
+            "insert": "The eLifted form will close on Sunday, December 8th at 11:59 PM!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana"
+            },
+            "insert": "Instagram: "
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana",
+                "link": "https://www.instagram.com/cornelllifted"
+            },
+            "insert": "@cornelllifted"
+        },
+        {
+            "insert": "\n"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana"
+            },
+            "insert": "YouTube feature 2021: "
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana",
+                "link": "https://www.youtube.com/watch?v=ewJ3UY5mTYA"
+            },
+            "insert": "youtube.com/watch?v=ewJ3UY5mTYA"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana"
+            },
+            "insert": "If you have any questions, feel free to contact us at "
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana",
+                "link": "mailto:lifted@cornell.edu"
+            },
+            "insert": "lifted@cornell.edu"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "verdana",
+                "italic": true
+            },
+            "insert": "Note: In order to send a Lifted message through this form, you need to sign in with your Cornell NetID.  If you don't have one (e.g., you're a parent), send us an email and we'll send your message for you :)"
+        },
+        {
+            "insert": "\n"
+        }
+    ]
+}
