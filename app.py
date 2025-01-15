@@ -139,5 +139,7 @@ if __name__ == '__main__':
     app = create_app()
     after_setup(app)
     # app.run(host='127.0.0.1', debug=app.debug, ssl_context="adhoc")
-    # app.run(host='127.0.0.1', debug=app.debug, ssl_context=('cert.pem', 'key.pem'))
-    serve(app, host='0.0.0.0', port=5000, url_scheme='https', threads=100)
+    if app.debug:
+        app.run(host='127.0.0.1', debug=app.debug, ssl_context=('cert.pem', 'key.pem'))
+    else:
+        serve(app, host='0.0.0.0', port=5000, url_scheme='https', threads=100)

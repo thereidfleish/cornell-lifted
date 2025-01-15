@@ -212,7 +212,7 @@ def delete_message(id):
     conn.close()
 
     if request.args.get("go_to_admin") == "true":
-        return redirect(url_for("admin.admin"))
+        return redirect(url_for("admin.admin_page"))
     return redirect(url_for("core.home"))
 
 class RegistrationForm(Form):
