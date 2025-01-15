@@ -18,7 +18,7 @@ def create_app():
     app = Flask(__name__)
 
     ### COMMENT OUT BEFORE DEPLOYING!!!!! ###
-    app.debug = True
+    # app.debug = True
 
     app.config.update({
     'SECRET_KEY': os.getenv("SECRET_KEY"),
@@ -139,5 +139,5 @@ if __name__ == '__main__':
     app = create_app()
     after_setup(app)
     # app.run(host='127.0.0.1', debug=app.debug, ssl_context="adhoc")
-    app.run(host='127.0.0.1', debug=app.debug, ssl_context=('cert.pem', 'key.pem'))
-    # serve(app, host='0.0.0.0', port=5000, url_scheme='https', threads=100)
+    # app.run(host='127.0.0.1', debug=app.debug, ssl_context=('cert.pem', 'key.pem'))
+    serve(app, host='0.0.0.0', port=5000, url_scheme='https', threads=100)
