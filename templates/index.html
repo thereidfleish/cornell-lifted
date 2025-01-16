@@ -44,7 +44,7 @@
                 </h4>
                 {% endif %}
 
-                <p class="{{'mb-0' if message_group_short_name in cards and message_group_short_name not in lifted_config.hidden_cards }}">
+                <p class="{{'mb-0' if (message_group_short_name in cards and message_group_short_name not in lifted_config.hidden_cards) or (direction == 'sent' and message_group_short_name in cards) }}">
                     {% if message_group_short_name not in cards %}
                     You did not {% if direction == "received" %}receive{% else %}send{% endif %} any {% if "e" in
                     message_group_short_name
