@@ -44,7 +44,7 @@
                 </h4>
                 {% endif %}
 
-                <p class="{{'mb-0' if message_group_short_name in cards }}">
+                <p class="{{'mb-0' if message_group_short_name in cards and message_group_short_name not in lifted_config.hidden_cards }}">
                     {% if message_group_short_name not in cards %}
                     You did not {% if direction == "received" %}receive{% else %}send{% endif %} any {% if "e" in
                     message_group_short_name
@@ -66,7 +66,8 @@
             {% endif %}
 
             {% if direction == "received" and message_group_short_name in cards and "_p" in message_group_short_name and message_group_short_name in lifted_config.hidden_cards %}
-            <div class="alert alert-success mt-1" role="alert">
+            {% if loop.index0 == 0 %}
+            <div class="alert alert-success" role="alert">
                 <h5 class="alert-heading">Pick up your physical cards on the last day of classes!</h5>
                 <p class="mb-0">Check your "You've been Lifted!" email for location and time specifics :)</p>
                 {% if lifted_config.swap_from == message_group_short_name %}
@@ -74,6 +75,7 @@
                 <p class="mt-2 mb-0">{{ lifted_config.swap_text | safe }}</p>
                 {% endif %}
             </div>
+            {% endif %}
             {% elif direction == "received" and message_group_short_name in cards and "_e" in message_group_short_name and message_group_short_name in lifted_config.hidden_cards %}
             <div class="alert alert-success mt-1" role="alert">
                 <h5 class="alert-heading">Check back here on the last day of classes for your eLifted messages!</h5>
