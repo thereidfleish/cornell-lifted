@@ -27,7 +27,23 @@ def home():
         "unique_received": unique_received,
         "unique_sent": unique_sent
     }
-    
+
+    fall_pics = len(os.listdir("static/images/home_fall"))
+    spring_pics = len(os.listdir("static/images/home_spring"))
+
+    carousel = {
+        "fall": fall_pics,
+        "spring": spring_pics
+    }
+
+    return render_template('index.html', stats=stats, helpers=helpers, carousel=carousel)
+
+@core.get("/faqs")
+def faqs():
+    return render_template("faqs.html", helpers=helpers)
+
+@core.get("/messages")
+def messages():
     if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"     
         conn = get_db_connection()
                 
@@ -50,13 +66,12 @@ def home():
         conn.close()
 
         return render_template(
-            'index.html',
-            stats=stats,
+            'messages.html',
             cards_dict=cards_dict,
             ranks_dict=ranks_dict
             )
     else:
-        return render_template('index.html', stats=stats)
+        return render_template('messages.html')
 
 @core.route("/process-all-cards/<message_group>")
 @login_required
@@ -213,7 +228,7 @@ def delete_message(id):
 
     if request.args.get("go_to_admin") == "true":
         return redirect(url_for("admin.admin_page"))
-    return redirect(url_for("core.home"))
+    return redirect(url_for("core.messages"))
 
 class RegistrationForm(Form):
     sender_name = StringField("Your Name", [validators.DataRequired(message="Please enter your name (or at the very least, 'Anonymous').")])
@@ -357,4 +372,4 @@ def swap_messages():
     conn.commit()
     conn.close()
     
-    return redirect(url_for("core.home"))
+    return redirect(url_for("core.messages"))

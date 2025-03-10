@@ -11,3 +11,4 @@ db/database.db
 db/init_db.ipynb
 /pptx_templates
 .env
+lifted_config.json

@@ -267,13 +267,13 @@ def impersonate():
     user = load_user(netID)
     login_user(user)
     session["impersonating"] = True
-    return redirect(url_for("core.home"))
+    return redirect(url_for("core.messages"))
 
 @admin.route("/end-impersonate")
 def end_impersonate():
     logout_user()
     session["impersonating"] = False
-    return redirect(url_for("core.home"))
+    return redirect(url_for("core.messages"))
 
 @admin.post("/add-admin")
 @login_required

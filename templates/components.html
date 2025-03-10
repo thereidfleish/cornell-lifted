@@ -26,7 +26,7 @@
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/">About</a>
+                <a class="nav-link" href="/faqs">FAQs</a>
             </li>
             {% if current_user.is_authenticated and is_admin() %}
             <li class="nav-item">
@@ -34,8 +34,8 @@
             </li>
             {% endif %}
         </ul>
-        <a class="btn btn-outline-success m-1" href="/send-message">Send a Lifted Message</a>
-        <a class="btn btn-outline-danger m-1" href="/">View My Messages</a>
+        <a class="btn btn-outline-primary m-1" href="/send-message">Send a Lifted Message</a>
+        <a class="btn btn-outline-danger m-1" href="/messages">View My Messages</a>
     </div>
 </nav>
 
@@ -72,6 +72,57 @@
     <p class="mt-2">This organization is a registered student organization of Cornell University.</p>
     <img class="rounded" src="/static/images/clocktower_balloons.jpg" width="150">
     <p class="mt-2 mb-0">Made with 💌 by 🐏</p>
+</div>
+{%- endmacro %}
+
+{% macro img_carousel(id, img_count, folder_path) %}
+<div id="{{id}}" class="carousel slide">
+    <div class="carousel-indicators">
+        {% for i in range(1, img_count + 1) %}
+        <button type="button" data-bs-target="#{{id}}" data-bs-slide-to="{{loop.index0}}"
+            class="{{'active' if loop.index0 == 0}}" aria-current="'true' if {{loop.index0 == 0}}"
+            aria-label="Slide {{loop.index1}}"></button>
+        {% endfor %}
+    </div>
+    <div class="carousel-inner">
+        {% for i in range(1, img_count + 1) %}
+        <div class="{{'carousel-item active' if loop.index0 == 0 else 'carousel-item'}}">
+            <img src="{{folder_path}}/{{i}}.jpg" class="d-block w-100" alt="...">
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#{{id}}"
+        data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#{{id}}"
+        data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+{%- endmacro %}
+
+{% macro accordion(id, content) %}
+<div class="accordion" id="{{id}}">
+    {% for title, faq in content.items() %}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#{{id}}_collapse_{{loop.index0}}" aria-expanded="true"
+                aria-controls="{{id}}_collapse_{{loop.index0}}">
+                {{title}}
+            </button>
+        </h2>
+        <div id="{{id}}_collapse_{{loop.index0}}" class="accordion-collapse collapse"
+            data-bs-parent="#{{id}}">
+            <div class="accordion-body">
+                <p>{{faq | safe}}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {%- endmacro %}
 

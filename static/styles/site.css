@@ -50,6 +50,14 @@ a {
     text-decoration: none;
 }
 
+.blue-text {
+    color: #3546e2
+}
+
+.pink-text {
+    color: #f98e8f
+}
+
 p a {
     color: rgb(27, 135, 229);
     text-decoration: underline;

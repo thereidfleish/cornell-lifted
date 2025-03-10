@@ -1,5 +1,7 @@
 {
     "message_group_list_map": {
+        "sp_25_p": "Spring 2025 Physical Lifted",
+        "sp_25_e": "Spring 2025 eLifted",
         "fa_24_p": "Fall 2024 Physical Lifted",
         "fa_24_e": "Fall 2024 eLifted",
         "sp_24_p": "Spring 2024 Physical Lifted",
@@ -15,10 +17,15 @@
     },
     "form_message_group": "none",
     "hidden_cards": [
+        "sp_19_p",
+        "sp_18_p",
+        "sp_21_p",
+        "fa_24_p",
+        "sp_24_p",
         "sp_23_p",
         "sp_22_p",
-        "sp_19_p",
-        "sp_18_p"
+        "sp_25_p",
+        "sp_25_e"
     ],
     "swap_from": "none",
     "swap_to": "fa_24_e",
