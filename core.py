@@ -90,7 +90,7 @@ def process_all_cards(message_group):
     should_process_pptx_pdf = True if request.args.get("pptx-pdf") == "true" else False
 
     with open(f"{output_filepath}.txt", "w") as file:
-        file.write(f".csv{', .pptx, .pdf' if should_process_pptx_pdf == True else ""}\n0%")
+        file.write(f".csv{', .pptx, .pdf' if should_process_pptx_pdf == True else ''}\n0%")
     
     helpers.create_csv(cards, output_filepath)
 
@@ -299,7 +299,7 @@ def send_message():
 
         return redirect(url_for('core.get_card_html', id=id["id"], message_confirmation=True))
 
-    dir_path = f"templates/rich_text/{current_app.config["lifted_config"]["form_message_group"]}/form.html"
+    dir_path = f'templates/rich_text/{current_app.config["lifted_config"]["form_message_group"]}/form.html'
     if Path(dir_path).exists():
         with open(dir_path, 'r', encoding='utf-8') as file:
             form_description = file.read()

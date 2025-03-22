@@ -4,123 +4,636 @@
 {% import 'components.html' as components with context %}
 
 <head>
-    {{ components.header("Cornell Lifted - View Messages") }}
+    {{ components.header("Cornell Lifted - Your Messages") }}
 </head>
 
-<body class="container-fluid">
-    <main>
-        {{ components.navbar() }}
+<body class="messages-page">
+    <!-- Sticky Navigation Bar -->
+    {{ components.sticky_navbar() }}
 
-        <h3 class="mt-3">View your Lifted messages!</h3>
-
-        <p>Sign in with your Cornell NetID to
-            view and manage Lifted messages you've sent and received!</p>
-
-        {% if current_user.is_authenticated %}
-        <p>Hi, {{ current_user.name }}! You are signed in as {{ current_user.email }}</p>
-
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received"
-                    type="button" role="tab" aria-controls="received-tab-pane" aria-selected="true">Received</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button"
-                    role="tab" aria-controls="sent-tab-pane" aria-selected="false">Sent</button>
-            </li>
-        </ul>
-
-        <div class="tab-content pt-2" id="myTabContent">
-            {% for direction, cards in cards_dict.items() %}
-            <div class="tab-pane fade{% if direction == 'received' %} show active{% endif %}" id="{{direction}}"
-                role="tabpanel" aria-labelledby="{{direction}}-tab-pane" tabindex="0">
-                {% for message_group_short_name, message_group_long_name in lifted_config.message_group_list_map.items() %}
-
-                {% if loop.previtem == undefined or "_".join(message_group_short_name.split("_")[0:2]) !=
-                "_".join(loop.previtem[0].split("_")[0:2]) %}
-                <h4>
-                    {% if "sp" in message_group_short_name %}Spring{% else %}Fall{% endif %} 20{{ message_group_short_name.split("_")[1]
-                    }}
-                </h4>
-                {% endif %}
-
-                <p class="{{'mb-0' if (message_group_short_name in cards and message_group_short_name not in lifted_config.hidden_cards) or (direction == 'sent' and message_group_short_name in cards) }}">
-                    {% if message_group_short_name not in cards %}
-                    You did not {% if direction == "received" %}receive{% else %}send{% endif %} any {% if "e" in
-                    message_group_short_name
-                    %}e{% else %}physical {% endif %}Lifted messages.
-                    {% else %}
-                    <b>You {{ direction }} {{ cards[message_group_short_name] | length }} {% if
-                    "e" in message_group_short_name %}e{% else %}physical {% endif %}Lifted message{% if cards[message_group_short_name]
-                    |length > 1 %}s{%
-                    endif %}!</b>
-                    {% endif %}
-                </p>
-
-                {% if ranks_dict[direction].get(message_group_short_name, 99) <= 3 %} <div class="alert alert-success mt-1"
-                    role="alert">
-                    <h5 class="alert-heading">🏆 Congrats!</h5>
-                    <p class="mb-0">You {{ direction }} the <b>{{ ranks_dict[direction][message_group_short_name] | int |
-                            ordinal }}</b> most messages out of all Cornellians!</p>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container h-100">
+            <div class="row align-items-center h-100">
+                <div class="col-lg-8 mx-auto hero-content text-center">
+                    <div class="mb-4">
+                        <img src="/static/images/logo.png" width="250" alt="Cornell Lifted Logo" class="hero-logo" />
+                    </div>
+                    <h1 class="hero-title">Your Lifted Journey</h1>
+                    <p class="hero-subtitle">Explore the gratitude you've shared and received throughout your Cornell
+                        experience</p>
+                </div>
             </div>
-            {% endif %}
+        </div>
+        <div class="hero-decoration">
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+        </div>
+    </section>
 
-            {% if direction == "received" and message_group_short_name in cards and "_p" in message_group_short_name and message_group_short_name in lifted_config.hidden_cards %}
-            {% if loop.index0 == 0 %}
-            <div class="alert alert-success" role="alert">
-                <h5 class="alert-heading">Pick up your physical cards on the last day of classes!</h5>
-                <p class="mb-0">Check your "You've been Lifted!" email for location and time specifics :)</p>
-                {% if lifted_config.swap_from == message_group_short_name %}
-                <hr>
-                <p class="mt-2 mb-0">{{ lifted_config.swap_text | safe }}</p>
-                {% endif %}
+    {% if not current_user.is_authenticated %}
+    <!-- Sign In Section -->
+    <section class="section-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="feature-box signin-box">
+                        <div class="feature-icon">🔑</div>
+                        <h3 class="feature-title">Sign In to View Your Messages</h3>
+                        <p class="mb-4">Sign in with your Cornell NetID to view and manage Lifted messages you've sent
+                            and received!</p>
+                        <a href="/login?next={{ url_for(request.endpoint) }}" class="btn btn-danger btn-lg">Sign In with
+                            Cornell NetID</a>
+                    </div>
+                </div>
             </div>
-            {% endif %}
-            {% elif direction == "received" and message_group_short_name in cards and "_e" in message_group_short_name and message_group_short_name in lifted_config.hidden_cards %}
-            <div class="alert alert-success mt-1" role="alert">
-                <h5 class="alert-heading">Check back here on the last day of classes for your eLifted messages!</h5>
-                <p class="mb-0">You'll get an email when your eLifted messages are ready :)</p>
-              </div>
-            {% else %}
-            {% for card in cards[message_group_short_name] %}
-            <a class="me-3" href="/get-card-html/{{ card['id'] }}" target="_blank"
-                onclick="change_color('{{ card.id }}')">
-                <img id="{{ card['id'] }}" class="mt-1 mb-4" src="/static/images/mail-with-heart-colored-red.png"
-                    alt="Lifted Message" width="75">
-            </a>
-            {% endfor %}
-            {% endif %}
+        </div>
+    </section>
+    {% else %}
+    <!-- Message Dashboard -->
+    <section class="section-container bg-light" id="messages-dashboard">
+        <div class="container">
+            <!-- User greeting -->
+            <div class="user-welcome mb-5">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="welcome-heading">Welcome, {{ current_user.name }}!</h2>
+                        <p class="welcome-text">You are signed in as {{ current_user.email }}</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="/send-message" class="btn cta-btn">Send a New Message</a>
+                    </div>
+                </div>
+            </div>
 
-            {% endfor %}
-            <h4>Spring 2017 and Spring 2016</h4>
-            <p>Please send us an email to access your messages from Spring 2017 and Spring 2016. We'll try our
-                best to
-                find them!</p>
+            <!-- Stats overview -->
+            <div class="messages-overview mb-5">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="message-stat-card">
+                            <div class="stat-icon">📤</div>
+                            <!-- Count directly from the actual cards displayed on the page -->
+                            <h3 class="stat-number" id="sent-count">0</h3>
+                            <p class="stat-label">Messages Sent</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="message-stat-card">
+                            <div class="stat-icon">📥</div>
+                            <!-- Count directly from the actual cards displayed on the page -->
+                            <h3 class="stat-number" id="received-count">0</h3>
+                            <p class="stat-label">Messages Received</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="message-stat-card">
+                            <div class="stat-icon">🗓️</div>
+                            <!-- Count directly from the number of message group cards -->
+                            <h3 class="stat-number" id="events-count">0</h3>
+                            <p class="stat-label">Lifted Events</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="message-stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <!-- Count directly from the rank badges displayed on the page -->
+                            <h3 class="stat-number" id="ranks-count">0</h3>
+                            <p class="stat-label">Top 3 Rankings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages timeline -->
+            <div class="timeline-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="section-title-small">Your Lifted Timeline</h2>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="message-filter text-md-end">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary active" id="filter-all">All
+                                    Messages</button>
+                                <button type="button" class="btn btn-outline-primary"
+                                    id="filter-received">Received</button>
+                                <button type="button" class="btn btn-outline-primary" id="filter-sent">Sent</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Replace the current timeline-wrapper code with this updated sorting logic -->
+            <div class="timeline-wrapper">
+                {% set all_event_groups = [] %}
+                {% for message_group_short_name, message_group_long_name in lifted_config.message_group_list_map.items()
+                %}
+                {% set year = "20" + message_group_short_name.split("_")[1] %}
+                {% set season = "Spring" if "sp" in message_group_short_name else "Fall" %}
+                {% set sort_key = year + ("1" if "sp" in message_group_short_name else "2") %}
+                {% set event_group = {
+                "year": year,
+                "season": season,
+                "sort_key": sort_key,
+                "display": year + "-" + season,
+                "sem_prefix": "sp" if "sp" in message_group_short_name else "fa",
+                "year_short": message_group_short_name.split("_")[1]
+                } %}
+                {% if event_group not in all_event_groups %}
+                {% set _ = all_event_groups.append(event_group) %}
+                {% endif %}
+                {% endfor %}
+
+                <!-- Sort by sort_key in reverse order (newest first) -->
+                {% set sorted_events = all_event_groups|sort(attribute='sort_key', reverse=true) %}
+
+                {% for event in sorted_events %}
+                <div class="timeline-event">
+                    <div class="timeline-marker">
+                        <div class="timeline-date">
+                            <span class="timeline-year">{{ event.year }}</span>
+                            <span class="timeline-season">{{ event.season }}</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-content">
+                        <div class="event-header">
+                            <h3 class="event-title">{{ event.season }} {{ event.year }} Lifted</h3>
+                        </div>
+
+                        <div class="event-cards">
+                            <div class="row">
+                                {% for message_group_short_name, message_group_long_name in
+                                lifted_config.message_group_list_map.items() %}
+                                {% if event.sem_prefix in message_group_short_name and event.year_short in
+                                message_group_short_name %}
+                                <div class="col-lg-6 mb-4">
+                                    <div class="message-group-card">
+                                        <div class="card-header">
+                                            <h4
+                                                class="group-title {% if 'e' in message_group_short_name %}pink-text{% else %}blue-text{% endif %}">
+                                                {{ message_group_long_name }}
+                                            </h4>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="message-tabs">
+                                                <ul class="nav nav-pills mb-3" role="tablist">
+                                                    <li class="nav-item" role="presentation">
+                                                        <button class="nav-link active" data-bs-toggle="pill"
+                                                            data-bs-target="#{{ message_group_short_name }}-received"
+                                                            type="button" role="tab" aria-selected="true">
+                                                            Received
+                                                        </button>
+                                                    </li>
+                                                    <li class="nav-item" role="presentation">
+                                                        <button class="nav-link" data-bs-toggle="pill"
+                                                            data-bs-target="#{{ message_group_short_name }}-sent"
+                                                            type="button" role="tab" aria-selected="false">
+                                                            Sent
+                                                        </button>
+                                                    </li>
+                                                </ul>
+
+                                                <div class="tab-content">
+                                                    <!-- Received Tab -->
+                                                    <div class="tab-pane fade show active"
+                                                        id="{{ message_group_short_name }}-received" role="tabpanel">
+
+                                                        {% if message_group_short_name not in cards_dict['received'] or
+                                                        not cards_dict['received'][message_group_short_name] %}
+                                                        <div class="empty-message">
+                                                            <p>You did not receive any
+                                                                {% if "e" in message_group_short_name %}e{% else
+                                                                %}physical {% endif %}Lifted messages.</p>
+                                                        </div>
+                                                        {% elif message_group_short_name in
+                                                        lifted_config.hidden_cards %}
+                                                        <div class="locked-message">
+                                                            {% if "_p" in message_group_short_name %}
+                                                            <div class="locked-icon">🎈</div>
+                                                            <h5 class="locked-title">Coming Soon!</h5>
+                                                            <p>Pick up your {{
+                                                                cards_dict['received'][message_group_short_name] |
+                                                                length
+                                                                }} physical cards on the last day of classes!</p>
+                                                            <p class="locked-note">Check your "You've been Lifted!"
+                                                                email for details</p>
+                                                            {% elif "_e" in message_group_short_name %}
+                                                            <div class="locked-icon">💌</div>
+                                                            <h5 class="locked-title">Coming Soon!</h5>
+                                                            <p>Your {{ cards_dict['received'][message_group_short_name]
+                                                                |
+                                                                length }} eLifted messages will be available on the last
+                                                                day of classes!</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        {% else %}
+                                                        <div class="message-count mb-3">
+                                                            <span class="count-badge">{{
+                                                                cards_dict['received'][message_group_short_name] |
+                                                                length
+                                                                }}</span>
+                                                            messages received
+                                                        </div>
+
+                                                        {% if ranks_dict['received'].get(message_group_short_name, 99)
+                                                        <= 3 %} <div class="rank-badge mb-3">
+                                                            <span class="rank-icon">🏆</span>
+                                                            Ranked <strong>{{
+                                                                ranks_dict['received'][message_group_short_name] | int |
+                                                                ordinal }}</strong>
+                                                            out of all Cornellians!
+                                                    </div>
+                                                    {% endif %}
+
+                                                    <div class="message-gallery">
+                                                        {% for card in cards_dict['received'][message_group_short_name]
+                                                        %}
+                                                        <a href="/get-card-html/{{ card['id'] }}"
+                                                            class="message-thumbnail" target="_blank"
+                                                            data-direction="received"
+                                                            onclick="change_color('{{ card.id }}')">
+                                                            <div class="thumbnail-content">
+                                                                <img src="/static/images/mail-with-heart-colored-red.png"
+                                                                    alt="Lifted Message" id="{{ card['id'] }}"
+                                                                    class="message-icon-img">
+                                                                <span class="message-number">{{ loop.index }}</span>
+                                                            </div>
+                                                        </a>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <!-- Sent Tab -->
+                                                <div class="tab-pane fade" id="{{ message_group_short_name }}-sent"
+                                                    role="tabpanel">
+
+                                                    {% if message_group_short_name not in cards_dict['sent'] or
+                                                    not cards_dict['sent'][message_group_short_name] %}
+                                                    <div class="empty-message">
+                                                        <p>You did not send any
+                                                            {% if "e" in message_group_short_name %}e{% else
+                                                            %}physical {% endif %}Lifted messages.</p>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="message-count mb-3">
+                                                        <span class="count-badge">{{
+                                                            cards_dict['sent'][message_group_short_name] | length
+                                                            }}</span>
+                                                        messages sent
+                                                    </div>
+
+                                                    {% if ranks_dict['sent'].get(message_group_short_name, 99) <= 3 %}
+                                                        <div class="rank-badge mb-3">
+                                                        <span class="rank-icon">🏆</span>
+                                                        Ranked <strong>{{
+                                                            ranks_dict['sent'][message_group_short_name] | int |
+                                                            ordinal }}</strong>
+                                                        out of all Cornellians!
+                                                </div>
+                                                {% endif %}
+
+                                                <div class="message-gallery">
+                                                    {% for card in cards_dict['sent'][message_group_short_name] %}
+                                                    <a href="/get-card-html/{{ card['id'] }}" class="message-thumbnail"
+                                                        target="_blank" data-direction="sent"
+                                                        onclick="change_color('{{ card.id }}')">
+                                                        <div class="thumbnail-content">
+                                                            <img src="/static/images/mail-with-heart-colored-red.png"
+                                                                alt="Lifted Message" id="{{ card['id'] }}"
+                                                                class="message-icon-img">
+                                                            <span class="message-number">{{ loop.index }}</span>
+                                                        </div>
+                                                    </a>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
         {% endfor %}
-        <div class="alert alert-danger" role="alert">
-            <h5 class="alert-heading">Missing messages?</h5>
-            <p>If you think you're missing a message, send us an email at <a
-                    href="mailto:lifted@cornell.edu">lifted@cornell.edu</a> and we'll help you find your
-                messages!</p>
-            <hr>
-            <p class="mb-0">If you received a message to a non-NetID email (such as touchdown@cornell.edu or
-                i.love.lifted@gmail.com), you won't see it here. Send us an email and we'll find your message!
-            </p>
+
+        <!-- Legacy years - 2017 and 2016 -->
+        <div class="timeline-event">
+            <div class="timeline-marker">
+                <div class="timeline-date">
+                    <span class="timeline-year">2017</span>
+                    <span class="timeline-season">Spring</span>
+                </div>
+            </div>
+
+            <div class="timeline-content">
+                <div class="event-header">
+                    <h3 class="event-title">Legacy Lifted Messages</h3>
+                </div>
+
+                <div class="event-cards">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="message-group-card">
+                                <div class="card-header">
+                                    <h4 class="group-title blue-text">Spring 2017 and Spring 2016</h4>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="locked-message">
+                                        <div class="locked-icon">📚</div>
+                                        <h5 class="locked-title">Legacy Archives</h5>
+                                        <p>Please send us an email to access your messages from Spring 2017 and
+                                            Spring 2016. We'll try our best to find them!</p>
+                                        <a href="mailto:lifted@cornell.edu"
+                                            class="btn btn-outline-primary btn-sm mt-2">Contact Us</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
         </div>
 
-        {% else %}
-        <a href="/login?next={{ url_for(request.endpoint) }}" class="btn btn-danger mb-3">Sign In with Cornell
-            NetID</a>
-        {% endif %}
-    </main>
+        <!-- Help Section -->
+        <div class="messages-help mt-5">
+            <div class="help-container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3 class="help-title">Missing messages?</h3>
+                        <p>If you think you're missing a message, send us an email at <a
+                                href="mailto:lifted@cornell.edu">lifted@cornell.edu</a> and we'll help you find your
+                            messages!</p>
+                        <p class="mb-0">If you received a message to a non-NetID email (such as touchdown@cornell.edu or
+                            i.love.lifted@gmail.com), you won't see it here. Send us an email and we'll find your
+                            message!</p>
+                    </div>
+                    <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                        <a href="mailto:lifted@cornell.edu" class="btn btn-outline-danger">Contact Support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
-    <footer>
-        {{ components.footer() }}
-    </footer>
+    <!-- Footer -->
+    {{ components.footer() }}
+
+    <script src="/static/scripts/scripts.js"></script>
+    <script src="/static/scripts/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Count messages in sent tabs
+            const sentCount = document.querySelectorAll('[id$="-sent"] .message-thumbnail').length;
+            document.getElementById('sent-count').textContent = sentCount;
+
+            // Count messages in received tabs
+            const receivedCount = document.querySelectorAll('[id$="-received"] .message-thumbnail').length;
+            document.getElementById('received-count').textContent = receivedCount;
+
+            // Count unique event cards (counting timeline-event divs, skipping the legacy one)
+            const eventCards = document.querySelectorAll('.timeline-event');
+            // Subtract 1 for the legacy events section
+            document.getElementById('events-count').textContent = Math.max(0, eventCards.length - 1);
+
+            // Count rank badges
+            const rankBadges = document.querySelectorAll('.rank-badge');
+            document.getElementById('ranks-count').textContent = rankBadges.length;
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get filter buttons
+            const filterAll = document.getElementById('filter-all');
+            const filterReceived = document.getElementById('filter-received');
+            const filterSent = document.getElementById('filter-sent');
+
+            // Get all tab panes
+            const receivedPanes = document.querySelectorAll('.tab-pane[id$="-received"]');
+            const sentPanes = document.querySelectorAll('.tab-pane[id$="-sent"]');
+
+            // Function to set active class on tab links
+            function setActiveLinks(type) {
+                const receivedLinks = document.querySelectorAll('.nav-link[data-bs-target$="-received"]');
+                const sentLinks = document.querySelectorAll('.nav-link[data-bs-target$="-sent"]');
+
+                if (type === 'received') {
+                    receivedLinks.forEach(link => {
+                        link.classList.add('active');
+                        sentLinks.forEach(sentLink => {
+                            if (sentLink.getAttribute('data-bs-target').replace('-sent', '') ===
+                                link.getAttribute('data-bs-target').replace('-received', '')) {
+                                sentLink.classList.remove('active');
+                            }
+                        });
+                    });
+                } else if (type === 'sent') {
+                    sentLinks.forEach(link => {
+                        link.classList.add('active');
+                        receivedLinks.forEach(receivedLink => {
+                            if (receivedLink.getAttribute('data-bs-target').replace('-received', '') ===
+                                link.getAttribute('data-bs-target').replace('-sent', '')) {
+                                receivedLink.classList.remove('active');
+                            }
+                        });
+                    });
+                }
+            }
+
+            // Handle All Messages filter
+            filterAll.addEventListener('click', function () {
+                // Set active button
+                filterAll.classList.add('active');
+                filterReceived.classList.remove('active');
+                filterSent.classList.remove('active');
+
+                // Reset to show all tab panes based on the active tab links
+                document.querySelectorAll('.message-tabs').forEach(tabGroup => {
+                    const activeLink = tabGroup.querySelector('.nav-link.active');
+                    if (activeLink) {
+                        const target = activeLink.getAttribute('data-bs-target');
+                        if (target) {
+                            const pane = document.querySelector(target);
+                            if (pane) {
+                                // Show this pane, hide others in this tab group
+                                const allPanes = tabGroup.querySelectorAll('.tab-pane');
+                                allPanes.forEach(p => {
+                                    p.classList.remove('show', 'active');
+                                });
+                                pane.classList.add('show', 'active');
+                            }
+                        }
+                    }
+                });
+
+                // Show all cards
+                document.querySelectorAll('.message-group-card').forEach(card => {
+                    card.style.display = '';
+                });
+            });
+
+            // Handle Received Messages filter
+            filterReceived.addEventListener('click', function () {
+                // Set active button
+                filterAll.classList.remove('active');
+                filterReceived.classList.add('active');
+                filterSent.classList.remove('active');
+
+                // Show only received tab panes
+                receivedPanes.forEach(pane => {
+                    pane.classList.add('show', 'active');
+                });
+
+                sentPanes.forEach(pane => {
+                    pane.classList.remove('show', 'active');
+                });
+
+                // Set the correct active class on nav links
+                setActiveLinks('received');
+
+                // Show cards with received messages, hide others
+                document.querySelectorAll('.message-group-card').forEach(card => {
+                    const receivedPane = card.querySelector('.tab-pane[id$="-received"]');
+                    const hasEmptyMessage = receivedPane &&
+                        receivedPane.querySelector('.empty-message') !== null;
+
+                    if (hasEmptyMessage) {
+                        card.style.display = 'none'; // Hide cards with no received messages
+                    } else {
+                        card.style.display = ''; // Show cards with received messages
+                    }
+                });
+            });
+
+            // Handle Sent Messages filter
+            filterSent.addEventListener('click', function () {
+                // Set active button
+                filterAll.classList.remove('active');
+                filterReceived.classList.remove('active');
+                filterSent.classList.add('active');
+
+                // Show only sent tab panes
+                sentPanes.forEach(pane => {
+                    pane.classList.add('show', 'active');
+                });
+
+                receivedPanes.forEach(pane => {
+                    pane.classList.remove('show', 'active');
+                });
+
+                // Set the correct active class on nav links
+                setActiveLinks('sent');
+
+                // Show cards with sent messages, hide others
+                document.querySelectorAll('.message-group-card').forEach(card => {
+                    const sentPane = card.querySelector('.tab-pane[id$="-sent"]');
+                    const hasEmptyMessage = sentPane &&
+                        sentPane.querySelector('.empty-message') !== null;
+
+                    if (hasEmptyMessage) {
+                        card.style.display = 'none'; // Hide cards with no sent messages
+                    } else {
+                        card.style.display = ''; // Show cards with sent messages
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        // Function to change all tabs to a specific type
+        function changeAllTabs(tabType) {
+            // Update active button
+            document.querySelectorAll('.message-filter .btn').forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(tabType === 'all' ? 'all' : tabType)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // If "All Messages" is selected, don't change any tabs
+            if (tabType === 'all') {
+                return;
+            }
+
+            // For specific tab types, change all tabs to that type
+            document.querySelectorAll(`.nav-link[data-bs-target$="-${tabType}"]`).forEach(tab => {
+                try {
+                    // Try to use Bootstrap's Tab API
+                    var tabInstance = new bootstrap.Tab(tab);
+                    tabInstance.show();
+                } catch (e) {
+                    // Fallback: manual tab activation
+                    const target = tab.getAttribute('data-bs-target');
+                    if (target) {
+                        // Remove active class from all tabs in this group
+                        const tabContainer = tab.closest('.nav');
+                        if (tabContainer) {
+                            tabContainer.querySelectorAll('.nav-link').forEach(t => {
+                                t.classList.remove('active');
+                            });
+                        }
+
+                        // Make this tab active
+                        tab.classList.add('active');
+
+                        // Show this tab pane, hide others
+                        const tabContent = tab.closest('.message-tabs').querySelector('.tab-content');
+                        if (tabContent) {
+                            tabContent.querySelectorAll('.tab-pane').forEach(pane => {
+                                pane.classList.remove('show', 'active');
+                            });
+
+                            const tabPane = document.querySelector(target);
+                            if (tabPane) {
+                                tabPane.classList.add('show', 'active');
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            // Apply hover effects to message thumbnails
+            const messageThumbnails = document.querySelectorAll('.message-thumbnail');
+
+            messageThumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('mouseenter', function () {
+                    const img = this.querySelector('.message-icon-img');
+                    if (img) {
+                        img.style.transform = 'scale(1.15) rotate(-5deg)';
+                    }
+                });
+
+                thumbnail.addEventListener('mouseleave', function () {
+                    const img = this.querySelector('.message-icon-img');
+                    if (img) {
+                        img.style.transform = 'scale(1) rotate(0deg)';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
-
-<script src="/static/scripts/scripts.js"></script>
-<script src="/static/scripts/bootstrap.bundle.min.js"></script>
 
 </html>

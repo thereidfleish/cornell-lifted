@@ -4,75 +4,96 @@
 <title>{{ title }}</title>
 <link rel="stylesheet" type="text/css" href="/static/styles/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="/static/styles/site.css" />
+<link rel="stylesheet" type="text/css" href="/static/styles/new-styles.css" />
 
 <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/static/favicon/site.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+<link rel="manifest" href="/static/favicon/site.webmanifest">
 {%- endmacro %}
 
-{% macro navbar() -%}
-<img class="mx-auto d-block mb-4" src="/static/images/logo.png" width="300" alt="Cornell Lifted Logo" />
 
-<nav class="navbar navbar-expand-sm nav-bg-color">
-    <a class="navbar-brand d-sm-none mx-2" href="/">Home</a>
-    <button class="navbar-toggler mx-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse mx-2" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto">
-            <li class="nav-item d-none d-sm-block">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/faqs">FAQs</a>
-            </li>
-            {% if current_user.is_authenticated and is_admin() %}
-            <li class="nav-item">
-                <a class="nav-link" href="/admin">Admin Dashboard</a>
-            </li>
-            {% endif %}
-        </ul>
-        <a class="btn btn-outline-primary m-1" href="/send-message">Send a Lifted Message</a>
-        <a class="btn btn-outline-danger m-1" href="/messages">View My Messages</a>
+{% macro sticky_navbar() -%}
+<div class="sticky-navbar">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Add a logo or brand name for the left side -->
+            <div class="navbar-brand">
+                <a href="/" class="text-decoration-none">
+                    <img src="/static/images/logo.png" width="100" alt="Cornell Lifted Logo" />
+                </a>
+            </div>
+
+            <!-- All navigation items on the right -->
+            <div class="d-flex align-items-center">
+                <div class="nav-links me-4">
+                    <a href="/" class="btn btn-link">Home</a>
+                    <a href="/faqs" class="btn btn-link">FAQs</a>
+                    {% if current_user.is_authenticated and is_admin() %}
+                    <a href="/admin" class="btn btn-link">Admin</a>
+                    {% endif %}
+                </div>
+
+                <div class="action-nav">
+                    <a href="/send-message" class="btn btn-outline-primary me-2">Send Message 💌</a>
+                    <a href="/messages" class="btn btn-outline-danger">View Messages 📬</a>
+                </div>
+            </div>
+        </div>
     </div>
-</nav>
+</div>
 
 {% if get_impersonating_status() %}
 <div class="alert alert-warning mt-2" role="alert">
     <h5 class="alert-heading">You are impersonating as {{ current_user.id }}</h5>
-    <a href="/end-impersonate" class="mb-0 download">End Impersonation
-    </a>
+    <a href="/end-impersonate" class="mb-0 download">End Impersonation</a>
 </div>
 {% endif %}
 {%- endmacro %}
 
 {% macro footer() -%}
-<div class="text-center">
-    <div class="row justify-content-center">
-        <div class="col-md">
-            <p class="float-md-start">© 2025 Lifted at Cornell</p>
-        </div>
-        <div class="col-md">
-            <a class="float-md-end" href="https://www.instagram.com/cornelllifted" target="_blank">
-                <img class="" src="/static/images/ig.png" width="30" height="30" alt="Instagram Logo">
-            </a>
-        </div>
-    </div>
+<footer class="footer-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <h5 class="footer-title">About Lifted</h5>
+                <p>Lifted is a student organization at Cornell University dedicated to spreading positivity and
+                    gratitude across campus.</p>
+                <p>Our end-of-semester events are designed to lift spirits and foster community.</p>
+            </div>
 
-    <div class="row justify-content-center">
-        <div class="col-md">
-            <p class="float-md-start"><a href="https://server.reidf.net/system-status/">System Status</a></p>
-            <!-- If you see this, email me at reidfleishman5@gmail.com :) -->
+            <div class="col-lg-4 mb-4">
+                <h5 class="footer-title">Quick Links</h5>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/send-message">Send a Message</a></li>
+                    <li><a href="/messages">View Messages</a></li>
+                    <li><a href="/faqs">FAQs</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <h5 class="footer-title">Contact Us</h5>
+                <p>Have questions or feedback? We'd love to hear from you!</p>
+                <p><a href="mailto:lifted@cornell.edu">lifted@cornell.edu</a></p>
+                <div class="d-flex mt-3">
+                    <a href="https://www.instagram.com/cornelllifted" target="_blank" class="me-3">
+                        <img src="/static/images/ig.png" width="30" height="30" alt="Instagram Logo">
+                    </a>
+                    <a href="mailto:lifted@cornell.edu">
+                        <img src="/static/favicon/favicon-32x32.png" width="30" height="30" alt="Email">
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="col-md">
+
+        <div class="footer-bottom text-center">
+            <p>© 2025 Lifted at Cornell University. All rights reserved.</p>
+            <p class="mt-1">This organization is a registered student organization of Cornell University.</p>
+            <p class="mb-0">Made with 💌 by 🐏</p>
         </div>
     </div>
-    <p class="mt-2">This organization is a registered student organization of Cornell University.</p>
-    <img class="rounded" src="/static/images/clocktower_balloons.jpg" width="150">
-    <p class="mt-2 mb-0">Made with 💌 by 🐏</p>
-</div>
+</footer>
 {%- endmacro %}
 
 {% macro img_carousel(id, img_count, folder_path) %}
@@ -91,16 +112,6 @@
         </div>
         {% endfor %}
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#{{id}}"
-        data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#{{id}}"
-        data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
 </div>
 {%- endmacro %}
 
@@ -115,8 +126,7 @@
                 {{title}}
             </button>
         </h2>
-        <div id="{{id}}_collapse_{{loop.index0}}" class="accordion-collapse collapse"
-            data-bs-parent="#{{id}}">
+        <div id="{{id}}_collapse_{{loop.index0}}" class="accordion-collapse collapse" data-bs-parent="#{{id}}">
             <div class="accordion-body">
                 <p>{{faq | safe}}</p>
             </div>
@@ -183,8 +193,9 @@
 <div class="mb-3 border border-2 rounded p-2" style="display: inline-block; max-height: 150px; overflow: auto">
     {% if show_none %}
     <div class="form-check">
-        <input class="form-check-input" type="radio" name="{{ id }}" value="none" id="{{ id }}_{{message_group_short_name}}"
-            onchange="{{ onclick_fn }}" required {{ "checked" if checked_expr == "none" }} {{ "disabled" if disabled_expr == "none" }}>
+        <input class="form-check-input" type="radio" name="{{ id }}" value="none"
+            id="{{ id }}_{{message_group_short_name}}" onchange="{{ onclick_fn }}" required {{ "checked" if
+            checked_expr=="none" }} {{ "disabled" if disabled_expr=="none" }}>
         <label class="form-check-label" for="{{id}}_{{message_group_short_name}}">
             None
         </label>
@@ -193,8 +204,9 @@
     {% for message_group_short_name, message_group_long_name in
     lifted_config.message_group_list_map.items() %}
     <div class="form-check">
-        <input class="form-check-input" type="radio" name="{{ id }}" value="{{message_group_short_name}}" id="{{ id }}_{{message_group_short_name}}"
-            onchange="{{ onclick_fn }}" required {{ "checked" if checked_expr == message_group_short_name }} {{ "disabled" if disabled_expr == message_group_short_name }}>
+        <input class="form-check-input" type="radio" name="{{ id }}" value="{{message_group_short_name}}"
+            id="{{ id }}_{{message_group_short_name}}" onchange="{{ onclick_fn }}" required {{ "checked" if
+            checked_expr==message_group_short_name }} {{ "disabled" if disabled_expr==message_group_short_name }}>
         <label class="form-check-label" for="{{id}}_{{message_group_short_name}}">
             {{message_group_long_name}}
         </label>

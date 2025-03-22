@@ -7,182 +7,476 @@
     {{ components.header("Send a Lifted Message") }}
 </head>
 
-<body class="container-fluid">
-    <main>
-        {{ components.navbar() }}
+<body class="send-message-page">
+    <!-- Sticky Navigation Bar -->
+    {{ components.sticky_navbar() }}
 
-        <h3 class="mt-3">{% if is_edit %}Edit{% else %}Send{% endif %} a Lifted Message</h3>
-
-        {% if current_user.is_authenticated and is_admin() and not is_edit %}
-        <a href="/send-message?show_admin_overrides=true" class="btn btn-primary mb-3">Enable Admin Overrides</a>
-        {% endif %}
-
-        {% if lifted_config["form_message_group"] == "none" and show_admin_overrides == False %}
-        <p>The Lifted message submission form is currently closed. See you next time!</p>
-        {% else %}
-
-        {{ form_description | safe }}
-
-        <hr>
-
-        {% if current_user.is_authenticated %}
-        <p class="mt-2">Hi, {{ current_user.name }}! You are signed in as {{ current_user.email }}</p>
-
-        {% if form.errors.values() %}
-        <div class="alert alert-danger" role="alert">
-            <h5 class="alert-heading">Please fix the following errors:</h5>
-            <ul>
-                {% for error_messages in form.errors.values() %}
-                {% for error_message in error_messages %}
-                <li>{{error_message}}</li>
-                {% endfor %}
-                {% endfor %}
-            </ul>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container h-100">
+            <div class="row align-items-center h-100">
+                <div class="col-lg-8 mx-auto hero-content text-center">
+                    <div class="mb-4">
+                        <img src="/static/images/logo.png" width="250" alt="Cornell Lifted Logo" class="hero-logo" />
+                    </div>
+                    <h1 class="hero-title">{% if is_edit %}Edit{% else %}Send{% endif %} a Lifted Message</h1>
+                    <p class="hero-subtitle">Share gratitude and appreciation with someone special</p>
+                </div>
+            </div>
         </div>
-        {% endif %}
+        <div class="hero-decoration">
+            <!-- Add balloon decorations -->
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+        </div>
+    </section>
 
-        <form method="post">
-            {% if show_admin_overrides %}
+    <!-- Main Content Section -->
+    <section class="section-container" id="send-message-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    {% if current_user.is_authenticated and is_admin() and not is_edit %}
+                    <div class="text-end mb-4">
+                        <a href="/send-message?show_admin_overrides=true" class="btn btn-outline-primary">
+                            <i class="fas fa-cog"></i> Enable Admin Overrides
+                        </a>
+                    </div>
+                    {% endif %}
 
-            <div class="mb-4">
-                {{ components.render_form_field(
-                field=form.message_group,
-                description="(Admin Only) Message group that the card should be placed in.",
-                placeholder='' ) }}
+                    {% if lifted_config["form_message_group"] == "none" and show_admin_overrides == False %}
+                    <div class="form-closed-container stats-card">
+                        <div class="feature-icon">⏳</div>
+                        <h3 class="feature-title">Form Closed</h3>
+                        <p>The Lifted message submission form is currently closed. See you next time!</p>
 
-                {{ components.message_group_radio(id="message_group_radio",
-                                onclick_fn="handleMessagesGroupRadioChange(this)",
-                                checked_expr=form.message_group.data,
-                                disabled_expr="",
-                                show_none=False) }}
-            </div>
+                        <div class="action-buttons mt-4">
+                            <a href="/messages" class="btn btn-outline-primary">View My Messages</a>
+                            <a href="/faqs" class="btn btn-outline-danger">Read FAQs</a>
+                        </div>
+                    </div>
+                    {% else %}
 
+                    <div class="form-container message-form-container lifted-card">
+                        <div class="form-intro mb-4">
+                            {{ form_description | safe }}
+                        </div>
 
-            <div class="mb-4">
-                {{ components.render_form_field(
-                field=form.sender_email,
-                description="(Admin Only) Enter the sender's FULL email (preferably Cornell so they can log in), such as
-                rf377@cornell.edu. DO NOT enter a NetID!",
-                placeholder='rf377@cornell.edu' ) }}
-            </div>
-            {% endif %}
+                        <hr class="form-divider">
 
-            <div class="mb-4">
-                {{ components.render_form_field(
-                field=form.sender_name,
-                description='This is your name that will appear on the card. If you want the letter to be anonymous, you
-                can
-                list your name as "Anonymous"',
-                placeholder='Garry' ) }}
-            </div>
+                        {% if current_user.is_authenticated %}
+                        <div class="user-greeting mb-4">
+                            <div class="user-badge">
+                                <p class="mb-0">Hi, <strong>{{ current_user.name }}</strong>! You are signed in as {{
+                                    current_user.email }}</p>
+                            </div>
+                        </div>
 
-            <div class="mb-4">
-                {{ components.render_form_field(
-                field=form.recipient_name,
-                description="This is the recipient's name that will appear on the card.",
-                placeholder='Happy Dave' ) }}
-            </div>
+                        {% if form.errors.values() %}
+                        <div class="alert alert-danger" role="alert">
+                            <h5 class="alert-heading">Please fix the following errors:</h5>
+                            <ul class="mb-0">
+                                {% for error_messages in form.errors.values() %}
+                                {% for error_message in error_messages %}
+                                <li>{{error_message}}</li>
+                                {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
 
-            {% if show_admin_overrides %}
-            <div class="mb-4">
-                {{ components.render_form_field(
-                field=form.recipient_email,
-                description="(Admin Only) Enter the recipient's FULL email (preferably Cornell so they can log in), such
-                as rf377@cornell.edu. DO NOT enter a NetID!",
-                placeholder='rf377@cornell.edu' ) }}
+                        <form method="post" class="lifted-form">
+                            {% if show_admin_overrides %}
+                            <div class="form-section admin-section mb-4">
+                                <div class="form-section-header">
+                                    <div class="section-icon">⚙️</div>
+                                    <h4 class="form-section-title blue-text">Admin Options</h4>
+                                </div>
 
-                {% if is_edit %}
-                <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" name="send_ybl_email" value="send_ybl_email"
-                        id="send_ybl_email">
-                    <label class="form-check-label" for="send_ybl_email">
-                        (Admin Only) Send "You've been Lifted!" email (only check this if you edited the recipient email
-                        on an existing message)
-                    </label>
+                                <div class="mb-4">
+                                    {{ components.render_form_field(
+                                    field=form.message_group,
+                                    description="(Admin Only) Message group that the card should be placed in.",
+                                    placeholder='' ) }}
+
+                                    {{ components.message_group_radio(id="message_group_radio",
+                                    onclick_fn="handleMessagesGroupRadioChange(this)",
+                                    checked_expr=form.message_group.data,
+                                    disabled_expr="",
+                                    show_none=False) }}
+                                </div>
+
+                                <div class="mb-4">
+                                    {{ components.render_form_field(
+                                    field=form.sender_email,
+                                    description="(Admin Only) Enter the sender's FULL email (preferably Cornell so they
+                                    can log in), such as rf377@cornell.edu. DO NOT enter a NetID!",
+                                    placeholder='rf377@cornell.edu' ) }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="form-section mb-4">
+                                <div class="form-section-header">
+                                    <div class="section-icon">👤</div>
+                                    <h4 class="form-section-title blue-text">Sender Information</h4>
+                                </div>
+
+                                <div class="mb-4">
+                                    {{ components.render_form_field(
+                                    field=form.sender_name,
+                                    description='This is your name that will appear on the card. If you want the letter
+                                    to be anonymous, you can list your name as "Anonymous"',
+                                    placeholder='Garry' ) }}
+                                </div>
+                            </div>
+
+                            <div class="form-section mb-4">
+                                <div class="form-section-header">
+                                    <div class="section-icon">📬</div>
+                                    <h4 class="form-section-title blue-text">Recipient Information</h4>
+                                </div>
+
+                                <div class="mb-4">
+                                    {{ components.render_form_field(
+                                    field=form.recipient_name,
+                                    description="This is the recipient's name that will appear on the card.",
+                                    placeholder='Happy Dave' ) }}
+                                </div>
+
+                                {% if show_admin_overrides %}
+                                <div class="mb-4">
+                                    {{ components.render_form_field(
+                                    field=form.recipient_email,
+                                    description="(Admin Only) Enter the recipient's FULL email (preferably Cornell so
+                                    they can log in), such as rf377@cornell.edu. DO NOT enter a NetID!",
+                                    placeholder='rf377@cornell.edu' ) }}
+
+                                    {% if is_edit %}
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="send_ybl_email"
+                                            value="send_ybl_email" id="send_ybl_email">
+                                        <label class="form-check-label" for="send_ybl_email">
+                                            (Admin Only) Send "You've been Lifted!" email (only check this if you edited
+                                            the recipient email on an existing message)
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% elif is_edit %}
+                                <h5>Recipient's Email</h5>
+                                <p>{{ form.recipient_email.data }}</p>
+                                {% else %}
+                                <div class="recipient-search-section mb-4">
+                                    {{ components.render_form_field(
+                                    field=form.recipient_netid,
+                                    description="Search for a name or NetID.",
+                                    placeholder='rf377 or Reid Fleishman' ) }}
+
+                                    <div class="col-12 col-md-6 mb-3">
+                                        <input type="text" class="form-control search-input" id="people-search-input"
+                                            placeholder="Search by name or NetID..."
+                                            oninput="handlePeopleSearchInputChange('{{current_user.id}}')" />
+                                    </div>
+
+                                    <div id="selected-person-status" class="alert alert-danger mt-4" role="alert">
+                                        No recipient selected.
+                                    </div>
+
+                                    <div class="search-guidance mt-3">
+                                        <div class="guidance-icon">💡</div>
+                                        <div class="guidance-text">
+                                            <p class="guidance-title mb-1">Search Tips:</p>
+                                            <ul class="guidance-list mb-0">
+                                                <li>Try searching by first or last name</li>
+                                                <li>NetIDs are the most precise way to find someone</li>
+                                                <li>You can search for professors, staff, or students</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <p class="search-instructions mb-2 mt-3" id="query-status">
+                                        <i class="search-icon">🔍</i> Search for a name or NetID above, then select it
+                                        in the table below.
+                                    </p>
+
+                                    <div class="search-results-container mt-4">
+                                        <div class="results-header">
+                                            <span class="results-icon">👥</span>
+                                            <h6 class="results-title mb-0">Search Results</h6>
+                                            <span id="results-count" class="results-count"></span>
+                                        </div>
+                                        <div class="table-responsive search-results-table">
+                                            <table id="people-info-table" class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">NetID</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Affiliation</th>
+                                                        <th scope="col">College</th>
+                                                        <th scope="col">Department</th>
+                                                        <th scope="col">Title</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Results will appear here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="no-results-message" class="no-results-message" style="display: none;">
+                                            <p>No results found. Try a different search term.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="form-section mb-4">
+                                <div class="form-section-header">
+                                    <div class="section-icon">💌</div>
+                                    <h4 class="form-section-title blue-text">Your Message</h4>
+                                </div>
+
+                                <div class="mb-4">
+                                    {{ components.render_form_field(
+                                    field=form.message_content,
+                                    description="Please limit your note to no more than 150 words to ensure it fits on
+                                    the card.",
+                                    placeholder="Hi! You are amazing and I love you!") }}
+                                </div>
+                                <div class="message-counter mt-2" id="message-counter">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="counter-item">
+                                            <span id="word-count">0</span>/<span id="word-limit">150</span> words
+                                        </div>
+                                        <div class="counter-item">
+                                            <span id="char-count">0</span> characters
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-2">
+                                        <div id="word-progress" class="progress-bar" role="progressbar"
+                                            style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-submit text-center mt-5">
+                                <button type="submit" class="btn cta-btn">{% if is_edit %}Update{% else %}Submit{% endif
+                                    %} Message</button>
+
+                                {% if not is_edit %}
+                                <p class="form-note mt-3">Your message will be delivered on the last day of classes.</p>
+                                {% endif %}
+                            </div>
+
+                            <script type="text/javascript">
+                                window.addEventListener('keydown', function (e) {
+                                    if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
+                                        if (e.target.nodeName == 'INPUT' && e.target.type == 'text') {
+                                            e.preventDefault();
+                                            return false;
+                                        }
+                                    }
+                                }, true);
+                            </script>
+                        </form>
+
+                        {% else %}
+                        <div class="text-center signin-container">
+                            <div class="feature-box">
+                                <div class="feature-icon">🔑</div>
+                                <h3 class="feature-title">Sign In Required</h3>
+                                <p class="mb-4">Please sign in with your Cornell NetID to send a message.</p>
+                                <a href="/login?next={{ url_for(request.endpoint) }}" class="btn btn-danger btn-lg">Sign
+                                    In with Cornell NetID</a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
-            {% elif is_edit %}
-            <h5>Recipient's Email</h5>
-            <p>{{ form.recipient_email.data }}</p>
-            {% else %}
-            <div class="mb-4">
-                {{ components.render_form_field(
-                field=form.recipient_netid,
-                description="Search for a name or NetID.",
-                placeholder='rf377 or Reid Fleishman' ) }}
+    </section>
 
-                <div class="col-12 col-md-3">
-                    <input type="text" class="form-control" id="people-search-input"
-                    placeholder="rf377 or Reid Fleishman"
-                    oninput="handlePeopleSearchInputChange('{{current_user.id}}')" />
-                </div>
+    <!-- Footer -->
+    {{ components.footer() }}
 
-                <div id="selected-person-status" class="alert alert-danger mt-4" role="alert">
-                    No recipient selected.
-                </div>
+    <script src="/static/scripts/scripts.js"></script>
+    <script src="/static/scripts/bootstrap.bundle.min.js"></script>
 
-                <p class="mb-1" id="query-status">Search for a name or NetID above, then select it in the table below.
-                </p>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Update the results count
+            function updateResultsCount() {
+                const tableRows = document.querySelectorAll('#people-info-table tbody tr');
+                const resultsCount = document.getElementById('results-count');
+                const noResultsMessage = document.getElementById('no-results-message');
+                const searchResultsTable = document.querySelector('.search-results-table');
 
-                <div class="table-responsive">
-                    <table id="people-info-table" class="table table-striped"
-                        style="display: block; max-height: 300px; overflow: auto">
-                        <thead>
-                            <tr style="position: sticky; top: 0;">
-                                <th scope="col">NetID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Affiliation</th>
-                                <th scope="col">College</th>
-                                <th scope="col">Department</th>
-                                <th scope="col">Title</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Results will appear here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                if (!resultsCount) return;
 
-            {% endif %}
+                if (tableRows.length === 0) {
+                    resultsCount.textContent = '(0)';
+                    if (noResultsMessage) noResultsMessage.style.display = 'block';
+                    if (searchResultsTable) searchResultsTable.style.display = 'none';
+                } else {
+                    resultsCount.textContent = `(${tableRows.length})`;
+                    if (noResultsMessage) noResultsMessage.style.display = 'none';
+                    if (searchResultsTable) searchResultsTable.style.display = 'block';
+                }
+            }
 
-            <div class="mb-4">
-                {{ components.render_form_field(
-                field=form.message_content,
-                description="Please limit your note to no more than 150 words to ensure it fits on the card.",
-                placeholder="The food at Okenshields might be mid (certainly not as good as my dining hall), but you
-                continue to be its saving grace. Congrats on your 45 years (or almost 50, if you count when you were a
-                student) at Cornell!!") }}
-            </div>
+            // Add animation to the selected person status
+            const originalHandlePeopleInfoRowClick = window.handlePeopleInfoRowClick;
+            if (originalHandlePeopleInfoRowClick) {
+                window.handlePeopleInfoRowClick = function (netid, name, email) {
+                    originalHandlePeopleInfoRowClick(netid, name, email);
 
-            <button type="submit" class="btn btn-primary">Submit</button>
+                    // Update the status with animation
+                    const statusElement = document.getElementById('selected-person-status');
+                    if (statusElement) {
+                        statusElement.classList.remove('alert-danger');
+                        statusElement.classList.add('alert-success');
+                        statusElement.innerHTML = `
+                            <div class="status-icon">✅</div>
+                            <div class="status-text">
+                                <strong>${name}</strong> (${netid}@cornell.edu) has been selected as your recipient.
+                            </div>
+                        `;
 
-            <script type="text/javascript">
-                window.addEventListener('keydown', function (e) {
-                    if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
-                        if (e.target.nodeName == 'INPUT' && e.target.type == 'text') {
-                            e.preventDefault();
-
-                            return false;
-                        }
+                        // Add animation
+                        statusElement.style.animation = 'none';
+                        statusElement.offsetHeight; // Trigger reflow
+                        statusElement.style.animation = 'status-pulse 1s ease-in-out';
                     }
-                }, true);
-            </script>
-        </form>
+                }
+            }
 
-        {% else %}
-        <a href="/login?next={{ url_for(request.endpoint) }}" class="btn btn-danger mb-3">Sign In with Cornell NetID</a>
-        {% endif %}
-        {% endif %}
+            // Enhance the search input behavior
+            const searchInput = document.getElementById('people-search-input');
+            if (searchInput) {
+                // Clear initial guidance on focus
+                searchInput.addEventListener('focus', function () {
+                    this.classList.add('input-active');
+                });
 
-    </main>
-    <footer>
-        {{ components.footer() }}
-    </footer>
+                // Remove active class on blur
+                searchInput.addEventListener('blur', function () {
+                    if (this.value === '') {
+                        this.classList.remove('input-active');
+                    }
+                });
+
+                // Hook into the existing search function to update results count
+                const originalHandlePeopleSearchInputChange = window.handlePeopleSearchInputChange;
+                if (originalHandlePeopleSearchInputChange) {
+                    window.handlePeopleSearchInputChange = function (netid) {
+                        originalHandlePeopleSearchInputChange(netid);
+
+                        // Set a timeout to update results count after search completes
+                        setTimeout(updateResultsCount, 500);
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const messageTextArea = document.getElementById('message_content');
+            const wordCountElement = document.getElementById('word-count');
+            const charCountElement = document.getElementById('char-count');
+            const wordProgressElement = document.getElementById('word-progress');
+            const counterElement = document.getElementById('message-counter');
+            const wordLimit = 150;
+            const submitButton = document.querySelector('.form-submit button[type="submit"]');
+
+            if (!messageTextArea || !wordCountElement || !charCountElement || !wordProgressElement || !submitButton) {
+                return; // Exit if any element is not found
+            }
+
+            function countWords(text) {
+                // Remove leading/trailing whitespace and split by whitespace
+                return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            }
+
+            function updateCounter() {
+                const text = messageTextArea.value;
+                const wordCount = countWords(text);
+                const charCount = text.length;
+
+                // Update the counters
+                wordCountElement.textContent = wordCount;
+                charCountElement.textContent = charCount;
+
+                // Update the progress bar
+                const percentage = Math.min((wordCount / wordLimit) * 100, 100);
+                wordProgressElement.style.width = percentage + '%';
+
+                // Change progress bar color based on word count
+                if (wordCount <= wordLimit * 0.7) {
+                    wordProgressElement.className = 'progress-bar bg-success';
+                } else if (wordCount <= wordLimit * 0.9) {
+                    wordProgressElement.className = 'progress-bar bg-warning';
+                } else if (wordCount <= wordLimit) {
+                    wordProgressElement.className = 'progress-bar bg-danger';
+                } else {
+                    wordProgressElement.className = 'progress-bar bg-danger';
+                    counterElement.classList.add('limit-exceeded');
+                }
+
+                // Disable submit button if limit exceeded
+                if (wordCount > wordLimit) {
+                    submitButton.disabled = true;
+                    submitButton.title = 'Please reduce your message to 150 words or less';
+
+                    if (!document.getElementById('word-limit-warning')) {
+                        const warningElement = document.createElement('div');
+                        warningElement.id = 'word-limit-warning';
+                        warningElement.className = 'alert alert-danger mt-2';
+                        warningElement.innerHTML = '<strong>Word limit exceeded!</strong> Please reduce your message to 150 words or less.';
+                        counterElement.after(warningElement);
+                    }
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.title = '';
+
+                    const warningElement = document.getElementById('word-limit-warning');
+                    if (warningElement) {
+                        warningElement.remove();
+                    }
+
+                    counterElement.classList.remove('limit-exceeded');
+                }
+            }
+
+            // Attach event listeners
+            messageTextArea.addEventListener('input', updateCounter);
+            messageTextArea.addEventListener('paste', function () {
+                // Use setTimeout to ensure content is pasted before counting
+                setTimeout(updateCounter, 10);
+            });
+
+            // Initialize counter on page load
+            updateCounter();
+
+            // Add check before form submission
+            const form = messageTextArea.closest('form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    const wordCount = countWords(messageTextArea.value);
+                    if (wordCount > wordLimit) {
+                        e.preventDefault();
+                        alert('Please reduce your message to 150 words or less before submitting.');
+                        messageTextArea.focus();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
-
-<script src="/static/scripts/scripts.js"></script>
-<script src="/static/scripts/bootstrap.bundle.min.js"></script>
 
 </html>

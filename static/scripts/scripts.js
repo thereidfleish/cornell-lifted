@@ -92,6 +92,27 @@ function selectPerson(row, person, my_netid) {
     document.getElementById("recipient_netid").value = person.NetID
 }
 
+// Seasonal Detection JavaScript
+document.addEventListener('DOMContentLoaded', function () {
+    // Automatically detect the season based on the current month
+    const month = new Date().getMonth();
+
+    if (month >= 2 && month <= 5) {
+        document.body.classList.add('spring');
+        console.log('Spring theme applied');
+    } else if (month >= 8 && month <= 12) {
+        document.body.classList.add('fall');
+        console.log('Fall theme applied');
+    } else {
+        // Currently using spring for Jan-Feb, fall for Jul-Aug
+        if (month <= 1) { // January and February
+            document.body.classList.add('fall'); // From previous year's fall
+        } else { // July and August
+            document.body.classList.add('spring'); // From current year's spring
+        }
+    }
+});
+
 // Admin Overrides Stuff
 // Call once on page load
 handleMessagesGroupRadioChange()

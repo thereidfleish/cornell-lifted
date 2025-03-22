@@ -7,30 +7,55 @@
     {{ components.header("Cornell Lifted - FAQs") }}
 </head>
 
-<body class="container-fluid">
-    <main>
-        {{ components.navbar() }}
+<body class="faq-page">
+    <!-- Sticky Navigation Bar -->
+    {{ components.sticky_navbar() }}
 
-        
+    <section class="section-container bg-light" id="faqs-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="text-center mb-5">
+                        <img class="mx-auto d-block" src="/static/images/logo.png" width="300"
+                            alt="Cornell Lifted Logo" />
+                    </div>
 
-        <h3 class="mt-3">Lifted FAQs</h3>
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Find answers to common questions about Lifted</p>
 
-        {% for type, content in helpers.faqs.items() %}
-        <h5 class="mt-3">{{type}}</h5>
+                    <div class="form-container">
+                        <!-- Balloon decorations -->
+                        <div class="faq-balloon faq-balloon-1"></div>
+                        <div class="faq-balloon faq-balloon-2"></div>
 
-        {{ components.accordion("faq_" + type | replace(" ", "_"), content) }}
+                        {% for type, content in helpers.faqs.items() %}
+                        <div class="mb-5 faq-category">
+                            <h3 class="blue-text mb-4">{{type}}</h3>
+                            {{ components.accordion("faq_" + type | replace(" ", "_"), content) }}
+                        </div>
+                        {% endfor %}
+                    </div>
 
-        {% endfor %}
+                    <div class="text-center mt-5 cta-container">
+                        <h4>Still have questions?</h4>
+                        <p>Reach out to us at <a href="mailto:lifted@cornell.edu">lifted@cornell.edu</a> and we'll be
+                            happy to help!</p>
 
-        
-    </main>
+                        <div class="action-buttons mt-4">
+                            <a href="/send-message" class="btn btn-primary">Send a Lifted Message</a>
+                            <a href="/messages" class="btn btn-outline-danger">View My Messages</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <footer>
-        {{ components.footer() }}
-    </footer>
+    <!-- Footer -->
+    {{ components.footer() }}
+
+    <script src="/static/scripts/scripts.js"></script>
+    <script src="/static/scripts/bootstrap.bundle.min.js"></script>
 </body>
-
-<script src="/static/scripts/scripts.js"></script>
-<script src="/static/scripts/bootstrap.bundle.min.js"></script>
 
 </html>

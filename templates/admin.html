@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    {% import 'components.html' as components with context %}
+{% import 'components.html' as components with context %}
 
 <head>
     {{ components.header("Admin Dashboard") }}
@@ -10,7 +10,7 @@
 
 <body class="mx-2">
     <main>
-        {{ components.navbar() }}
+        {{ components.sticky_navbar() }}
 
         <h3 class="mt-3">Admin Dashboard</h3>
 
@@ -159,38 +159,41 @@
                     message group
                     instead. This will essentially "move" their messages from one message group to the other
                     message group.</p>
-                    <p>Currently, only swapping from the physical Lifted group to the eLifted group for a particular semester is supported.</p>
-                    <p>Set to <b>None</b> to disable.  <b>Be sure to turn this off right before you export the cards as PDFs!</b></p>
-                
-                    <form method="post" action="/update-swapping-config">
-                        <div class="d-flex">
-                            <div class="me-2">
-                                <p><b>Swap From</b></p>
-                                {{ components.message_group_radio(id="swap-from",
-                                onclick_fn="this.form.submit()",
-                                checked_expr=lifted_config.swap_from,
-                                disabled_expr=lifted_config.swap_to,
-                                show_none=True) }}
-                            </div>
-                            
-                            <div>
-                                <p><b>Swap To</b></p>
-                                {{ components.message_group_radio(id="swap-to",
-                                onclick_fn="this.form.submit()",
-                                checked_expr=lifted_config.swap_to,
-                                disabled_expr=lifted_config.swap_from,
-                                show_none=False) }}
-                            </div>
+                <p>Currently, only swapping from the physical Lifted group to the eLifted group for a particular
+                    semester is supported.</p>
+                <p>Set to <b>None</b> to disable. <b>Be sure to turn this off right before you export the cards as
+                        PDFs!</b></p>
+
+                <form method="post" action="/update-swapping-config">
+                    <div class="d-flex">
+                        <div class="me-2">
+                            <p><b>Swap From</b></p>
+                            {{ components.message_group_radio(id="swap-from",
+                            onclick_fn="this.form.submit()",
+                            checked_expr=lifted_config.swap_from,
+                            disabled_expr=lifted_config.swap_to,
+                            show_none=True) }}
                         </div>
 
-                        <label for="swap-text"><b>Message Swap Instructional Text</b></label>
-                        <p>This text is shown on the homepage to the user.  You can use HTML to style this.</p>
-                        <div class="d-flex">
-                            <input type="text" class="form-control" id="swap-text" name="swap-text" value="{{ lifted_config.swap_text }}"/>
-                            <button type="submit" class="btn btn-primary ms-4 mx-2">Save</button>
+                        <div>
+                            <p><b>Swap To</b></p>
+                            {{ components.message_group_radio(id="swap-to",
+                            onclick_fn="this.form.submit()",
+                            checked_expr=lifted_config.swap_to,
+                            disabled_expr=lifted_config.swap_from,
+                            show_none=False) }}
                         </div>
+                    </div>
 
-                    </form>
+                    <label for="swap-text"><b>Message Swap Instructional Text</b></label>
+                    <p>This text is shown on the homepage to the user. You can use HTML to style this.</p>
+                    <div class="d-flex">
+                        <input type="text" class="form-control" id="swap-text" name="swap-text"
+                            value="{{ lifted_config.swap_text }}" />
+                        <button type="submit" class="btn btn-primary ms-4 mx-2">Save</button>
+                    </div>
+
+                </form>
 
 
                 <h5 class="mt-3">Form and Email Text</h5>
@@ -428,8 +431,9 @@
                 </div>
 
                 <h5>Swap Prefs Table</h5>
-                <p>The swap_prefs table.  Num entries: {{ swap_prefs | length }}</p>
-                <p>Deleting will remove the pref (so no future messages will be moved), but you will have to manually move the existing messages back.</p>
+                <p>The swap_prefs table. Num entries: {{ swap_prefs | length }}</p>
+                <p>Deleting will remove the pref (so no future messages will be moved), but you will have to manually
+                    move the existing messages back.</p>
                 <div class="table-responsive mb-4">
                     <table id="admins-table" class="table table-striped"
                         style="display: block; max-height: 300px; overflow: auto">
