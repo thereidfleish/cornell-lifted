@@ -58,6 +58,11 @@ a {
     color: #f98e8f
 }
 
+.circle-white-text {
+    color: white;
+    font-size: larger;
+}
+
 p a {
     color: rgb(27, 135, 229);
     text-decoration: underline;
@@ -187,3 +192,9 @@ p a:hover {
     text-decoration: underline;
     color: blue;
 }
+
+.im-fell-english-sc-regular {
+    font-family: "IM Fell English SC", serif;
+    font-weight: 400;
+    font-style: normal;
+  }  

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, abort, current_app
+from flask import Flask, render_template, session, abort, current_app, request
 from flask_login import LoginManager, UserMixin, login_user, current_user
 from flask_oidc import OpenIDConnect, signals
 from werkzeug.exceptions import HTTPException
@@ -36,8 +36,10 @@ def create_app():
 
     from core import core
     from admin import admin
+    from circle import circle
     app.register_blueprint(core)
     app.register_blueprint(admin)
+    app.register_blueprint(circle)
 
     return app
 
@@ -49,7 +51,7 @@ def after_setup(app):
         error_message_body = e.description
         
         if hasattr(current_user, "id"):
-            print(current_user.id, ' had an error ', e.code)
+            print(current_user.id, "(", current_user.name, ")", "had an error", e.code)
         
         if e.code == 400:
             error_code = "In other words, the server did not like something you just sent it.  Like if you sent your ex a Lifted message, they would probably not like it (please do that at your own risk — we are not endorsing this).  Or, if you were trying to reverse-engineer this web app, that's why you might be here.  Otherwise, I don't know what to tell you, it's probably something wrong on our end, so you should email us below."
@@ -130,7 +132,8 @@ def after_oidc_authorize(sender, **extras):
     user = load_user(oidc_profile["sub"])
     login_user(user)
     # app.logger.info(current_user.id, ' logged in successfully')
-    print(current_user.id, ' logged in successfully')
+    # print(current_user.id, ' logged in successfully')
+    print(current_user.id, "(", current_user.name, ")", "logged in successfully")
 
 signals.after_authorize.connect(after_oidc_authorize)
 
