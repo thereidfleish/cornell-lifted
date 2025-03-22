@@ -17,6 +17,12 @@
     --balloon-green: #4CAF50;
     --balloon-purple: #9C27B0;
     --note-yellow: #fff9c4;
+    --winter-blue-light: #d9eaff;
+    --winter-blue-medium: #a8d8ff;
+    --winter-blue-dark: #7bb5eb;
+    --winter-accent: #9C27B0;
+    --winter-background: #e3eeff;
+    --winter-background-alt: #d7e7ff;
 }
 
 /* Typography */
@@ -3240,5 +3246,193 @@ body.fall .message-group-card .card-header {
 
     .message-icon-img {
         width: 35px;
+    }
+}
+
+body.fall {
+    background: linear-gradient(135deg, var(--winter-background) 0%, var(--winter-background-alt) 100%) !important;
+}
+
+/* Override hero section background */
+body.fall .hero-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background-alt) 100%) !important;
+}
+
+/* Override CTA section background */
+body.fall .cta-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background) 100%) !important;
+}
+
+/* Override FAQ section background */
+body.fall #faqs-content {
+    background: linear-gradient(135deg, var(--winter-background) 0%, var(--winter-blue-light) 100%) !important;
+}
+
+/* Override Stats section background */
+body.fall .stats-section {
+    background-color: var(--winter-blue-light) !important;
+}
+
+/* Override Message page background */
+body.fall.messages-page .hero-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background-alt) 100%) !important;
+}
+
+/* Override Send message page background */
+body.fall.send-message-page .hero-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background-alt) 100%) !important;
+}
+
+/* Hide all balloons in fall theme */
+body.fall .balloon {
+    display: none !important;
+}
+
+/* Snowflake styling - full definition */
+.snowflake {
+    position: absolute;
+    color: var(--winter-blue-medium);
+    font-size: 2em;
+    opacity: 0.9;
+    animation-name: fall-rotate;
+    animation-duration: 10s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    z-index: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+/* Different sizes and animations for variety */
+.snowflake:nth-child(1) {
+    top: 5%;
+    left: 3%;
+    animation-delay: 0s;
+    font-size: 2.4em;
+    color: var(--winter-blue-dark);
+}
+
+.snowflake:nth-child(2) {
+    top: 20%;
+    right: 3%;
+    animation-delay: -2s;
+    font-size: 2.2em;
+    color: var(--winter-blue-medium);
+}
+
+.snowflake:nth-child(3) {
+    bottom: 10%;
+    right: 5%;
+    animation-delay: -4s;
+    font-size: 2.5em;
+    color: #ffffff;
+}
+
+.snowflake:nth-child(4) {
+    bottom: 30%;
+    left: 2%;
+    animation-delay: -6s;
+    font-size: 2.1em;
+    color: var(--winter-blue-light);
+}
+
+.snowflake:nth-child(5) {
+    top: 40%;
+    right: 7%;
+    animation-delay: -8s;
+    font-size: 2.3em;
+    color: var(--winter-blue-dark);
+}
+
+/* Snowflake falling and rotating animation */
+@keyframes fall-rotate {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(30px) rotate(180deg);
+    }
+
+    100% {
+        transform: translateY(0) rotate(360deg);
+    }
+}
+
+/* Snowflake character with glow */
+.snowflake:before {
+    content: "❄";
+    text-shadow: 0 0 8px var(--winter-blue-medium), 0 0 15px rgba(168, 216, 255, 0.8);
+}
+
+/* Variations for snowflake shapes */
+.snowflake:nth-child(2n):before {
+    content: "❅";
+}
+
+.snowflake:nth-child(3n):before {
+    content: "❆";
+}
+
+/* Position snowflakes in CTA section */
+.cta-snowflakes .snowflake:nth-child(1) {
+    bottom: 10%;
+    left: 5%;
+    top: auto;
+}
+
+.cta-snowflakes .snowflake:nth-child(2) {
+    bottom: 20%;
+    right: 5%;
+    top: auto;
+}
+
+.cta-snowflakes .snowflake:nth-child(3) {
+    top: 10%;
+    right: 8%;
+}
+
+/* Additional styles to override other fall-specific elements */
+body.fall .form-section {
+    background-color: rgba(217, 234, 255, 0.5) !important;
+}
+
+body.fall .admin-section {
+    background-color: rgba(168, 216, 255, 0.1) !important;
+}
+
+body.fall .message-group-card .card-header {
+    background-color: rgba(168, 216, 255, 0.2) !important;
+    border-bottom: 1px solid rgba(168, 216, 255, 0.3) !important;
+}
+
+body.fall .timeline-date {
+    background-color: rgba(217, 234, 255, 0.9) !important;
+}
+
+/* Ensure responsive behavior is maintained */
+@media (max-width: 576px) {
+    .snowflake {
+        font-size: 1.5em;
+    }
+
+    .snowflake:nth-child(1) {
+        font-size: 1.8em;
+    }
+
+    .snowflake:nth-child(2) {
+        font-size: 1.6em;
+    }
+
+    .snowflake:nth-child(3) {
+        font-size: 2em;
+    }
+
+    .snowflake:nth-child(4) {
+        font-size: 1.4em;
+    }
+
+    .snowflake:nth-child(5) {
+        font-size: 1.7em;
     }
 }
