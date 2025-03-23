@@ -44,7 +44,9 @@ def faqs():
 
 @core.get("/messages")
 def messages():
-    if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"     
+    if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"    
+        print(current_user.id, "(", current_user.name, ")", "accessed their messages page!")
+
         conn = get_db_connection()
                 
         received_cards = conn.execute("select * from messages where recipient_email=?", (current_user.email,)).fetchall()

@@ -1,0 +1,225 @@
+{
+    "ops": [
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "{{LOGO}}"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "bold": true
+            },
+            "insert": "Someone at Cornell wrote you a Lifted message! \ud83d\udc8c"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "We can't tell you who it is yet (it's a secret), but we can tell you that you're appreciated!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "Your message will be posted on a notecard (for you to keep!) on the "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "underline": true
+            },
+            "insert": "Arts Quad"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": " on the last day of classes ("
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "bold": true
+            },
+            "insert": "Tuesday, May 6th"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "), along with a balloon, flower, pinwheel, or more to celebrate the end of the semester."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "bold": true
+            },
+            "insert": "New this year!"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "  Choose which attachment you'd like to receive!  "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "link": "https://cornelllifted.com/"
+            },
+            "insert": "Click here to get your messages delivered virtually instead"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": ".  Hard deadline to do this is 4/27/25."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "bold": true
+            },
+            "insert": "Can't make it on the last day of classes?"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "  "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "link": "https://cornelllifted.com/"
+            },
+            "insert": "Click here to get your messages delivered virtually instead"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": ".  Hard deadline to do this is 4/27/25."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "Spread the love by writing your own Lifted message to a friend, staff, or faculty member who has made your year better. "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "bold": true
+            },
+            "insert": "The form closes on Sunday, April 27th at 11:59 PM!"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": " Any messages submitted after will be sent virtually to your recipient."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "link": "https://cornelllifted.com/send-message",
+                "underline": true,
+                "font": "georgia",
+                "bold": true
+            },
+            "insert": "Send a Lifted Message"
+        },
+        {
+            "attributes": {
+                "align": "center"
+            },
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "See you then,"
+        },
+        {
+            "insert": "\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "Cornell Lifted \ud83c\udf88"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "Check us out at our Instagram "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "link": "https://www.instagram.com/cornelllifted"
+            },
+            "insert": "@cornelllifted"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": " and on our website "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "link": "https://cornelllifted.com/"
+            },
+            "insert": "cornelllifted.com"
+        },
+        {
+            "insert": "\n"
+        },
+        {
+            "attributes": {
+                "font": "georgia"
+            },
+            "insert": "Read more about Lifted here: "
+        },
+        {
+            "attributes": {
+                "font": "georgia",
+                "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+            },
+            "insert": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+        },
+        {
+            "insert": "\n"
+        }
+    ]
+}

@@ -19,3 +19,19 @@
 --     message_group_from TEXT NOT NULL,
 --     message_group_to TEXT NOT NULL
 -- );
+
+-- DROP TABLE IF EXISTS cp_taps;
+
+-- CREATE TABLE cp_taps (
+--     netid TEXT PRIMARY KEY NOT NULL,
+--     responded_timestamp TIMESTAMP,
+--     tap_name TEXT NOT NULL,
+--     accept_tap BOOLEAN,
+--     clear_schedule BOOLEAN,
+--     wear_clothing BOOLEAN,
+--     monitor_inbox BOOLEAN,
+--     notes TEXT,
+--     pronouns TEXT,
+--     phonetic_spelling TEXT,
+--     allergens TEXT
+-- );
