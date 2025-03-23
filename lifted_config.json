@@ -15,20 +15,20 @@
         "sp_19_p": "Spring 2019 Physical Lifted",
         "sp_18_p": "Spring 2018 Physical Lifted"
     },
-    "form_message_group": "none",
+    "form_message_group": "sp_25_p",
     "hidden_cards": [
         "sp_19_p",
         "sp_18_p",
         "sp_21_p",
         "fa_24_p",
-        "sp_24_p",
         "sp_23_p",
         "sp_22_p",
         "sp_25_p",
-        "sp_25_e"
+        "sp_25_e",
+        "sp_24_p"
     ],
     "swap_from": "none",
-    "swap_to": "fa_24_e",
+    "swap_to": "sp_25_e",
     "swap_text": "<b>Can't make it on the last day of classes?</b> <a href=\"/swap-messages\">Click here</a> to have all your physical Lifted messages delivered as virtual eLifted messages on the last day of classes instead.  Hard deadline to do this is <b>4/27/25</b> since we send our print order the following day.",
     "rich_text_types": {
         "form": "Form Description",
@@ -41,6 +41,10 @@
         "advanced": "Advanced"
     },
     "admins": [
-        "rf377"
+        "rf377",
+        "ns597",
+        "abb234",
+        "frt23",
+        "vw77"
     ]
 }
