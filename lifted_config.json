@@ -15,7 +15,7 @@
         "sp_19_p": "Spring 2019 Physical Lifted",
         "sp_18_p": "Spring 2018 Physical Lifted"
     },
-    "form_message_group": "sp_25_p",
+    "form_message_group": "none",
     "hidden_cards": [
         "sp_19_p",
         "sp_18_p",
