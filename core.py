@@ -350,8 +350,8 @@ def get_person_info():
             "Name": str(result.cn.value),
             "Primary Affiliation": str(result.cornelleduprimaryaffiliation.value),
             "College": helpers.college_dict.get(result.cornelleduacadcollege.value, str(result.cornelleduacadcollege.value)),
-            "Primary Dept": str(result.cornelledudeptname1),
-            "Primary Title": str(result.cornelleduwrkngtitle1),
+            "Primary Dept": str("" if len(result.cornelledudeptname1) == 0 else result.cornelledudeptname1),
+            "Primary Title": str("" if len(result.cornelleduwrkngtitle1) == 0 else result.cornelleduwrkngtitle1),
         }
 
         master_dict.append(dict)

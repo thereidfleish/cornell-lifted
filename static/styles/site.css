@@ -1555,6 +1555,10 @@ textarea.form-control {
     background-color: rgba(0, 118, 189, 0.1);
 }
 
+.people-row-selected td {
+    background-color: #45da006c !important;
+}
+
 /* Submit button */
 .form-submit .btn-primary {
     min-width: 200px;

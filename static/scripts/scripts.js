@@ -67,8 +67,8 @@ function selectPerson(row, person, my_netid) {
 
     // Some fun Easter Eggs :)
     var selectedPersonTextInfo = `Selected <b>${person.NetID} (${person.Name}, ${person["Primary Affiliation"]})</b>`
-    if (person.NetID == "rf377") {
-        selectedPersonTextInfo += " - AKA the person who created this Lifted web app :) Thanks for Lifting me haha"
+    if (person.NetID == "rf377" || person.NetID == "abb234") {
+        selectedPersonTextInfo += " - 👀"
     }
     if (person.NetID == my_netid) {
         selectedPersonTextInfo += " - Wait, that's you!  While you can <i>technically</i> send a Lifted message to yourself, we encourage you to also spread the love to those around you :)"

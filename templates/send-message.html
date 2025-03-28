@@ -186,7 +186,7 @@
                                         No recipient selected.
                                     </div>
 
-                                    <div class="search-guidance mt-3">
+                                    <!-- <div class="search-guidance mt-3">
                                         <div class="guidance-icon">💡</div>
                                         <div class="guidance-text">
                                             <p class="guidance-title mb-1">Search Tips:</p>
@@ -196,7 +196,7 @@
                                                 <li>You can search for professors, staff, or students</li>
                                             </ul>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <p class="search-instructions mb-2 mt-3" id="query-status">
                                         <i class="search-icon">🔍</i> Search for a name or NetID above, then select it
@@ -207,7 +207,6 @@
                                         <div class="results-header">
                                             <span class="results-icon">👥</span>
                                             <h6 class="results-title mb-0">Search Results</h6>
-                                            <span id="results-count" class="results-count"></span>
                                         </div>
                                         <div class="table-responsive search-results-table">
                                             <table id="people-info-table" class="table table-hover">
@@ -225,9 +224,6 @@
                                                     <!-- Results will appear here -->
                                                 </tbody>
                                             </table>
-                                        </div>
-                                        <div id="no-results-message" class="no-results-message" style="display: none;">
-                                            <p>No results found. Try a different search term.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -247,21 +243,7 @@
                                     the card.",
                                     placeholder="Hi! You are amazing and I love you!") }}
                                 </div>
-                                <div class="message-counter mt-2" id="message-counter">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="counter-item">
-                                            <span id="word-count">0</span>/<span id="word-limit">150</span> words
-                                        </div>
-                                        <div class="counter-item">
-                                            <span id="char-count">0</span> characters
-                                        </div>
-                                    </div>
-                                    <div class="progress mt-2">
-                                        <div id="word-progress" class="progress-bar" role="progressbar"
-                                            style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
 
                             <div class="form-submit text-center mt-5">
@@ -307,176 +289,6 @@
 
     <script src="/static/scripts/scripts.js"></script>
     <script src="/static/scripts/bootstrap.bundle.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Update the results count
-            function updateResultsCount() {
-                const tableRows = document.querySelectorAll('#people-info-table tbody tr');
-                const resultsCount = document.getElementById('results-count');
-                const noResultsMessage = document.getElementById('no-results-message');
-                const searchResultsTable = document.querySelector('.search-results-table');
-
-                if (!resultsCount) return;
-
-                if (tableRows.length === 0) {
-                    resultsCount.textContent = '(0)';
-                    if (noResultsMessage) noResultsMessage.style.display = 'block';
-                    if (searchResultsTable) searchResultsTable.style.display = 'none';
-                } else {
-                    resultsCount.textContent = `(${tableRows.length})`;
-                    if (noResultsMessage) noResultsMessage.style.display = 'none';
-                    if (searchResultsTable) searchResultsTable.style.display = 'block';
-                }
-            }
-
-            // Add animation to the selected person status
-            const originalHandlePeopleInfoRowClick = window.handlePeopleInfoRowClick;
-            if (originalHandlePeopleInfoRowClick) {
-                window.handlePeopleInfoRowClick = function (netid, name, email) {
-                    originalHandlePeopleInfoRowClick(netid, name, email);
-
-                    // Update the status with animation
-                    const statusElement = document.getElementById('selected-person-status');
-                    if (statusElement) {
-                        statusElement.classList.remove('alert-danger');
-                        statusElement.classList.add('alert-success');
-                        statusElement.innerHTML = `
-                            <div class="status-icon">✅</div>
-                            <div class="status-text">
-                                <strong>${name}</strong> (${netid}@cornell.edu) has been selected as your recipient.
-                            </div>
-                        `;
-
-                        // Add animation
-                        statusElement.style.animation = 'none';
-                        statusElement.offsetHeight; // Trigger reflow
-                        statusElement.style.animation = 'status-pulse 1s ease-in-out';
-                    }
-                }
-            }
-
-            // Enhance the search input behavior
-            const searchInput = document.getElementById('people-search-input');
-            if (searchInput) {
-                // Clear initial guidance on focus
-                searchInput.addEventListener('focus', function () {
-                    this.classList.add('input-active');
-                });
-
-                // Remove active class on blur
-                searchInput.addEventListener('blur', function () {
-                    if (this.value === '') {
-                        this.classList.remove('input-active');
-                    }
-                });
-
-                // Hook into the existing search function to update results count
-                const originalHandlePeopleSearchInputChange = window.handlePeopleSearchInputChange;
-                if (originalHandlePeopleSearchInputChange) {
-                    window.handlePeopleSearchInputChange = function (netid) {
-                        originalHandlePeopleSearchInputChange(netid);
-
-                        // Set a timeout to update results count after search completes
-                        setTimeout(updateResultsCount, 500);
-                    }
-                }
-            }
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const messageTextArea = document.getElementById('message_content');
-            const wordCountElement = document.getElementById('word-count');
-            const charCountElement = document.getElementById('char-count');
-            const wordProgressElement = document.getElementById('word-progress');
-            const counterElement = document.getElementById('message-counter');
-            const wordLimit = 150;
-            const submitButton = document.querySelector('.form-submit button[type="submit"]');
-
-            if (!messageTextArea || !wordCountElement || !charCountElement || !wordProgressElement || !submitButton) {
-                return; // Exit if any element is not found
-            }
-
-            function countWords(text) {
-                // Remove leading/trailing whitespace and split by whitespace
-                return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-            }
-
-            function updateCounter() {
-                const text = messageTextArea.value;
-                const wordCount = countWords(text);
-                const charCount = text.length;
-
-                // Update the counters
-                wordCountElement.textContent = wordCount;
-                charCountElement.textContent = charCount;
-
-                // Update the progress bar
-                const percentage = Math.min((wordCount / wordLimit) * 100, 100);
-                wordProgressElement.style.width = percentage + '%';
-
-                // Change progress bar color based on word count
-                if (wordCount <= wordLimit * 0.7) {
-                    wordProgressElement.className = 'progress-bar bg-success';
-                } else if (wordCount <= wordLimit * 0.9) {
-                    wordProgressElement.className = 'progress-bar bg-warning';
-                } else if (wordCount <= wordLimit) {
-                    wordProgressElement.className = 'progress-bar bg-danger';
-                } else {
-                    wordProgressElement.className = 'progress-bar bg-danger';
-                    counterElement.classList.add('limit-exceeded');
-                }
-
-                // Disable submit button if limit exceeded
-                if (wordCount > wordLimit) {
-                    submitButton.disabled = true;
-                    submitButton.title = 'Please reduce your message to 150 words or less';
-
-                    if (!document.getElementById('word-limit-warning')) {
-                        const warningElement = document.createElement('div');
-                        warningElement.id = 'word-limit-warning';
-                        warningElement.className = 'alert alert-danger mt-2';
-                        warningElement.innerHTML = '<strong>Word limit exceeded!</strong> Please reduce your message to 150 words or less.';
-                        counterElement.after(warningElement);
-                    }
-                } else {
-                    submitButton.disabled = false;
-                    submitButton.title = '';
-
-                    const warningElement = document.getElementById('word-limit-warning');
-                    if (warningElement) {
-                        warningElement.remove();
-                    }
-
-                    counterElement.classList.remove('limit-exceeded');
-                }
-            }
-
-            // Attach event listeners
-            messageTextArea.addEventListener('input', updateCounter);
-            messageTextArea.addEventListener('paste', function () {
-                // Use setTimeout to ensure content is pasted before counting
-                setTimeout(updateCounter, 10);
-            });
-
-            // Initialize counter on page load
-            updateCounter();
-
-            // Add check before form submission
-            const form = messageTextArea.closest('form');
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    const wordCount = countWords(messageTextArea.value);
-                    if (wordCount > wordLimit) {
-                        e.preventDefault();
-                        alert('Please reduce your message to 150 words or less before submitting.');
-                        messageTextArea.focus();
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 
 </html>
