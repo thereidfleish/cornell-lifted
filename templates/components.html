@@ -17,17 +17,29 @@
 <div class="sticky-navbar">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <!-- Add a logo or brand name for the left side -->
+            <!-- Logo/brand on the left -->
             <div class="navbar-brand">
                 <a href="/" class="text-decoration-none">
                     <img src="/static/images/logo.png" width="100" alt="Cornell Lifted Logo" />
                 </a>
             </div>
 
-            <!-- All navigation items on the right -->
-            <div class="d-flex align-items-center">
+            <!-- Hamburger menu button (visible only on mobile) -->
+            <button class="navbar-toggler d-lg-none" type="button" onclick="toggleMobileMenu()"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </span>
+            </button>
+
+            <!-- Navigation items (visible on desktop) -->
+            <div class="d-none d-lg-flex align-items-center">
                 <div class="nav-links me-4">
-                    <a href="/" class="btn btn-link">Home</a>
                     <a href="/faqs" class="btn btn-link">FAQs</a>
                     {% if current_user.is_authenticated and is_admin() %}
                     <a href="/admin" class="btn btn-link">Admin</a>
@@ -41,6 +53,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Mobile menu (hidden by default) -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="container py-3">
+            <div class="nav-links mb-3">
+                <a href="/faqs" class="btn btn-link d-block text-start py-2">FAQs</a>
+                {% if current_user.is_authenticated and is_admin() %}
+                <a href="/admin" class="btn btn-link d-block text-start py-2">Admin</a>
+                {% endif %}
+            </div>
+
+            <div class="action-nav d-flex flex-column">
+                <a href="/send-message" class="btn btn-outline-primary mb-2 w-100">Send Message 💌</a>
+                <a href="/messages" class="btn btn-outline-danger w-100">View Messages 📬</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% if get_impersonating_status() %}
@@ -49,6 +78,25 @@
     <a href="/end-impersonate" class="mb-0 download">End Impersonation</a>
 </div>
 {% endif %}
+
+<script>
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenu.classList.toggle('show');
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function (event) {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const navbarToggler = document.querySelector('.navbar-toggler');
+
+        if (mobileMenu.classList.contains('show') &&
+            !mobileMenu.contains(event.target) &&
+            !navbarToggler.contains(event.target)) {
+            mobileMenu.classList.remove('show');
+        }
+    });
+</script>
 {%- endmacro %}
 
 {% macro footer() -%}
@@ -277,6 +325,7 @@
     onclick="saveRichText('{{ type_short_name }}', send_email=true)">Save and Send Test Email to Yourself</button>
 {% endif %}
 
+<script src="/static/scripts/themes.js"></script>
 <script>
     quills["{{type_short_name}}"] = new Quill("#quill-{{ type_short_name }}", {
         modules: {

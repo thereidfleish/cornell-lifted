@@ -83,7 +83,7 @@ p {
 
 /* Full-height sections */
 .section-container {
-    min-height: 70vh;
+    min-height: auto;
     padding: 80px 0px;
     display: flex;
     flex-direction: column;
@@ -119,7 +119,7 @@ p {
     font-weight: 400;
 }
 
-/* Updated navbar styling */
+/* Navbar styling */
 .sticky-navbar {
     position: sticky;
     top: 0;
@@ -164,44 +164,87 @@ p {
     box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Hamburger button styling */
+.navbar-toggler {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.navbar-toggler:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.navbar-toggler-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+}
+
+/* Mobile menu styling */
+.mobile-menu {
+    display: none;
+    background-color: white;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+}
+
+.mobile-menu.show {
+    display: block;
+    max-height: 300px;
+    /* Adjust as needed */
+}
+
+/* Mobile link styling */
+.mobile-menu .btn-link {
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    margin: 0;
+}
+
+.mobile-menu .btn-link:last-child {
+    border-bottom: none;
+}
+
+.mobile-menu .action-nav {
+    padding-top: 10px;
+}
+
+/* Animation for menu items */
+.mobile-menu.show .btn {
+    animation: fadeInDown 0.3s forwards;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments - already in your site.css but added here for reference */
+@media (max-width: 992px) {
     .sticky-navbar .d-flex {
-        flex-direction: column;
-        align-items: center;
+        /* Keep as-is since we're using Bootstrap classes */
     }
 
     .navbar-brand {
-        margin-bottom: 15px;
+        margin-bottom: 0;
+        /* Changed to keep logo properly aligned */
     }
-
-    .nav-links {
-        margin-bottom: 15px;
-        text-align: center;
-    }
-
-    .action-nav {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .action-nav .btn {
-        margin: 5px;
-    }
-}
-
-.sticky-navbar .btn-link {
-    color: var(--text-color);
-    text-decoration: none;
-    font-weight: 500;
-    margin-right: 15px;
-    transition: all 0.3s ease;
-}
-
-.sticky-navbar .btn-link:hover {
-    color: var(--cornell-red);
-    transform: translateY(-2px);
 }
 
 /* Hero Logo Styling */
@@ -511,7 +554,7 @@ p {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     text-align: center;
     position: relative;
-    border: 1px dashed var(--cornell-blue);
+    border: 1px var(--cornell-blue);
 }
 
 .stats-card:before {
@@ -522,7 +565,7 @@ p {
     top: 8px;
     left: 8px;
     border-radius: 20px;
-    border: 1px dashed var(--cornell-red);
+    border: 1px var(--cornell-red);
     z-index: -1;
 }
 
@@ -1868,8 +1911,8 @@ body.fall.messages-page .hero-section {
 /* Send Message Page Specific Styling */
 
 /* Send message hero section */
-body.send-message-page .hero-section {
-    min-height: 92vh;
+body.send-message-page .message-hero-section {
+    min-height: 50vh;
     padding: 100px 0 60px;
 }
 
@@ -2969,6 +3012,8 @@ body.messages-page .hero-subtitle {
 .messages-help {
     margin-top: 60px;
     margin-bottom: 30px;
+    padding: 0 15px;
+    /* Add padding instead of fixed margins */
 }
 
 .help-container {
@@ -2976,7 +3021,11 @@ body.messages-page .hero-subtitle {
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     padding: 30px;
-    border: 1px dashed var(--cornell-red);
+    width: 100%;
+    max-width: 1140px;
+    /* Match container max-width */
+    margin: 0 auto;
+    /* Center the container */
     position: relative;
 }
 
@@ -2988,15 +3037,40 @@ body.messages-page .hero-subtitle {
     top: 8px;
     left: 8px;
     border-radius: 15px;
-    border: 1px dashed var(--cornell-blue);
+    border: 1px var(--cornell-blue);
     z-index: -1;
 }
 
 .help-title {
     font-family: 'Schoolbell', arial, serif;
-    font-size: 1.8rem;
+    font-size: 2.5rem;
     color: var(--cornell-red);
     margin-bottom: 15px;
+}
+
+.help-text {
+    margin-bottom: 15px;
+}
+
+/* Make help section mobile responsive */
+@media (max-width: 768px) {
+    .help-title {
+        font-size: 2rem;
+    }
+
+    .help-container {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .help-title {
+        font-size: 1.8rem;
+    }
+
+    .help-text {
+        font-size: 0.95rem;
+    }
 }
 
 /* Spring theme adjustments */
@@ -3193,10 +3267,6 @@ body.fall .message-group-card .card-header {
     .help-container {
         padding: 20px;
         text-align: center;
-    }
-
-    .help-container .btn {
-        margin-top: 15px;
     }
 }
 
@@ -3434,5 +3504,421 @@ body.fall .timeline-date {
 
     .snowflake:nth-child(5) {
         font-size: 1.7em;
+    }
+}
+
+#card-header {
+    margin-bottom: -150px;
+}
+
+/* Message thumbnail and icon styling */
+.message-thumbnail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    margin: 8px;
+}
+
+.message-thumbnail:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.thumbnail-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Style for emoji icons */
+.message-icon-img {
+    font-size: 2rem;
+    /* Increase the size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    transition: all 0.3s ease;
+}
+
+/* Style for numbered indicators */
+.message-number {
+    position: absolute;
+    bottom: -15px;
+    font-size: 0.75rem;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.message-thumbnail:hover .message-number {
+    bottom: -10px;
+    color: var(--cornell-blue);
+}
+
+/* For message cards that have been viewed (optional) */
+.message-icon-img.viewed {
+    color: #ccc;
+    /* Lighter color for viewed messages */
+}
+
+/* Add some color to the heart emoji */
+.received-icon {
+    color: #B31B1B;
+    /* Cornell red from your CSS variables */
+}
+
+.sent-icon {
+    color: #0076BD;
+    /* Cornell blue from your CSS variables */
+}
+
+/* Timeline layout styling */
+.timeline-container {
+    display: flex;
+    min-height: 70vh;
+    margin-bottom: 50px;
+}
+
+.timeline-sidebar {
+    width: 40%;
+    border-right: 1px solid var(--border-color);
+    padding-right: 20px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+.card-preview-area {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.vertical-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.vertical-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--cornell-red), var(--cornell-blue));
+    z-index: 1;
+}
+
+.timeline-semester {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.semester-dot {
+    position: absolute;
+    left: -30px;
+    top: 5px;
+    width: 30px;
+    height: 30px;
+    background-color: var(--cornell-blue);
+    border-radius: 50%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.semester-heading {
+    font-family: 'Schoolbell', arial, serif;
+    font-size: 1.8rem;
+    color: var(--cornell-blue);
+    margin-bottom: 15px;
+    margin-left: 15px;
+}
+
+.message-category {
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+
+.category-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--cornell-red);
+}
+
+.tab-buttons {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    padding: 5px 15px;
+    font-size: 0.9rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-button.active {
+    background-color: var(--cornell-blue);
+    color: white;
+    font-weight: 500;
+}
+
+.tab-button:first-child {
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+}
+
+.tab-button:last-child {
+    border-radius: 0 5px 5px 0;
+}
+
+.messages-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+/* Styling to match the original card image */
+.message-indicator {
+    width: 55px;
+    height: 55px;
+    background-color: white;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    margin: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    text-decoration: none;
+}
+
+.message-indicator:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.message-indicator.active {
+    border: 2px solid var(--cornell-red);
+    background-color: #efefef;
+}
+
+.message-icon-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+}
+
+.message-indicator.active .message-icon-container {
+    border: 1px solid #B31B1B;
+    box-shadow: 0 0 0 2px rgba(179, 27, 27, 0.3);
+}
+
+.message-icon {
+    font-size: 1.5rem;
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+}
+
+.received-icon {
+    color: #B31B1B;
+}
+
+.sent-icon {
+    color: #0076BD;
+}
+
+.message-number {
+    /* font-size: 0.7rem;
+            color: #666;
+            position: absolute;
+            bottom: 3px; */
+
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #B31B1B;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Empty state */
+.empty-card-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    max-width: 650px;
+    width: 100%;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    padding: 30px;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-title {
+    font-family: 'Schoolbell', arial, serif;
+    font-size: 1.8rem;
+    color: var(--cornell-blue);
+    margin-bottom: 15px;
+}
+
+.empty-text {
+    color: #666;
+    margin-bottom: 0;
+    max-width: 400px;
+}
+
+.empty-message.small,
+.locked-message.small {
+    padding: 10px;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    margin: 0;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+/* Card styling */
+.card-container {
+    max-width: 650px;
+    width: 100%;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+    position: relative;
+}
+
+.back-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: var(--cornell-blue);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* Lifted card styling - directly from your original CSS */
+.lifted-card {
+    background-color: white;
+    border-radius: 15px;
+    border: none;
+    padding: 30px;
+    margin: 30px 0;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transform: rotate(-1deg);
+}
+
+.lifted-card h4 {
+    color: var(--cornell-blue);
+    border-bottom: 2px solid var(--cornell-red);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.message-content {
+    white-space: pre-line;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .timeline-container {
+        flex-direction: column;
+    }
+
+    .timeline-sidebar {
+        width: 100%;
+        max-height: none;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding-right: 0;
+        padding-bottom: 30px;
+        margin-bottom: 30px;
+    }
+
+    .card-preview-area {
+        padding: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .semester-heading {
+        font-size: 1.5rem;
+    }
+
+    .category-title {
+        font-size: 1.1rem;
+    }
+
+    .message-indicator {
+        width: 40px;
+        height: 40px;
+    }
+
+    .message-icon {
+        font-size: 1.3rem;
     }
 }
