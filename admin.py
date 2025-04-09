@@ -1,6 +1,7 @@
 from flask import redirect, send_file, render_template, session, abort, jsonify, request, url_for, Blueprint, current_app
 from flask_login import login_user, login_required, current_user, logout_user
 from pathlib import Path
+from datetime import datetime
 
 import json
 import os
@@ -45,16 +46,28 @@ def admin_page():
         if stem in all_cards_files_dict: # Don't include tmp files or other stuff
             if "~" not in stem and ext in all_cards_files_dict[stem]["to_process"]:
                 all_cards_files_dict[stem]["done"] += ext + ", "
-
+    
     # Swap Prefs Table
     conn = get_db_connection()
     swap_prefs = conn.execute("select * from swap_prefs").fetchall()
     conn.close()
 
+    # Attachments Table
+    conn = get_db_connection()
+    attachments = conn.execute("select * from attachments").fetchall()
+    conn.close()
+
+    # Attachment Prefs Table
+    conn = get_db_connection()
+    attachment_prefs = conn.execute("select * from attachment_prefs").fetchall()
+    conn.close()
+
     return render_template("admin.html",
                            all_cards_files_dict=all_cards_files_dict,
                            pptx_templates_files=pptx_templates_files,
-                           swap_prefs=swap_prefs)
+                           swap_prefs=swap_prefs,
+                           attachments=attachments,
+                           attachment_prefs=attachment_prefs)
 
 @admin.post("/add-message-group")
 @login_required
@@ -116,6 +129,39 @@ def update_form_message_group():
     current_app.config["lifted_config"]["form_message_group"] = request.form.get("form-message-group")
     update_lifted_config(current_app.config["lifted_config"])
     return redirect(url_for('admin.admin_page'))
+
+@admin.post("/update-attachment-message-group")
+@login_required
+@admin_required
+def update_attachment_message_group():
+    current_app.config["lifted_config"]["attachment_message_group"] = request.form.get("attachment-message-group")
+    update_lifted_config(current_app.config["lifted_config"])
+    return redirect(url_for('admin.admin_page'))
+
+@admin.route("/delete-attachment/<attachment>")
+@login_required
+@admin_required
+def delete_attachment(attachment):
+    conn = get_db_connection()
+    conn.execute('delete from attachments where attachment = ?', (attachment,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("admin.admin_page"))
+
+@admin.post("/add-attachment")
+@login_required
+@admin_required
+def add_attachment():
+    attachment = request.form["attachment-name"]
+    count = request.form["attachment-count"]
+
+    conn = get_db_connection()
+    conn.execute("insert into attachments (attachment, count) values (?, ?)", (attachment, count))
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for("admin.admin_page"))
 
 @admin.post("/update-swapping-config")
 @login_required
@@ -258,6 +304,33 @@ def query_messages():
         return jsonify({"results": "none"})
     
     return jsonify({"results": [{attr: result[attr] for attr in result.keys()} for result in results]})
+
+@admin.route("/process-all-cards/<message_group>")
+@login_required
+@admin_required
+def process_all_cards(message_group):
+    print("Starting task")
+    sql = "select * from messages where message_group=?" + (" order by recipient_email asc" if request.args.get('alphabetical') == "true" else "")
+    conn = get_db_connection()
+    cards = conn.execute(sql, (message_group,)).fetchall()
+    conn.close()
+    
+    if len(cards) == 0:
+        return "No cards found", 404
+
+    output_filepath = "all_cards_output/" + message_group + datetime.now().strftime(" %m-%d-%Y at %H-%M-%S")
+    
+    should_process_pptx_pdf = True if request.args.get("pptx-pdf") == "true" else False
+
+    with open(f"{output_filepath}.txt", "w") as file:
+        file.write(f".csv{', .pptx, .pdf' if should_process_pptx_pdf == True else ''}\n0%")
+    
+    helpers.create_csv(cards, output_filepath)
+
+    if should_process_pptx_pdf:
+        helpers.cards_to_pptx_and_pdf(cards, message_group, output_filepath)
+    
+    return "Done!"
 
 @admin.post("/impersonate")
 @login_required

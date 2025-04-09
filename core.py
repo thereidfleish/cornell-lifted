@@ -65,45 +65,83 @@ def messages():
             "sent": helpers.process_ranks_to_dict(sent_ranks)
         }
 
+        attachments = conn.execute("select * from attachments").fetchall()
+        attachment_pref = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
+                                       (current_user.email, current_app.config["lifted_config"]["attachment_message_group"])).fetchone()
+
         conn.close()
 
         return render_template(
             'messages.html',
             cards_dict=cards_dict,
-            ranks_dict=ranks_dict
+            ranks_dict=ranks_dict,
+            attachments=attachments,
+            attachment_pref=attachment_pref
             )
     else:
         return render_template('messages.html')
+    
+@core.get("/messages-json")
+def messages_json():
+    # conn = get_db_connection()
+            
+    # received_cards = conn.execute("select * from messages where recipient_email=?", ("rf377@cornell.edu",)).fetchall()
+    # sent_cards = conn.execute("select * from messages where sender_email=?", ("rf377@cornell.edu",)).fetchall()
 
-@core.route("/process-all-cards/<message_group>")
+    # cards_dict = {
+    #     "received": helpers.process_cards_to_dict(received_cards),
+    #     "sent": helpers.process_cards_to_dict(sent_cards)
+    # }
+
+    # print(cards_dict)
+
+    # conn.close()
+
+    cards_dict = {
+        "received": [
+            {
+                "sem": "Fall 2024",
+                "ids": [118, 254, 2638]
+            },
+            {
+                "sem": "Spring 2024",
+                "ids": [16193, 2614, 12345]
+            }
+        ]
+    }
+
+    return jsonify(cards_dict)
+    
+@core.post("/set-attachment")
 @login_required
-def process_all_cards(message_group):
-    print("Starting task")
-    sql = "select * from messages where message_group=?" + (" order by recipient_email asc" if request.args.get('alphabetical') == "true" else "")
+def set_attachment():
+    attachment = request.form["attachment"]
+    message_group = current_app.config["lifted_config"]["attachment_message_group"]
+
     conn = get_db_connection()
-    cards = conn.execute(sql, (message_group,)).fetchall()
+    conn.execute("update attachments set count=count-1 where attachment=?", (attachment,))
+
+    prev_attachment = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
+                                       (current_user.email, message_group)).fetchone()
+    
+    if prev_attachment:
+        conn.execute("update attachment_prefs set attachment=? where recipient_email=? and message_group=?",
+                     (attachment, current_user.email, message_group))
+        conn.execute("update attachments set count=count+1 where attachment=?", (prev_attachment["attachment"],))
+    else:
+        conn.execute("insert into attachment_prefs (recipient_email, message_group, attachment) values (?, ?, ?)",
+                 (current_user.email, current_app.config["lifted_config"]["attachment_message_group"], attachment))
+
+    # conn.execute("insert or replace into attachment_prefs (recipient_email, attachment) values (?, ?)", (current_user.email, attachment))
+    conn.commit()
     conn.close()
     
-    if len(cards) == 0:
-        return "No cards found", 404
-
-    output_filepath = "all_cards_output/" + message_group + datetime.now().strftime(" %m-%d-%Y at %H-%M-%S")
-    
-    should_process_pptx_pdf = True if request.args.get("pptx-pdf") == "true" else False
-
-    with open(f"{output_filepath}.txt", "w") as file:
-        file.write(f".csv{', .pptx, .pdf' if should_process_pptx_pdf == True else ''}\n0%")
-    
-    helpers.create_csv(cards, output_filepath)
-
-    if should_process_pptx_pdf:
-        helpers.cards_to_pptx_and_pdf(cards, message_group, output_filepath)
-    
-    return "Done!"
+    return redirect(url_for("core.messages"))
 
 def get_card(id):
     conn = get_db_connection()
     card = conn.execute("select * from messages where id=?", (id,)).fetchone()
+    # card = conn.execute("select * from messages", (id,)).fetch()
     conn.close()
 
     if card is None:
@@ -126,6 +164,29 @@ def get_card_html(id):
             abort(401)
 
     return render_template("card.html", card=card, message_confirmation=request.args.get("message_confirmation"))
+
+@core.route("/get-card-json/<id>")
+# @login_required
+def get_card_json(id):
+    card = get_card(id)
+
+    card_json = {
+        "id": card["id"],
+        "sender_email": card["sender_email"],
+        "recipient_email": card["recipient_email"],
+        "message_content": card["message_content"]
+    }
+
+    # # First check if the user is an admin.  If so, they can bypass all the remaining checks
+    # if is_admin() == False:
+    #     # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
+    #     if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
+    #         abort(401)
+    #     # So now we know the user is affiliated with the message in some way.  However, if the cards are hidden and the user was not a sender of the card, abort
+    #     elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"] and card["sender_email"] != current_user.email:
+    #         abort(401)
+
+    return jsonify(card_json)
 
 @core.route("/get-card-pdf/<id>")
 @login_required

@@ -20,6 +20,22 @@
 --     message_group_to TEXT NOT NULL
 -- );
 
+-- DROP TABLE IF EXISTS attachments;
+
+-- CREATE TABLE attachments (
+--     attachment TEXT PRIMARY KEY,
+--     count INTEGER NOT NULL
+-- );
+
+-- DROP TABLE IF EXISTS attachment_prefs;
+
+-- CREATE TABLE attachment_prefs (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     recipient_email TEXT NOT NULL,
+--     message_group TEXT NOT NULL,
+--     attachment TEXT NOT NULL
+-- );
+
 -- DROP TABLE IF EXISTS cp_taps;
 
 -- CREATE TABLE cp_taps (

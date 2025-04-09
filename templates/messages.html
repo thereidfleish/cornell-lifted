@@ -223,6 +223,32 @@
                                                                 }} physical cards on the last day of classes!</p>
                                                             <p class="locked-note">Check your "You've been Lifted!"
                                                                 email for details</p>
+                                                            
+                                                            {% if lifted_config.attachment_message_group == message_group_short_name %}
+                                                                <hr>
+                                                                <p class="mt-2 mb-0"><b>New!  Choose your message attachment!</b></p>
+                                                                <form method="post" action="/set-attachment">
+                                                                    {% for attachment in attachments %}
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input" type="radio" name="attachment" value="{{ attachment['attachment'] }}"
+                                                                            id="attachment_{{ attachment['attachment'] }}" onchange="this.form.submit();" required {{ "checked" if
+                                                                            attachment["attachment"]==attachment_pref["attachment"] }} {{ "disabled" if attachment["count"] < 1 }}>
+                                                                        <label class="form-check-label" for="attachment_{{attachment['attachment']}}">
+                                                                            <p class="mb-0">{{ attachment["attachment"] }} ({{ attachment["count"] }} left)</p>
+                                                                        </label>
+                                                                    </div>
+                                                                    {% endfor %}
+                                                                </form>
+                                                                                                                                
+                                                                </p>
+                                                            {% endif %}
+                                                            
+                                                            {% if lifted_config.swap_from == message_group_short_name %}
+                                                            <hr>
+                                                            <p class="mt-2 mb-0">{{ lifted_config.swap_text | safe }}
+                                                            </p>
+                                                            {% endif %}
+                                                            
                                                             {% elif "_e" in message_group_short_name %}
                                                             <div class="locked-icon">💌</div>
                                                             <h5 class="locked-title">Coming Soon!</h5>

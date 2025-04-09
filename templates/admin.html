@@ -154,6 +154,53 @@
                     show_none=True) }}
                 </form>
 
+                <h5>Attachment Options</h5>
+                <p>Add, remove, and edit attachments for the following message group</p>
+                
+                <p><b>Current Message Group:</b> Set this to the message group that people will pick an attachment for.  Set this to <b>None</b> to not allow any choosing attachments.</p>
+                <form method="post" action="/update-attachment-message-group">
+                    {{ components.message_group_radio(id="attachment-message-group",
+                    onclick_fn="this.form.submit()",
+                    checked_expr=lifted_config.attachment_message_group,
+                    show_none=True) }}
+                </form>
+
+                <p class="mb-1"><b>Add attachments and counts</b></p>
+                <form method="post" action="/add-attachment">
+                    <div class="d-inline-flex border border-2 rounded mb-2 p-2">
+                        <div class="d-flex align-items-center ms-4">
+                            <label for="attachment-name-input" class="form-label m-2">Name</label>
+                            <input type="text" class="form-control" id="attachment-name" name="attachment-name" required />
+
+                            <label for="attachment-count-input" class="form-label m-2">Count</label>
+                            <input type="number" class="form-control" id="attachment-count" name="attachment-count" min="0" required />
+                            <button type="submit" class="btn btn-primary ms-4 mx-2" onclick="">Add</button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <div class="table-responsive mb-4">
+                    <table id="swap-prefs-table" class="table table-striped"
+                        style="display: block; max-height: 300px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">Attachment</th>
+                                <th scope="col">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in attachments %}
+                            <tr>
+                                <td>{{ record["attachment"] }}</td>
+                                <td>{{ record["count"] }}</td>
+                                <td><a href="/delete-attachment/{{record['attachment']}}">🗑️</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
                 <h5 class="mt-3">Message Swapping</h5>
                 <p>Allow recipients to choose to receive their Lifted messages sent to one message group to another
                     message group
@@ -435,7 +482,7 @@
                 <p>Deleting will remove the pref (so no future messages will be moved), but you will have to manually
                     move the existing messages back.</p>
                 <div class="table-responsive mb-4">
-                    <table id="admins-table" class="table table-striped"
+                    <table id="swap-prefs-table" class="table table-striped"
                         style="display: block; max-height: 300px; overflow: auto">
                         <thead>
                             <tr style="position: sticky; top: 0;">
@@ -454,6 +501,35 @@
                                 <td>{{ record["message_group_from"] }}</td>
                                 <td>{{ record["message_group_to"] }}</td>
                                 <td><a href="/delete-swap-pref/{{record['id']}}">🗑️</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5>Attachment Prefs Table</h5>
+                <p>The attachment_prefs table. Num entries: {{ attachment_prefs | length }}</p>
+                <p>Deleting will remove the pref.</p>
+                <div class="table-responsive mb-4">
+                    <table id="swap-prefs-table" class="table table-striped"
+                        style="display: block; max-height: 300px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">ID</th>
+                                <th scope="col">Recipient Email</th>
+                                <th scope="col">Message Group</th>
+                                <th scope="col">Attachment</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in attachment_prefs %}
+                            <tr>
+                                <td>{{ record["id"] }}</td>
+                                <td>{{ record["recipient_email"] }}</td>
+                                <td>{{ record["message_group"] }}</td>
+                                <td>{{ record["attachment"] }}</td>
+                                <td><a href="/delete-attachment-pref/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
