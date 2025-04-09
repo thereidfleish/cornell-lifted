@@ -15,7 +15,6 @@
         <div class="container">
             <div class="text-center mb-5">
                 <img class="mx-auto d-block" src="/static/images/logo.png" width="300" alt="Cornell Lifted Logo" />
-                <h1 class="lifted-title">LIFTED</h1>
             </div>
 
             <h2 class="section-title">Your {% if current_user.email == card["recipient_email"] %}Received{% else
@@ -112,11 +111,11 @@
                         </div>
                         {% endif %}
 
-                        <div class="alert alert-danger mt-4" role="alert">
+                        <!-- <div class="alert alert-danger mt-4" role="alert">
                             <h5 class="alert-heading">Something missing or seem wrong?</h5>
                             <p class="mb-0">Send us an email at <a
                                     href="mailto:lifted@cornell.edu">lifted@cornell.edu</a> and we'll take a look!</p>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -127,6 +126,7 @@
     {{ components.footer() }}
 
     <script src="/static/scripts/scripts.js"></script>
+    <script src="/static/scripts/themes.js"></script>
     <script src="/static/scripts/bootstrap.bundle.min.js"></script>
 </body>
 
