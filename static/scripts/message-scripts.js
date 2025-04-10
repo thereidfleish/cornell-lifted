@@ -1,31 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // Count messages in sent tabs
-  const sentCount = document.querySelectorAll('[id$="-sent"] .message-thumbnail').length;
-  document.getElementById('sent-count').textContent = sentCount;
-
-  // Count messages in received tabs
-  const receivedCount = document.querySelectorAll('[id$="-received"] .message-thumbnail').length;
-  document.getElementById('received-count').textContent = receivedCount;
-
-  // Count unique event cards (counting timeline-event divs, skipping the legacy one)
-  const eventCards = document.querySelectorAll('.timeline-event');
-  // Subtract 1 for the legacy events section
-  document.getElementById('events-count').textContent = Math.max(0, eventCards.length - 1);
-
-  // Count rank badges
-  const rankBadges = document.querySelectorAll('.rank-badge');
-  document.getElementById('ranks-count').textContent = rankBadges.length;
-});
-
-document.addEventListener('DOMContentLoaded', function () {
   // Get filter buttons
-  const filterAll = document.getElementById('filter-all');
   const filterReceived = document.getElementById('filter-received');
   const filterSent = document.getElementById('filter-sent');
 
-  // Get all tab panes
-  const receivedPanes = document.querySelectorAll('.tab-pane[id$="-received"]');
-  const sentPanes = document.querySelectorAll('.tab-pane[id$="-sent"]');
 
   // Function to set active class on tab links
   function setActiveLinks(type) {
@@ -54,159 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
   }
-
-  // Handle All Messages filter
-  filterAll.addEventListener('click', function () {
-    // Set active button
-    filterAll.classList.add('active');
-    filterReceived.classList.remove('active');
-    filterSent.classList.remove('active');
-
-    // Reset to show all tab panes based on the active tab links
-    document.querySelectorAll('.message-tabs').forEach(tabGroup => {
-      const activeLink = tabGroup.querySelector('.nav-link.active');
-      if (activeLink) {
-        const target = activeLink.getAttribute('data-bs-target');
-        if (target) {
-          const pane = document.querySelector(target);
-          if (pane) {
-            // Show this pane, hide others in this tab group
-            const allPanes = tabGroup.querySelectorAll('.tab-pane');
-            allPanes.forEach(p => {
-              p.classList.remove('show', 'active');
-            });
-            pane.classList.add('show', 'active');
-          }
-        }
-      }
-    });
-
-    // Show all cards
-    document.querySelectorAll('.message-group-card').forEach(card => {
-      card.style.display = '';
-    });
-  });
-
-  // Handle Received Messages filter
-  filterReceived.addEventListener('click', function () {
-    // Set active button
-    filterAll.classList.remove('active');
-    filterReceived.classList.add('active');
-    filterSent.classList.remove('active');
-
-    // Show only received tab panes
-    receivedPanes.forEach(pane => {
-      pane.classList.add('show', 'active');
-    });
-
-    sentPanes.forEach(pane => {
-      pane.classList.remove('show', 'active');
-    });
-
-    // Set the correct active class on nav links
-    setActiveLinks('received');
-
-    // Show cards with received messages, hide others
-    document.querySelectorAll('.message-group-card').forEach(card => {
-      const receivedPane = card.querySelector('.tab-pane[id$="-received"]');
-      const hasEmptyMessage = receivedPane &&
-        receivedPane.querySelector('.empty-message') !== null;
-
-      if (hasEmptyMessage) {
-        card.style.display = 'none'; // Hide cards with no received messages
-      } else {
-        card.style.display = ''; // Show cards with received messages
-      }
-    });
-  });
-
-  // Handle Sent Messages filter
-  filterSent.addEventListener('click', function () {
-    // Set active button
-    filterAll.classList.remove('active');
-    filterReceived.classList.remove('active');
-    filterSent.classList.add('active');
-
-    // Show only sent tab panes
-    sentPanes.forEach(pane => {
-      pane.classList.add('show', 'active');
-    });
-
-    receivedPanes.forEach(pane => {
-      pane.classList.remove('show', 'active');
-    });
-
-    // Set the correct active class on nav links
-    setActiveLinks('sent');
-
-    // Show cards with sent messages, hide others
-    document.querySelectorAll('.message-group-card').forEach(card => {
-      const sentPane = card.querySelector('.tab-pane[id$="-sent"]');
-      const hasEmptyMessage = sentPane &&
-        sentPane.querySelector('.empty-message') !== null;
-
-      if (hasEmptyMessage) {
-        card.style.display = 'none'; // Hide cards with no sent messages
-      } else {
-        card.style.display = ''; // Show cards with sent messages
-      }
-    });
-  });
 });
-
-// Function to change all tabs to a specific type
-function changeAllTabs(tabType) {
-  // Update active button
-  document.querySelectorAll('.message-filter .btn').forEach(btn => {
-    if (btn.textContent.toLowerCase().includes(tabType === 'all' ? 'all' : tabType)) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
-
-  // If "All Messages" is selected, don't change any tabs
-  if (tabType === 'all') {
-    return;
-  }
-
-  // For specific tab types, change all tabs to that type
-  document.querySelectorAll(`.nav-link[data-bs-target$="-${tabType}"]`).forEach(tab => {
-    try {
-      // Try to use Bootstrap's Tab API
-      var tabInstance = new bootstrap.Tab(tab);
-      tabInstance.show();
-    } catch (e) {
-      // Fallback: manual tab activation
-      const target = tab.getAttribute('data-bs-target');
-      if (target) {
-        // Remove active class from all tabs in this group
-        const tabContainer = tab.closest('.nav');
-        if (tabContainer) {
-          tabContainer.querySelectorAll('.nav-link').forEach(t => {
-            t.classList.remove('active');
-          });
-        }
-
-        // Make this tab active
-        tab.classList.add('active');
-
-        // Show this tab pane, hide others
-        const tabContent = tab.closest('.message-tabs').querySelector('.tab-content');
-        if (tabContent) {
-          tabContent.querySelectorAll('.tab-pane').forEach(pane => {
-            pane.classList.remove('show', 'active');
-          });
-
-          const tabPane = document.querySelector(target);
-          if (tabPane) {
-            tabPane.classList.add('show', 'active');
-          }
-        }
-      }
-    }
-  });
-}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function () {
@@ -229,19 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
-
-function change_color(cardId) {
-  // Store viewed cards in localStorage
-  let viewedCards = JSON.parse(localStorage.getItem('viewedCards') || '[]');
-
-  if (!viewedCards.includes(cardId)) {
-    viewedCards.push(cardId);
-    localStorage.setItem('viewedCards', JSON.stringify(viewedCards));
-  }
-
-  // Add viewed class to make the icon lighter in color
-  document.getElementById(cardId).classList.add('viewed');
-}
 
 // When page loads, apply viewed style to previously viewed cards
 document.addEventListener('DOMContentLoaded', function () {
@@ -362,12 +174,4 @@ function hideCard() {
   // Hide the card and show empty state
   document.getElementById('card-container').style.display = 'none';
   document.getElementById('empty-state').style.display = 'flex';
-}
-
-// Function from your original scripts.js
-function change_color(id) {
-  element = document.getElementById(id);
-  if (element) {
-    element.style.opacity = "0.6";
-  }
 }

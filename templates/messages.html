@@ -75,219 +75,243 @@
                 </div>
 
                 <!-- Timeline with Card Preview -->
-                <div class="timeline-container">
-                    <!-- Timeline Sidebar -->
-                    <div class="timeline-sidebar">
-                        <div class="vertical-timeline">
-                            {% set all_event_groups = [] %}
-                            {% for message_group_short_name, message_group_long_name in
-                            lifted_config.message_group_list_map.items()
-                            %}
-                            {% set year = "20" + message_group_short_name.split("_")[1] %}
-                            {% set season = "Spring" if "sp" in message_group_short_name else "Fall" %}
-                            {% set sort_key = year + ("1" if "sp" in message_group_short_name else "2") %}
-                            {% set event_group = {
-                            "year": year,
-                            "season": season,
-                            "sort_key": sort_key,
-                            "display": year + "-" + season,
-                            "sem_prefix": "sp" if "sp" in message_group_short_name else "fa",
-                            "year_short": message_group_short_name.split("_")[1]
-                            } %}
-                            {% if event_group not in all_event_groups %}
-                            {% set _ = all_event_groups.append(event_group) %}
+                <div class="timeline-wrapper">
+                    {% set all_event_groups = [] %}
+                    {% for message_group_short_name, message_group_long_name in
+                    lifted_config.message_group_list_map.items()
+                    %}
+                    {% set year = "20" + message_group_short_name.split("_")[1] %}
+                    {% set season = "Spring" if "sp" in message_group_short_name else "Fall" %}
+                    {% set sort_key = year + ("1" if "sp" in message_group_short_name else "2") %}
+                    {% set event_group = {
+                    "year": year,
+                    "season": season,
+                    "sort_key": sort_key,
+                    "display": year + "-" + season,
+                    "sem_prefix": "sp" if "sp" in message_group_short_name else "fa",
+                    "year_short": message_group_short_name.split("_")[1]
+                    } %}
+                    {% if event_group not in all_event_groups %}
+                    {% set _ = all_event_groups.append(event_group) %}
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- Sort by sort_key in reverse order (newest first) -->
+                    {% set sorted_events = all_event_groups|sort(attribute='sort_key', reverse=true) %}
+
+                    {% for event in sorted_events %}
+                    <div class="timeline-event">
+                        <div class="timeline-marker">
+                            <div class="timeline-date">
+                                <span class="timeline-year">{{ event.year }}</span>
+                                <span class="timeline-season">{{ event.season }}</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-content">
+                            <div class="event-header">
+                                <h3 class="event-title">{{ event.season }} {{ event.year }} Lifted</h3>
+                            </div>
+
+                            <div class="event-cards">
+                                <div class="row">
+                                    {% for message_group_short_name, message_group_long_name in
+                                    lifted_config.message_group_list_map.items() %}
+                                    {% if event.sem_prefix in message_group_short_name and event.year_short in
+                                    message_group_short_name %}
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="message-group-card">
+                                            <div class="card-header">
+                                                <h4
+                                                    class="group-title {% if 'e' in message_group_short_name %}pink-text{% else %}blue-text{% endif %}">
+                                                    {{ message_group_long_name }}
+                                                </h4>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="message-tabs">
+                                                    <ul class="nav nav-pills mb-3" role="tablist">
+                                                        <li class="nav-item" role="presentation">
+                                                            <button class="nav-link active" data-bs-toggle="pill"
+                                                                data-bs-target="#{{ message_group_short_name }}-received"
+                                                                type="button" role="tab" aria-selected="true">
+                                                                Received
+                                                            </button>
+                                                        </li>
+                                                        <li class="nav-item" role="presentation">
+                                                            <button class="nav-link" data-bs-toggle="pill"
+                                                                data-bs-target="#{{ message_group_short_name }}-sent"
+                                                                type="button" role="tab" aria-selected="false">
+                                                                Sent
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+
+                                                    <div class="tab-content">
+                                                        <!-- Received Tab -->
+                                                        <div class="tab-pane fade show active"
+                                                            id="{{ message_group_short_name }}-received"
+                                                            role="tabpanel">
+
+                                                            {% if message_group_short_name not in cards_dict['received']
+                                                            or
+                                                            not cards_dict['received'][message_group_short_name] %}
+                                                            <div class="empty-message">
+                                                                <p>You did not receive any
+                                                                    {% if "e" in message_group_short_name %}e{% else
+                                                                    %}physical {% endif %}Lifted messages.</p>
+                                                            </div>
+                                                            {% elif message_group_short_name in
+                                                            lifted_config.hidden_cards %}
+                                                            <div class="locked-message">
+                                                                {% if "_p" in message_group_short_name %}
+                                                                <div class="locked-icon">🎈</div>
+                                                                <h5 class="locked-title">We hope you enjoyed Lifted!
+                                                                </h5>
+                                                                {% elif "_e" in message_group_short_name %}
+                                                                <div class="locked-icon">💌</div>
+                                                                <h5 class="locked-title">We hope you enjoyed Lifted!
+                                                                </h5>
+                                                                {% endif %}
+                                                            </div>
+                                                            {% else %}
+                                                            <div class="message-count mb-3">
+                                                                <span class="count-badge">{{
+                                                                    cards_dict['received'][message_group_short_name] |
+                                                                    length
+                                                                    }}</span>
+                                                                messages received
+                                                            </div>
+
+                                                            {% if ranks_dict['received'].get(message_group_short_name,
+                                                            99)
+                                                            <= 3 %} <div class="rank-badge mb-3">
+                                                                <span class="rank-icon">🏆</span>
+                                                                Ranked <strong>{{
+                                                                    ranks_dict['received'][message_group_short_name] |
+                                                                    int |
+                                                                    ordinal }}</strong>
+                                                                out of all Cornellians!
+                                                        </div>
+                                                        {% endif %}
+
+                                                        <div class="message-gallery">
+                                                            {% for card in
+                                                            cards_dict['received'][message_group_short_name]
+                                                            %}
+                                                            <a href="/get-card-html/{{ card['id'] }}"
+                                                                class="message-thumbnail" target="_blank"
+                                                                data-direction="received"
+                                                                onclick="change_color('{{ card.id }}')">
+                                                                <div class="thumbnail-content">
+                                                                    <div class="message-icon-img" id="{{ card['id'] }}">
+                                                                        💌
+                                                                    </div>
+                                                                    <span class="message-number">{{ loop.index }}</span>
+                                                                </div>
+                                                            </a>
+                                                            {% endfor %}
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+
+                                                    <!-- Sent Tab -->
+                                                    <div class="tab-pane fade" id="{{ message_group_short_name }}-sent"
+                                                        role="tabpanel">
+
+                                                        {% if message_group_short_name not in cards_dict['sent'] or
+                                                        not cards_dict['sent'][message_group_short_name] %}
+                                                        <div class="empty-message">
+                                                            <p>You did not send any
+                                                                {% if "e" in message_group_short_name %}e{% else
+                                                                %}physical {% endif %}Lifted messages.</p>
+                                                        </div>
+                                                        {% else %}
+                                                        <div class="message-count mb-3">
+                                                            <span class="count-badge">{{
+                                                                cards_dict['sent'][message_group_short_name] | length
+                                                                }}</span>
+                                                            messages sent
+                                                        </div>
+
+                                                        {% if ranks_dict['sent'].get(message_group_short_name, 99) <= 3
+                                                            %} <div class="rank-badge mb-3">
+                                                            <span class="rank-icon">🏆</span>
+                                                            Ranked <strong>{{
+                                                                ranks_dict['sent'][message_group_short_name] | int |
+                                                                ordinal }}</strong>
+                                                            out of all Cornellians!
+                                                    </div>
+                                                    {% endif %}
+
+                                                    <div class="message-gallery">
+                                                        {% for card in cards_dict['sent'][message_group_short_name] %}
+                                                        <a href="/get-card-html/{{ card['id'] }}"
+                                                            class="message-thumbnail" target="_blank"
+                                                            data-direction="sent"
+                                                            onclick="change_color('{{ card.id }}')">
+                                                            <div class="thumbnail-content">
+                                                                <div class="message-icon-img" id="{{ card['id'] }}">💌
+                                                                </div>
+                                                                <span class="message-number">{{ loop.index }}</span>
+                                                            </div>
+                                                        </a>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             {% endif %}
                             {% endfor %}
-
-                            <!-- Sort by sort_key in reverse order (newest first) -->
-                            {% set sorted_events = all_event_groups|sort(attribute='sort_key', reverse=true) %}
-
-                            {% for event in sorted_events %}
-                            <div class="timeline-semester" id="semester-{{ sem_prefix }}{{ year_short }}">
-                                <div class="semester-dot"></div>
-                                <h3 class="semester-heading">{{ season }} {{ year }}</h3>
-
-                                {% for message_group_short_name, message_group_long_name in
-                                lifted_config.message_group_list_map.items() %}
-                                {% if event.sem_prefix in message_group_short_name and event.year_short in
-                                message_group_short_name %}
-                                <div class="message-category">
-                                    <h4 class="category-title">{{ message_group_long_name }}</h4>
-
-                                    <div class="tab-buttons">
-                                        <div class="tab-button active"
-                                            data-tab="received-{{ message_group_short_name }}">
-                                            received</div>
-                                        <div class="tab-button" data-tab="sent-{{ message_group_short_name }}">sent
-                                        </div>
-                                    </div>
-                                                
-                                    <!-- Received Messages -->
-                                    <div class="messages-list active" id="received-{{ message_group_short_name }}">
-                                        {% if message_group_short_name not in cards_dict.get('received', {}) or not
-                                        cards_dict.get('received', {}).get(message_group_short_name) %}
-                                        <div class="empty-message small">
-                                            <p>No {% if "e" in message_group_short_name %}e{% else %}physical {% endif
-                                                %}messages received.</p>
-                                        </div>
-                                        {% elif message_group_short_name in lifted_config.hidden_cards %}
-                                        <div class="locked-message small">
-                                            <p>Available on last day of classes ({{ cards_dict.get('received',
-                                                {}).get(message_group_short_name, [])|length }} messages)</p>
-                                        </div>
-                                        {% else %}
-                                        {% for card in cards_dict.get('received', {}).get(message_group_short_name, [])
-                                        %}
-                                        <!-- <a href="javascript:void(0)" class="message-indicator"
-                                            data-card-id="{{ card['id'] }}" data-direction="received"
-                                            onclick="loadCard('{{ card.id }}')">
-                                            <div class="message-icon-container" id="{{ card['id'] }}">
-                                                <div class="message-icon">💌</div>
-                                            </div>
-                                            <div class="message-number">{{ loop.index }}</div>
-                                        </a> -->
-                                        <button type="button" class="message-indicator sent-message"
-                                            data-bs-toggle="modal" data-bs-target="#card-modal"
-                                            onclick="getCardJson('{{ card.id }}', '{{ current_user.email }}', '{{lifted_config.form_message_group}}', {{lifted_config.hidden_cards}})">
-                                            <div class="message-icon-container" id="{{ card['id'] }}">
-                                                <div class="message-icon">💌</div>
-                                            </div>
-                                            <div class="message-number">{{ loop.index }}</div>
-                                        </button>
-                                        {% endfor %}
-                                        {% endif %}
-                                    </div>
-
-                                    <!-- Sent Messages -->
-                                    <div class="messages-list" id="sent-{{ message_group_short_name }}"
-                                        style="display: none;">
-                                        {% if message_group_short_name not in cards_dict.get('sent', {}) or not
-                                        cards_dict.get('sent', {}).get(message_group_short_name) %}
-                                        <div class="empty-message small">
-                                            <p>No {% if "e" in message_group_short_name %}e{% else %}physical {% endif
-                                                %}messages sent.</p>
-                                        </div>
-                                        {% else %}
-                                        {% for card in cards_dict.get('sent', {}).get(message_group_short_name, []) %}
-                                        <!-- <a href="javascript:void(0)" class="message-indicator sent-message"
-                                            data-card-id="{{ card['id'] }}" data-direction="sent"
-                                            onclick="loadCard('{{ card.id }}')">
-                                            <div class="message-icon-container" id="{{ card['id'] }}">
-                                                <div class="message-icon">💌</div>
-                                            </div>
-                                            <div class="message-number">{{ loop.index }}</div>
-                                        </a> -->
-                                        <button type="button" class="message-indicator sent-message"
-                                            data-bs-toggle="modal" data-bs-target="#card-modal"
-                                            onclick="getCardJson('{{ card.id }}', '{{ current_user.email }}', '{{lifted_config.form_message_group}}', {{lifted_config.hidden_cards}})">
-                                            <div class="message-icon-container" id="{{ card['id'] }}">
-                                                <div class="message-icon">💌</div>
-                                            </div>
-                                            <div class="message-number">{{ loop.index }}</div>
-                                        </button>
-                                        {% endfor %}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                            {% endfor %}
-
-                            <!-- Legacy years section -->
-                            <div class="timeline-semester" id="year-legacy">
-                                <div class="semester-dot"></div>
-                                <h3 class="semester-heading">Legacy</h3>
-                                <div class="message-category">
-                                    <h4 class="category-title">2017 & 2016</h4>
-                                    <div class="locked-message small">
-                                        <p>Please email lifted@cornell.edu to access your legacy messages.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="card-modal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="card-modal-label">Your Lifted Message</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="form-container modal-body m-0">
-                                    <div id="card-edit-delete-options" class="d-flex justify-content-between mb-4 d-none">
-                                        <div>
-                                            <a id="edit-message-button" class="btn btn-outline-primary me-2">✍️
-                                                Edit</a>
-                                            <a id="delete-message-button" class="btn btn-outline-danger">🗑️ Delete</a>
-                                        </div>
-                                    </div>
-
-                                    <div class="card-container mx-auto" id="card-container">
-                                        <div class="lifted-card p-4 my-4">
-                                            <h4 class="text-center blue-text" id="card-recipient-id"></h4>
-                                            <hr>
-                                            <p><b>To:</b> <span id="card-recipient-name"></span></p>
-                                            <p style="white-space: pre-line" class="message-content" id="card-message-content">
-                                                Loading
-                                                message...</p>
-                                            <p><b>From:</b> <span id="card-sender-name"></span></p>
-                                        </div>
-                                        <p class="text-muted text-center" id="card-timestamp"></p>
-                                    </div>
-            
-                                    <hr class="my-4">
-            
-                                    <div id="card-print-options" class="mt-4 d-none">
-                                        <h5>Want to print your card?</h5>
-                                        <p>If you'd like to print your card, we suggest either printing with 100% size on normal
-                                            paper and
-                                            cutting it out, or inserting a properly sized card into your printer!</p>
-                                        <a id="card-pdf-button" class="btn btn-primary mb-3"
-                                            target="_blank">Download PDF</a>
-            
-                                        <div class="card mt-3">
-                                            <div class="card-body">
-                                                <p class="mb-0 fw-bold">Card Sizes:</p>
-                                                <ul class="mb-0">
-                                                    <li><b>Fall 2024:</b> 4 x 6 in</li>
-                                                    <li><b>Spring 2024:</b> 5 x 7 in</li>
-                                                    <li><b>Spring 2022, 2023:</b> 4.25 x 5.5 in</li>
-                                                    <li><b>Spring 2018, 2019, 2020, 2021:</b> Widescreen 16:9</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card Preview Area -->
-                    <div class="card-preview-area">
-                        <div class="empty-card-state" id="empty-state">
-                            <div class="empty-icon">💌</div>
-                            <h3 class="empty-title">Select a Message</h3>
-                            <p class="empty-text">Click on any heart from the timeline to view your message here.</p>
-                        </div>
-
-                        <div class="card-container" id="card-container" style="display: none;">
-                            <button onclick="hideCard()" class="back-button">Go Back</button>
-                            <div class="lifted-card p-4 my-4">
-                                <h4 class="text-center blue-text" id="card-recipient-id"></h4>
-                                <hr>
-                                <p><b>To:</b> <span id="card-recipient-name"></span></p>
-                                <p style="white-space: pre-line" class="message-content" id="card-message-content">
-                                    Loading
-                                    message...</p>
-                                <p><b>From:</b> <span id="card-sender-name"></span></p>
-                            </div>
-                            <p class="text-muted text-center" id="card-timestamp"></p>
                         </div>
                     </div>
                 </div>
+            </div>
+            {% endfor %}
+
+            <!-- Legacy years - 2017 and 2016 -->
+            <div class="timeline-event">
+                <div class="timeline-marker">
+                    <div class="timeline-date">
+                        <span class="timeline-year">2017</span>
+                        <span class="timeline-season">Spring</span>
+                    </div>
+                </div>
+
+                <div class="timeline-content">
+                    <div class="event-header">
+                        <h3 class="event-title">Legacy Lifted Messages</h3>
+                    </div>
+
+                    <div class="event-cards">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="message-group-card">
+                                    <div class="card-header">
+                                        <h4 class="group-title blue-text">Spring 2017 and Spring 2016</h4>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="locked-message">
+                                            <div class="locked-icon">📚</div>
+                                            <h5 class="locked-title">Legacy Archives</h5>
+                                            <p>Please send us an email to access your messages from Spring 2017 and
+                                                Spring 2016. We'll try our best to find them!</p>
+                                            <a href="mailto:lifted@cornell.edu"
+                                                class="btn btn-outline-primary btn-sm mt-2">Contact Us</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
             </div>
 
             <!-- Help Section -->
@@ -299,10 +323,8 @@
                         messages!
                     </p>
                     <p class="help-text mb-0">If you received a message to a non-NetID email (such as
-                        touchdown@cornell.edu or i.love.lifted@gmail.com), you won't see it here. Send us an email and
-                        we'll
-                        find your
-                        message!</p>
+                        touchdown@cornell.edu or i.love.lifted@gmail.com), you won't see it here. Send us an email
+                        and we'll find your message!</p>
                 </div>
             </div>
         </section>

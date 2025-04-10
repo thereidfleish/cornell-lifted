@@ -3025,12 +3025,13 @@ body.messages-page .hero-subtitle {
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     padding: 30px;
-    width: 100%;
+    width: 70%;
     max-width: 1140px;
     /* Match container max-width */
     margin: 0 auto;
     /* Center the container */
     position: relative;
+    text-align: center;
 }
 
 .help-container:before {
@@ -3082,28 +3083,28 @@ body.spring.messages-page .hero-section {
     background: linear-gradient(135deg, #f4ffee 0%, #fcf4ff 100%);
 }
 
-body.spring .timeline-date {
+/* body.spring .timeline-date {
     background-color: rgba(244, 255, 238, 0.9);
-}
+} */
 
-body.spring .message-group-card .card-header {
+/* body.spring .message-group-card .card-header {
     background-color: rgba(150, 230, 161, 0.1);
     border-bottom: 1px solid rgba(150, 230, 161, 0.2);
-}
+} */
 
 /* Fall theme adjustments */
 body.fall.messages-page .hero-section {
     background: linear-gradient(135deg, #fff8ee 0%, #fef5ec 100%);
 }
 
-body.fall .timeline-date {
+/* body.fall .timeline-date {
     background-color: rgba(255, 248, 238, 0.9);
-}
+} */
 
-body.fall .message-group-card .card-header {
+/* body.fall .message-group-card .card-header {
     background-color: rgba(253, 203, 110, 0.1);
     border-bottom: 1px solid rgba(253, 203, 110, 0.2);
-}
+} */
 
 /* Animations */
 @keyframes fadeIn {
