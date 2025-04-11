@@ -340,6 +340,10 @@
                     </table>
                 </div>
 
+                {{ components.confirm_modal("delete-card-modal", "Delete Message", "Are you sure you want to delete this message?  This cannot be undone!") }}
+                
+                {{ components.card_modal("card-modal", "Lifted Message", False) }}
+
                 <h5>Download All Cards as CSV, PPTX, and PDF</h5>
                 <p>Use this tool to download all cards for a specific message group in these formats. Downloading as a
                     PDF will be necessary for
@@ -546,7 +550,7 @@
     </footer>
 </body>
 
-<!-- <script src="/static/scripts/scripts.js"></script> -->
+<script src="/static/scripts/get-card-json.js"></script>
 <script src="/static/scripts/admin.js"></script>
 <script src="/static/scripts/themes.js"></script>
 <script src="/static/scripts/bootstrap.bundle.min.js"></script>

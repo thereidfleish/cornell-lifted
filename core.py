@@ -76,41 +76,11 @@ def messages():
             cards_dict=cards_dict,
             ranks_dict=ranks_dict,
             attachments=attachments,
-            attachment_pref=attachment_pref
+            attachment_pref=attachment_pref,
+            message_confirmation=request.args.get("message_confirmation")
             )
     else:
         return render_template('messages.html')
-    
-@core.get("/messages-json")
-def messages_json():
-    # conn = get_db_connection()
-            
-    # received_cards = conn.execute("select * from messages where recipient_email=?", ("rf377@cornell.edu",)).fetchall()
-    # sent_cards = conn.execute("select * from messages where sender_email=?", ("rf377@cornell.edu",)).fetchall()
-
-    # cards_dict = {
-    #     "received": helpers.process_cards_to_dict(received_cards),
-    #     "sent": helpers.process_cards_to_dict(sent_cards)
-    # }
-
-    # print(cards_dict)
-
-    # conn.close()
-
-    cards_dict = {
-        "received": [
-            {
-                "sem": "Fall 2024",
-                "ids": [118, 254, 2638]
-            },
-            {
-                "sem": "Spring 2024",
-                "ids": [16193, 2614, 12345]
-            }
-        ]
-    }
-
-    return jsonify(cards_dict)
     
 @core.post("/set-attachment")
 @login_required
@@ -149,9 +119,9 @@ def get_card(id):
     
     return card
 
-@core.route("/get-card-html/<id>")
+@core.route("/get-card-json/<id>")
 @login_required
-def get_card_html(id):
+def get_card_json(id):
     card = get_card(id)
 
     # First check if the user is an admin.  If so, they can bypass all the remaining checks
@@ -162,29 +132,17 @@ def get_card_html(id):
         # So now we know the user is affiliated with the message in some way.  However, if the cards are hidden and the user was not a sender of the card, abort
         elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"] and card["sender_email"] != current_user.email:
             abort(401)
-
-    return render_template("card.html", card=card, message_confirmation=request.args.get("message_confirmation"))
-
-@core.route("/get-card-json/<id>")
-# @login_required
-def get_card_json(id):
-    card = get_card(id)
-
+    
     card_json = {
         "id": card["id"],
+        "created_timestamp": card["created_timestamp"],
+        "message_group": card["message_group"],
         "sender_email": card["sender_email"],
+        "sender_name": card["sender_name"],
         "recipient_email": card["recipient_email"],
+        "recipient_name": card["recipient_name"],
         "message_content": card["message_content"]
     }
-
-    # # First check if the user is an admin.  If so, they can bypass all the remaining checks
-    # if is_admin() == False:
-    #     # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
-    #     if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
-    #         abort(401)
-    #     # So now we know the user is affiliated with the message in some way.  However, if the cards are hidden and the user was not a sender of the card, abort
-    #     elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"] and card["sender_email"] != current_user.email:
-    #         abort(401)
 
     return jsonify(card_json)
 
@@ -263,7 +221,7 @@ def edit_message(id):
         else:
             message_group = current_app.config["lifted_config"]["form_message_group"]
             if message_group == "none":
-                return "Haha, nice try :)"
+                return "Sorry - the form is closed!"
             
             id = conn.execute('update messages set sender_name=?, recipient_name=?, message_content=?  where id=? returning id',
                          (sender_name, recipient_name, message_content, card["id"])).fetchone()
@@ -271,7 +229,7 @@ def edit_message(id):
         conn.commit()
         conn.close()
 
-        return redirect(url_for('core.get_card_html', id=id["id"]))
+        return redirect(url_for('core.messages'))
     
     return render_template("send-message.html", form=form, is_edit=True, show_admin_overrides=show_admin_overrides,
                            form_description="<p>Edit your Lifted message.  If you need to change the recipient email, please email us at <a href=mailto:lifted@cornell.edu>lifted@cornell.edu</a></p>",)
@@ -333,7 +291,7 @@ def send_message():
         else:
             message_group = current_app.config["lifted_config"]["form_message_group"]
             if message_group == "none":
-                return "Haha, nice try :)"
+                return "Sorry - the form is closed!"
             
             recipient_netID = form.recipient_netid.data.strip()
             if "@" in recipient_netID:
@@ -360,7 +318,7 @@ def send_message():
 
         helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
 
-        return redirect(url_for('core.get_card_html', id=id["id"], message_confirmation=True))
+        return redirect(url_for('core.messages', message_confirmation=True))
 
     dir_path = f'templates/rich_text/{current_app.config["lifted_config"]["form_message_group"]}/form.html'
     if Path(dir_path).exists():
@@ -369,7 +327,7 @@ def send_message():
         return render_template("send-message.html", form=form, is_edit=False, show_admin_overrides=show_admin_overrides, form_description=form_description)
     
     return render_template("send-message.html", form=form, is_edit=False, show_admin_overrides=show_admin_overrides,
-                           form_description="<p>You need to set a form description!</p>",)
+                           form_description="<p>A Lifted admin needs to set a form description!  Sign into the admin dashboard to do this.</p>",)
 
 @core.route("/people-search")
 @login_required

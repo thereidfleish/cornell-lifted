@@ -19,12 +19,12 @@
         "sp_19_p",
         "sp_18_p",
         "sp_21_p",
-        "fa_24_p",
         "sp_23_p",
         "sp_22_p",
         "sp_24_p",
         "sp_25_p",
-        "sp_25_e"
+        "sp_25_e",
+        "fa_24_p"
     ],
     "form_message_group": "none",
     "attachment_message_group": "sp_25_p",

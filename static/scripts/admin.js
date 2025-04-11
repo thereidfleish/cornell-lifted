@@ -16,6 +16,12 @@ async function processAllCards() {
   }
 }
 
+function deleteMessageConfirmation(id) {
+  if (confirm('Are you sure you want to delete this message?  This cannot be undone')) {
+    window.open(`/delete-message/${id}?go_to_admin=true`, "_self");
+  }
+}
+
 async function handleMessagesQuery(inputText, messageGroupSelect) {
   queryStatus = document.getElementById("message-query-status")
   queryStatus.textContent = "Loading..."
@@ -27,8 +33,6 @@ async function handleMessagesQuery(inputText, messageGroupSelect) {
     return
   }
   const data = await response.json();
-
-  console.log(data)
 
   // Update the table with the results
   const resultsTable = document.getElementById("messages-info-table");
@@ -45,15 +49,22 @@ async function handleMessagesQuery(inputText, messageGroupSelect) {
     const row = document.createElement("tr");
     // row.className = "table_hover"
     // console.log(result)
-    row.innerHTML = `<td style="white-space: nowrap"><a href=/get-card-html/${result["id"]} target="_blank">💌</a> <a href=/get-card-pdf/${result["id"]} target="_blank">⬇️</a> <a href=/edit-message/${result["id"]}?show_admin_overrides=true>✍️</a> <a href=/delete-message/${result["id"]}?go_to_admin=true>🗑️</a></td>
-                         <td>${result["created_timestamp"]}</td>
-                         <td>${result["message_group"]}</td>
-                         <td>${result["sender_email"]}</td>
-                         <td>${result["recipient_email"]}</td>
-                         <td>${result["sender_name"]}</td>
-                         <td>${result["recipient_name"]}</td>
-                         <td>${result["message_content"]}</td>
-                         <td>${result["id"]}</td>`;
+    row.innerHTML = `<td style="white-space: nowrap">
+                        <button class="p-0" style="background: none; border: none;" type="button" data-bs-toggle="modal"
+                        data-bs-target="#card-modal" onclick="getCardJson(${result["id"]})">💌</button>
+                        <a class="px-1" href=/get-card-pdf/${result["id"]} target="_blank">⬇️</a>
+                        <a class="px-1" href=/edit-message/${result["id"]}?show_admin_overrides=true>✍️</a>
+                        <button class="p-0" style="background: none; border: none;" type="button" data-bs-toggle="modal"
+                        data-bs-target="#delete-card-modal" onclick="document.getElementById('delete-card-modal_yes_button').setAttribute('href', '/delete-message/${result['id']}?go_to_admin=true')">🗑️</button>
+                      </td>
+                      <td>${result["created_timestamp"]}</td>
+                      <td>${result["message_group"]}</td>
+                      <td>${result["sender_email"]}</td>
+                      <td>${result["recipient_email"]}</td>
+                      <td>${result["sender_name"]}</td>
+                      <td>${result["recipient_name"]}</td>
+                      <td>${result["message_content"]}</td>
+                      <td>${result["id"]}</td>`;
 
     // row.addEventListener("click", () => selectPerson(row, result));
     tableBody.appendChild(row);
