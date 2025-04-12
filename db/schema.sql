@@ -23,7 +23,9 @@
 -- DROP TABLE IF EXISTS attachments;
 
 -- CREATE TABLE attachments (
---     attachment TEXT PRIMARY KEY,
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     message_group TEXT NOT NULL,
+--     attachment TEXT NOT NULL,
 --     count INTEGER NOT NULL
 -- );
 
@@ -33,7 +35,7 @@
 --     id INTEGER PRIMARY KEY AUTOINCREMENT,
 --     recipient_email TEXT NOT NULL,
 --     message_group TEXT NOT NULL,
---     attachment TEXT NOT NULL
+--     attachment_id INTEGER NOT NULL
 -- );
 
 -- DROP TABLE IF EXISTS cp_taps;

@@ -20,10 +20,14 @@ def create_app():
     ### COMMENT OUT BEFORE DEPLOYING!!!!! ###
     # app.debug = True
 
+    ### Put T/F for if windows or mac!!!!! ###
+    is_windows = True
+
     app.config.update({
     'SECRET_KEY': os.getenv("SECRET_KEY"),
     "OIDC_CLIENT_SECRETS": "client_secrets_test.json" if app.debug else "client_secrets.json",
-    "lifted_config": load_lifted_config()
+    "lifted_config": load_lifted_config(),
+    "is_windows": is_windows
     })
 
     app.jinja_env.globals['lifted_config'] = app.config["lifted_config"]

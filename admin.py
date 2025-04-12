@@ -54,7 +54,7 @@ def admin_page():
 
     # Attachments Table
     conn = get_db_connection()
-    attachments = conn.execute("select * from attachments").fetchall()
+    attachments = conn.execute("select * from attachments order by id desc").fetchall()
     conn.close()
 
     # Attachment Prefs Table
@@ -138,29 +138,40 @@ def update_attachment_message_group():
     update_lifted_config(current_app.config["lifted_config"])
     return redirect(url_for('admin.admin_page'))
 
-@admin.route("/delete-attachment/<attachment>")
+@admin.route("/delete-attachment/<id>")
 @login_required
 @admin_required
-def delete_attachment(attachment):
+def delete_attachment(id):
     conn = get_db_connection()
-    conn.execute('delete from attachments where attachment = ?', (attachment,))
+    conn.execute('delete from attachments where id = ?', (id,))
     conn.commit()
     conn.close()
 
     return redirect(url_for("admin.admin_page"))
 
-@admin.post("/add-attachment")
+@admin.post("/add-attachment/<message_group>")
 @login_required
 @admin_required
-def add_attachment():
+def add_attachment(message_group):
     attachment = request.form["attachment-name"]
     count = request.form["attachment-count"]
 
     conn = get_db_connection()
-    conn.execute("insert into attachments (attachment, count) values (?, ?)", (attachment, count))
+    conn.execute("insert into attachments (message_group, attachment, count) values (?, ?, ?)", (message_group, attachment, count))
     conn.commit()
     conn.close()
     
+    return redirect(url_for("admin.admin_page"))
+
+@admin.route("/delete-attachment-pref/<id>")
+@login_required
+@admin_required
+def delete_attachment_pref(id):
+    conn = get_db_connection()
+    conn.execute('delete from attachment_prefs where id = ?', (id,))
+    conn.commit()
+    conn.close()
+
     return redirect(url_for("admin.admin_page"))
 
 @admin.post("/update-swapping-config")

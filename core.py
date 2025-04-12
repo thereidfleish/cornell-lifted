@@ -65,9 +65,11 @@ def messages():
             "sent": helpers.process_ranks_to_dict(sent_ranks)
         }
 
-        attachments = conn.execute("select * from attachments").fetchall()
+        current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
+
+        attachments = conn.execute("select * from attachments where message_group=?", (current_attachment_message_group,)).fetchall()
         attachment_pref = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
-                                       (current_user.email, current_app.config["lifted_config"]["attachment_message_group"])).fetchone()
+                                       (current_user.email, current_attachment_message_group)).fetchone()
 
         conn.close()
 
@@ -85,22 +87,22 @@ def messages():
 @core.post("/set-attachment")
 @login_required
 def set_attachment():
-    attachment = request.form["attachment"]
+    attachment_id = request.form["id"]
     message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
     conn = get_db_connection()
-    conn.execute("update attachments set count=count-1 where attachment=?", (attachment,))
+    conn.execute("update attachments set count=count-1 where id=?", (attachment_id,))
 
     prev_attachment = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
                                        (current_user.email, message_group)).fetchone()
     
     if prev_attachment:
-        conn.execute("update attachment_prefs set attachment=? where recipient_email=? and message_group=?",
-                     (attachment, current_user.email, message_group))
-        conn.execute("update attachments set count=count+1 where attachment=?", (prev_attachment["attachment"],))
+        conn.execute("update attachment_prefs set attachment_id=? where recipient_email=? and message_group=?",
+                     (attachment_id, current_user.email, message_group))
+        conn.execute("update attachments set count=count+1 where id=?", (prev_attachment["attachment_id"],))
     else:
-        conn.execute("insert into attachment_prefs (recipient_email, message_group, attachment) values (?, ?, ?)",
-                 (current_user.email, current_app.config["lifted_config"]["attachment_message_group"], attachment))
+        conn.execute("insert into attachment_prefs (recipient_email, message_group, attachment_id) values (?, ?, ?)",
+                 (current_user.email, current_app.config["lifted_config"]["attachment_message_group"], attachment_id))
 
     # conn.execute("insert or replace into attachment_prefs (recipient_email, attachment) values (?, ?)", (current_user.email, attachment))
     conn.commit()

@@ -2,6 +2,7 @@ from comtypes import client, CoInitialize, CoUninitialize
 import win32com.client
 import csv
 import os
+from flask import current_app
 
 def process_cards_to_dict(cards):
     dict = {}
@@ -23,74 +24,75 @@ def process_ranks_to_dict(ranks):
     return dict
 
 def cards_to_pptx_and_pdf(cards, message_group, output_filepath):
-    print("Beginning replacing placeholders")
-    CoInitialize()
+    if current_app.config["is_windows"]:
+        print("Beginning replacing placeholders")
+        CoInitialize()
 
-    powerpoint = client.CreateObject("PowerPoint.Application")
+        powerpoint = client.CreateObject("PowerPoint.Application")
 
-    # NEED with window to be true for text resizing to work!!!!
-    input_pptx = f"pptx_templates/{message_group}.pptx"
-    presentation = powerpoint.Presentations.Open(os.path.abspath(input_pptx), WithWindow=True)
+        # NEED with window to be true for text resizing to work!!!!
+        input_pptx = f"pptx_templates/{message_group}.pptx"
+        presentation = powerpoint.Presentations.Open(os.path.abspath(input_pptx), WithWindow=True)
 
-    num_cards = len(cards)
+        num_cards = len(cards)
 
-    for i, card in enumerate(cards):
+        for i, card in enumerate(cards):
+            if num_cards > 1:
+                if i % 100 == 0:
+                    progress = round(i/num_cards*100 ,2)
+                    with open(f"{output_filepath}.txt", "a") as file:
+                        file.write(f"\n{progress}%")
+                    print(f"{progress}% converting cards to pptx")
+
+                presentation.Slides(presentation.Slides.Count).Duplicate()
+
+            replacements_dict = {
+                            "{{NET_ID}}": card["recipient_email"].split("@")[0],
+                            "{{RECIPIENT_NAME}}": card["recipient_name"],
+                            "{{SENDER_NAME}}": card["sender_name"],
+                            "{{MESSAGE}}": card["message_content"]
+                        }
+            # Iterate through shapes
+            for shape in presentation.Slides(presentation.Slides.Count - 1 if num_cards > 1 else presentation.Slides.Count).Shapes:
+                if shape.HasTextFrame:
+                    text_frame = shape.TextFrame2
+                    text_range = text_frame.TextRange
+                    # for paragraph in text_range.Paragraphs():
+                        # print(paragraph.Text)
+                    for run in text_range.Runs():
+                        # print(run.Text)
+                        for placeholder, replacement in replacements_dict.items():
+                            if placeholder in ''.join(run.Text.split()):
+                                run.Text = run.Text.replace(placeholder, replacement)
+
+                    text_frame.AutoSize = 2
+
         if num_cards > 1:
-            if i % 100 == 0:
-                progress = round(i/num_cards*100 ,2)
-                with open(f"{output_filepath}.txt", "a") as file:
-                    file.write(f"\n{progress}%")
-                print(f"{progress}% converting cards to pptx")
-
-            presentation.Slides(presentation.Slides.Count).Duplicate()
-
-        replacements_dict = {
-                        "{{NET_ID}}": card["recipient_email"].split("@")[0],
-                        "{{RECIPIENT_NAME}}": card["recipient_name"],
-                        "{{SENDER_NAME}}": card["sender_name"],
-                        "{{MESSAGE}}": card["message_content"]
-                    }
-        # Iterate through shapes
-        for shape in presentation.Slides(presentation.Slides.Count - 1 if num_cards > 1 else presentation.Slides.Count).Shapes:
-            if shape.HasTextFrame:
-                text_frame = shape.TextFrame2
-                text_range = text_frame.TextRange
-                # for paragraph in text_range.Paragraphs():
-                    # print(paragraph.Text)
-                for run in text_range.Runs():
-                    # print(run.Text)
-                    for placeholder, replacement in replacements_dict.items():
-                        if placeholder in ''.join(run.Text.split()):
-                            run.Text = run.Text.replace(placeholder, replacement)
-
-                text_frame.AutoSize = 2
-
-    if num_cards > 1:
-        presentation.Slides(presentation.Slides.Count).Delete()
-        print("Saving PPTX...")
-        presentation.SaveAs(os.path.abspath(f"{output_filepath}.pptx"))
-    print("Converting and Saving PPTX to PDF...")
-    presentation.SaveAs(os.path.abspath(f"{output_filepath}.pdf"), 32)
-    presentation.Close()
-    print("Done!")
-    # powerpoint.Quit()
-    # CoUninitialize()
-
-    # """
-    # Mac-compatible version - just logs actions without actually generating files
-    # For development/testing purposes only
-    # """
-    # print("Mac-compatible version: Would generate PPTX and PDF here")
-    # print(f"Would process {len(cards)} cards for message group '{message_group}'")
-    # print(f"Would save to {output_filepath}.pptx and {output_filepath}.pdf")
-    
-    # # Create a dummy text file to simulate progress tracking
-    # with open(f"{output_filepath}.txt", "a") as file:
-    #     file.write(f"\n100%")
-    
-    # # Create empty PDF file for testing purposes
-    # with open(f"{output_filepath}.pdf", "w") as file:
-    #     file.write("This is a placeholder PDF file for Mac testing")
+            presentation.Slides(presentation.Slides.Count).Delete()
+            print("Saving PPTX...")
+            presentation.SaveAs(os.path.abspath(f"{output_filepath}.pptx"))
+        print("Converting and Saving PPTX to PDF...")
+        presentation.SaveAs(os.path.abspath(f"{output_filepath}.pdf"), 32)
+        presentation.Close()
+        print("Done!")
+        # powerpoint.Quit()
+        # CoUninitialize()
+    else:
+        """
+        Mac-compatible version - just logs actions without actually generating files
+        For development/testing purposes only
+        """
+        print("Mac-compatible version: Would generate PPTX and PDF here")
+        print(f"Would process {len(cards)} cards for message group '{message_group}'")
+        print(f"Would save to {output_filepath}.pptx and {output_filepath}.pdf")
+        
+        # Create a dummy text file to simulate progress tracking
+        with open(f"{output_filepath}.txt", "a") as file:
+            file.write(f"\n100%")
+        
+        # Create empty PDF file for testing purposes
+        with open(f"{output_filepath}.pdf", "w") as file:
+            file.write("This is a placeholder PDF file for Mac testing")
 
 def create_csv(cards, output_path):
     with open(output_path + ".csv", 'w', newline="", encoding="utf-8") as csvfile:
@@ -103,61 +105,62 @@ def create_csv(cards, output_path):
         writer.writerows(cards)
 
 def send_email(message_group, type, to, cc=None, bcc=None):
-    CoInitialize()
-    o = win32com.client.Dispatch("Outlook.Application")
-    oacctouse = None
-    for oacc in o.Session.Accounts:
-        if oacc.SmtpAddress == "lifted@cornell.edu":
-            oacctouse = oacc
-            break
-    Msg = o.CreateItem(0)
-    if oacctouse:
-        Msg._oleobj_.Invoke(*(64209, 0, 8, 0, oacctouse))  # Msg.SendUsingAccount = oacctouse
+    if current_app.config["is_windows"]:
+        CoInitialize()
+        o = win32com.client.Dispatch("Outlook.Application")
+        oacctouse = None
+        for oacc in o.Session.Accounts:
+            if oacc.SmtpAddress == "lifted@cornell.edu":
+                oacctouse = oacc
+                break
+        Msg = o.CreateItem(0)
+        if oacctouse:
+            Msg._oleobj_.Invoke(*(64209, 0, 8, 0, oacctouse))  # Msg.SendUsingAccount = oacctouse
 
-    Msg.To = ";".join(to)
-    if cc is not None:
-        Msg.CC = ";".join(cc)
-    if bcc is not None:
-        Msg.BCC = ";".join(bcc)
-    
-    dir_path = f"templates/rich_text/{message_group}/{type}"
+        Msg.To = ";".join(to)
+        if cc is not None:
+            Msg.CC = ";".join(cc)
+        if bcc is not None:
+            Msg.BCC = ";".join(bcc)
+        
+        dir_path = f"templates/rich_text/{message_group}/{type}"
 
-    with open(f'{dir_path}.txt', 'r', encoding='utf-8') as file:
-        Msg.Subject = file.read()
+        with open(f'{dir_path}.txt', 'r', encoding='utf-8') as file:
+            Msg.Subject = file.read()
 
-    with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
-        Msg.HTMLBody = file.read()
+        with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
+            Msg.HTMLBody = file.read()
 
-    Msg.Send()
-
-    # """
-    # Mac-compatible version - just logs email that would be sent
-    # For development/testing purposes only
-    # """
-    # print(f"Mac-compatible version: Would send email from 'lifted@cornell.edu'")
-    # print(f"To: {'; '.join(to)}")
-    # if cc is not None:
-    #     print(f"CC: {'; '.join(cc)}")
-    # if bcc is not None:
-    #     print(f"BCC: {'; '.join(bcc)}")
-    
-    # dir_path = f"templates/rich_text/{message_group}/{type}"
-    
-    # try:
-    #     with open(f'{dir_path}.txt', 'r', encoding='utf-8') as file:
-    #         subject = file.read()
-    #         print(f"Subject: {subject}")
-    # except FileNotFoundError:
-    #     print(f"Subject template not found: {dir_path}.txt")
-    
-    # try:
-    #     with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
-    #         body = file.read()
-    #         print(f"Email body length: {len(body)} characters")
-    # except FileNotFoundError:
-    #     print(f"Email body template not found: {dir_path}.html")
-    
-    # print("Email would be sent!")
+        Msg.Send()
+    else:
+        """
+        Mac-compatible version - just logs email that would be sent
+        For development/testing purposes only
+        """
+        print(f"Mac-compatible version: Would send email from 'lifted@cornell.edu'")
+        print(f"To: {'; '.join(to)}")
+        if cc is not None:
+            print(f"CC: {'; '.join(cc)}")
+        if bcc is not None:
+            print(f"BCC: {'; '.join(bcc)}")
+        
+        dir_path = f"templates/rich_text/{message_group}/{type}"
+        
+        try:
+            with open(f'{dir_path}.txt', 'r', encoding='utf-8') as file:
+                subject = file.read()
+                print(f"Subject: {subject}")
+        except FileNotFoundError:
+            print(f"Subject template not found: {dir_path}.txt")
+        
+        try:
+            with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
+                body = file.read()
+                print(f"Email body length: {len(body)} characters")
+        except FileNotFoundError:
+            print(f"Email body template not found: {dir_path}.html")
+        
+        print("Email would be sent!")
 
 college_dict = {
         "AG": "Agriculture and Life Sciences",

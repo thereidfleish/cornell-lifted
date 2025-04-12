@@ -26,9 +26,9 @@
                 {% if message_confirmation %}
                     <div class="alert alert-success" role="alert">
                         <h4 class="alert-heading">Message Sent Successfully!</h4>
-                        <p>Your Lifted message was submitted successfully!  You can view it below.</p>
+                        <p>Your Lifted message was submitted successfully!  You can view it in your sent messages below.</p>
                         <p>Your recipient was just notified that they've been Lifted, but
-                            they won't know who it was until the last day of classes!</p>
+                            they won't get to see your message until the last day of classes!</p>
                         <p>Feel free to Lift some more inspirational people in your life! And to stay up-to-date with any last-minute reminders or changes, and to help Lift us,
                             follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
                     </div>
@@ -212,10 +212,10 @@
                                                                                 <form method="post" action="/set-attachment">
                                                                                     {% for attachment in attachments %}
                                                                                     <div class="form-check">
-                                                                                        <input class="form-check-input" type="radio" name="attachment" value="{{ attachment['attachment'] }}"
-                                                                                            id="attachment_{{ attachment['attachment'] }}" onchange="this.form.submit();" required {{ "checked" if
-                                                                                            attachment["attachment"]==attachment_pref["attachment"] }} {{ "disabled" if attachment["count"] < 1 }}>
-                                                                                        <label class="form-check-label" for="attachment_{{attachment['attachment']}}">
+                                                                                        <input class="form-check-input" type="radio" name="id" value="{{ attachment['id'] }}"
+                                                                                            id="attachment_{{ attachment['id'] }}" onchange="this.form.submit();" required {{ "checked" if
+                                                                                            attachment["id"]==attachment_pref["attachment_id"] }} {{ "disabled" if attachment["count"] < 1 }}>
+                                                                                        <label class="form-check-label" for="attachment_{{attachment['id']}}">
                                                                                             <p class="mb-0">{{ attachment["attachment"] }} ({{ attachment["count"] }} left)</p>
                                                                                         </label>
                                                                                     </div>

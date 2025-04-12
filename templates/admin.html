@@ -165,8 +165,8 @@
                     show_none=True) }}
                 </form>
 
-                <p class="mb-1"><b>Add attachments and counts</b></p>
-                <form method="post" action="/add-attachment">
+                <p class="mb-1"><b>Add Attachments and Counts:</b> This will add for the message group selected above.</p>
+                <form method="post" action="/add-attachment/{{lifted_config.attachment_message_group}}">
                     <div class="d-inline-flex border border-2 rounded mb-2 p-2">
                         <div class="d-flex align-items-center ms-4">
                             <label for="attachment-name-input" class="form-label m-2">Name</label>
@@ -185,16 +185,21 @@
                         style="display: block; max-height: 300px; overflow: auto">
                         <thead>
                             <tr style="position: sticky; top: 0;">
+                                <th scope="col">ID</th>
+                                <th scope="col">Message Group</th>
                                 <th scope="col">Attachment</th>
                                 <th scope="col">Count</th>
+                                <th scope="col">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for record in attachments %}
                             <tr>
+                                <td>{{ record["id"] }}</td>
+                                <td>{{ record["message_group"] }}</td>
                                 <td>{{ record["attachment"] }}</td>
                                 <td>{{ record["count"] }}</td>
-                                <td><a href="/delete-attachment/{{record['attachment']}}">🗑️</a></td>
+                                <td><a href="/delete-attachment/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -522,7 +527,7 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">Recipient Email</th>
                                 <th scope="col">Message Group</th>
-                                <th scope="col">Attachment</th>
+                                <th scope="col">Attachment ID</th>
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
@@ -532,7 +537,7 @@
                                 <td>{{ record["id"] }}</td>
                                 <td>{{ record["recipient_email"] }}</td>
                                 <td>{{ record["message_group"] }}</td>
-                                <td>{{ record["attachment"] }}</td>
+                                <td>{{ record["attachment_id"] }}</td>
                                 <td><a href="/delete-attachment-pref/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
