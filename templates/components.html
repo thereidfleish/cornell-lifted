@@ -231,55 +231,53 @@
                 <h1 class="modal-title fs-5" id="card-modal-label">{{title_text}}</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="form-container modal-body m-0">
-                {% if show_options %}
-                <div id="card-edit-delete-options" class="d-flex justify-content-between mb-4 d-none">
-                    <div>
-                        <a id="edit-message-button" class="btn btn-outline-primary me-2">✍️
-                            Edit</a>
-                        <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal"
+            <!-- <div class="form-container modal-body m-0"> -->
+            {% if show_options %}
+            <div id="card-edit-delete-options" class="d-flex justify-content-between mb-4 d-none">
+                <div>
+                    <a id="edit-message-button" class="btn btn-outline-primary me-2">✍️
+                        Edit</a>
+                    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal"
                         data-bs-target="#delete-card-modal">🗑️ Delete</button>
-                    </div>
                 </div>
-                {% endif %}
-
-                <div class="card-container mx-auto" id="card-container">
-                    <div class="lifted-card p-4 my-4">
-                        <h4 class="text-center blue-text" id="card-recipient-id"></h4>
-                        <hr>
-                        <p><b>To:</b> <span id="card-recipient-name"></span></p>
-                        <p style="white-space: pre-line" class="message-content" id="card-message-content">
-                            Loading
-                            message...</p>
-                        <p><b>From:</b> <span id="card-sender-name"></span></p>
-                    </div>
-                    <p class="text-muted text-center" id="card-timestamp"></p>
-                </div>
-
-                {% if show_options %}
-                <hr class="my-4">
-
-                <div id="card-print-options" class="mt-4 d-none">
-                    <h5>Want to print your card?</h5>
-                    <p>If you'd like to print your card, we suggest either printing with 100% size on normal
-                        paper and
-                        cutting it out, or inserting a properly sized card into your printer!</p>
-                    <a id="card-pdf-button" class="btn btn-primary mb-3" target="_blank">Download PDF</a>
-
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <p class="mb-0 fw-bold">Card Sizes:</p>
-                            <ul class="mb-0">
-                                <li><b>Fall 2024:</b> 4 x 6 in</li>
-                                <li><b>Spring 2024:</b> 5 x 7 in</li>
-                                <li><b>Spring 2022, 2023:</b> 4.25 x 5.5 in</li>
-                                <li><b>Spring 2018, 2019, 2020, 2021:</b> Widescreen 16:9</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
             </div>
+            {% endif %}
+
+            <div class="lifted-card">
+                <h4 class="text-center blue-text" id="card-recipient-id"></h4>
+                <hr>
+                <p><b>To:</b> <span id="card-recipient-name"></span></p>
+                <p style="white-space: pre-line" class="message-content" id="card-message-content">
+                    Loading
+                    message...</p>
+                <p><b>From:</b> <span id="card-sender-name"></span></p>
+                <p class="text-muted text-center" id="card-timestamp"></p>
+            </div>
+
+            {% if show_options %}
+            <!-- <hr class="my-4"> -->
+
+            <div id="card-print-options" class="mt-4 d-none">
+                <h5>Want to print your card?</h5>
+                <p>If you'd like to print your card, we suggest either printing with 100% size on normal
+                    paper and
+                    cutting it out, or inserting a properly sized card into your printer!</p>
+                <a id="card-pdf-button" class="btn btn-primary mb-3" target="_blank">Download PDF</a>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <p class="mb-0 fw-bold">Card Sizes:</p>
+                        <ul class="mb-0">
+                            <li><b>Fall 2024:</b> 4 x 6 in</li>
+                            <li><b>Spring 2024:</b> 5 x 7 in</li>
+                            <li><b>Spring 2022, 2023:</b> 4.25 x 5.5 in</li>
+                            <li><b>Spring 2018, 2019, 2020, 2021:</b> Widescreen 16:9</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <!-- </div> -->
         </div>
     </div>
 </div>

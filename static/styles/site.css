@@ -84,7 +84,7 @@ p {
 /* Full-height sections */
 .section-container {
     min-height: auto;
-    padding: 80px 0px;
+    padding: 40px 0px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -275,7 +275,7 @@ p {
 /* Hero Section with balloon background */
 .hero-section {
     background: linear-gradient(135deg, #f7f7ff 0%, #e9ecef 100%);
-    padding: 160px 0 120px;
+    padding: 100px 0 120px;
     min-height: 90vh;
     display: flex;
     align-items: center;
@@ -325,6 +325,7 @@ p {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    margin-bottom: 10px;
 }
 
 .hero-cta .btn-primary {
@@ -431,7 +432,7 @@ p {
 .square-image-container {
     position: relative;
     width: 450px;
-    height: 450px;
+    height: 325px;
     max-width: 90%;
     margin: 0 auto;
     border-radius: 25px;
@@ -439,8 +440,13 @@ p {
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
     background-color: white;
     padding: 12px;
-    transform: rotate(-2deg);
-    border: 5px solid white;
+    /* transform: rotate(-2deg); */
+    /* border: 5px solid white; */
+}
+
+.square-image-container:hover .feature {
+    transform: translateY(-8px) rotate(1deg);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 .square-image {
@@ -977,14 +983,14 @@ body.fall .cta-section {
 .form-container {
     background-color: white;
     border-radius: 20px;
-    padding: 30px;
+    padding: 25px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     margin: 40px 0;
     border: 1px solid #f0f0f0;
     position: relative;
 }
 
-.form-container:before {
+/* .form-container:before {
     content: '';
     position: absolute;
     width: 50px;
@@ -995,12 +1001,12 @@ body.fall .cta-section {
     transform: rotate(15deg);
     z-index: -1;
     border-radius: 0 15px 0 0;
-}
+} */
 
 .form-label {
     font-weight: 600;
     color: var(--text-color);
-    font-size: 1.2rem;
+    font-size: 1.0rem;
 }
 
 .form-control {
@@ -1019,10 +1025,10 @@ body.fall .cta-section {
     background-color: white;
     border-radius: 15px;
     border: none;
-    padding: 30px;
-    margin: 30px 0;
+    padding: 15px 25px;
+    /* margin: 30px 0; */
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    transform: rotate(-1deg);
+    /* transform: rotate(-1deg); */
 }
 
 .lifted-card h4 {
@@ -1296,7 +1302,7 @@ body.fall .cta-section {
     }
 
     .hero-section {
-        padding: 120px 0 100px;
+        padding: 70px 0 100px;
         min-height: 70vh;
     }
 
@@ -1467,8 +1473,8 @@ body.fall #faqs-content {
 /* Main container styling */
 #send-message-section {
     min-height: auto;
-    padding-top: 20px;
-    padding-bottom: 100px;
+    padding-top: 0px;
+    padding-bottom: 20px;
 }
 
 /* Form container with paper effect */
@@ -1486,7 +1492,7 @@ body.fall #faqs-content {
     background-color: var(--note-yellow);
     top: -8px;
     right: -8px;
-    transform: rotate(15deg);
+    /* transform: rotate(15deg); */
     z-index: -1;
     border-radius: 0 15px 0 0;
 }
@@ -1685,10 +1691,6 @@ body.fall .admin-section {
 /* Messages Page Specific Styling */
 
 /* Messages hero section with themed backgrounds */
-body.messages-page .hero-section {
-    min-height: 60vh;
-    padding: 100px 0 80px;
-}
 
 /* Hero title with fun styling */
 body.messages-page .hero-title {
@@ -1791,10 +1793,10 @@ body.fall.messages-page .hero-section {
     border: 1px solid #f0f0f0;
 }
 
-.message-group-section:hover {
+/* .message-group-section:hover {
     transform: translateY(-5px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .message-group-section h4 {
     font-family: 'Tenor Sans', sans-serif;
@@ -1814,7 +1816,7 @@ body.fall.messages-page .hero-section {
     background-color: #ccc;
     border-radius: 50%;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    transform: rotate(5deg);
+    /* transform: rotate(5deg); */
     z-index: 1;
 }
 
@@ -1916,8 +1918,8 @@ body.fall.messages-page .hero-section {
 
 /* Send message hero section */
 body.send-message-page .message-hero-section {
-    min-height: 50vh;
-    padding: 100px 0 60px;
+    /* min-height: 50vh; */
+    padding: 50px 0 10px;
 }
 
 /* Hero title with consistent styling */
@@ -1933,12 +1935,12 @@ body.send-message-page .hero-title {
 /* Form container styling */
 .message-form-container {
     position: relative;
-    padding: 40px;
+    padding: 25px;
     margin-bottom: 60px;
     background-color: white;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    transform: rotate(-0.5deg);
+    /* transform: rotate(-0.5deg); */
 }
 
 /* Form closed container */
@@ -2085,7 +2087,7 @@ textarea.form-control {
     border: 1px solid #eee;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     margin-top: 0px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .search-results-table thead th {
@@ -2406,7 +2408,7 @@ body.fall .admin-section {
 .search-results-container {
     border: 1px solid #e0e0e0;
     border-radius: 10px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .results-header {
@@ -2436,7 +2438,7 @@ body.fall .admin-section {
 /* Results table styling */
 .search-results-table {
     max-height: 300px;
-    overflow-y: auto;
+    overflow: auto;
     background-color: white;
 }
 
@@ -2599,7 +2601,7 @@ body.fall .admin-section {
 /* Basic hero section styling */
 body.messages-page .hero-section {
     min-height: 45vh;
-    padding: 100px 0 60px;
+    padding: 50px 0 50px;
 }
 
 body.messages-page .hero-title {
@@ -2638,14 +2640,14 @@ body.messages-page .hero-subtitle {
 
 .welcome-heading {
     font-family: 'Schoolbell', arial, serif;
-    font-size: 2.3rem;
+    font-size: 2rem;
     color: var(--cornell-red);
     margin-bottom: 0.5rem;
 }
 
 .welcome-text {
     color: #666;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     margin-bottom: 0;
 }
 
@@ -2828,14 +2830,14 @@ body.messages-page .hero-subtitle {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.05);
-    height: 100%;
+    height: auto;
     overflow: hidden;
 }
 
-.message-group-card:hover {
+/* .message-group-card:hover {
     transform: translateY(-8px) rotate(1deg);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-}
+} */
 
 .message-group-card .card-header {
     background-color: rgba(0, 118, 189, 0.05);
@@ -2924,31 +2926,172 @@ body.messages-page .hero-subtitle {
 }
 
 .locked-message {
-    padding: 30px;
+    padding: 15px 15px;
     text-align: center;
-    background-color: rgba(255, 255, 255, 0.6);
-    border-radius: 10px;
-    border: 1px dashed rgba(0, 118, 189, 0.2);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(248, 249, 252, 0.8));
+    border-radius: 15px;
+    border: 1px rgba(0, 118, 189, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.locked-message:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
 }
 
 .locked-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: var(--cornell-blue);
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.7);
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
 }
 
 .locked-title {
     font-family: 'Schoolbell', arial, serif;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     color: var(--cornell-red);
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.locked-message p {
+    color: #555;
+    max-width: 100%;
+    /* margin-left: auto;
+    margin-right: auto; */
+    position: relative;
+    z-index: 1;
+    font-size: small;
 }
 
 .locked-note {
     font-size: 0.9rem;
-    color: #888;
+    color: #777;
     font-style: italic;
-    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+    padding: 8px 15px;
+    background-color: rgba(0, 118, 189, 0.05);
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0px;
+}
+
+/* Compact attachment section styling */
+.attachment-section {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border: 1px dashed rgba(0, 118, 189, 0.2);
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.attachment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.new-badge {
+    display: inline-block;
+    background-color: var(--cornell-red);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-right: 6px;
+    transform: rotate(-3deg);
+}
+
+.attachment-option {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    background-color: white;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.attachment-option.checked {
+    border-color: var(--cornell-blue);
+    background-color: rgba(0, 118, 189, 0.05);
+}
+
+/* Hide the default radio button */
+.attachment-option .form-check-input {
+    margin-right: 6px;
+}
+
+.attachment-icon {
+    font-size: 1.1rem;
+    margin-right: 6px;
+    width: 20px;
+    text-align: center;
+}
+
+.attachment-details {
+    display: flex;
+    align-items: center;
     margin-bottom: 0;
+    cursor: pointer;
+}
+
+.attachment-name {
+    font-weight: 500;
+    color: var(--cornell-blue);
+    font-size: 0.9rem;
+    margin-right: 6px;
+}
+
+.attachment-count {
+    display: inline-block;
+    background-color: rgba(0, 118, 189, 0.08);
+    padding: 1px 6px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.attachment-option.disabled {
+    opacity: 0.6;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .locked-message {
+        padding: 15px 10px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+    }
+
+    .locked-icon {
+        margin-bottom: 15px;
+    }
+
+    .locked-title {
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+        color: var(--cornell-red);
+    }
 }
 
 /* Message gallery */
@@ -3027,7 +3170,7 @@ body.messages-page .hero-subtitle {
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     padding: 30px;
-    width: 70%;
+    width: 90%;
     max-width: 1140px;
     /* Match container max-width */
     margin: 0 auto;
@@ -3864,15 +4007,6 @@ body.fall .timeline-date {
 }
 
 /* Lifted card styling - directly from your original CSS */
-.lifted-card {
-    background-color: white;
-    border-radius: 15px;
-    border: none;
-    padding: 30px;
-    margin: 30px 0;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    transform: rotate(-1deg);
-}
 
 .lifted-card h4 {
     color: var(--cornell-blue);

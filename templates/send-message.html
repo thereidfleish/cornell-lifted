@@ -119,13 +119,13 @@
                             </div>
                             {% endif %}
 
-                            <div class="form-section mb-4">
+                            <div class="form-section mb-5">
                                 <div class="form-section-header">
                                     <div class="section-icon">👤</div>
-                                    <h4 class="form-section-title blue-text">Sender Information</h4>
+                                    <h5 class="form-section-title blue-text">Sender Information</h5>
                                 </div>
 
-                                <div class="mb-4">
+                                <div class="mb-5">
                                     {{ components.render_form_field(
                                     field=form.sender_name,
                                     description='This is your name that will appear on the card. If you want the letter
@@ -134,10 +134,10 @@
                                 </div>
                             </div>
 
-                            <div class="form-section mb-4">
+                            <div class="form-section mb-5">
                                 <div class="form-section-header">
                                     <div class="section-icon">📬</div>
-                                    <h4 class="form-section-title blue-text">Recipient Information</h4>
+                                    <h5 class="form-section-title blue-text">Recipient Information</h5>
                                 </div>
 
                                 <div class="mb-4">
@@ -167,7 +167,7 @@
                                     {% endif %}
                                 </div>
                                 {% elif is_edit %}
-                                <h5>Recipient's Email</h5>
+                                <h6>Recipient's Email</h6>
                                 <p>{{ form.recipient_email.data }}</p>
                                 {% else %}
                                 <div class="recipient-search-section mb-4">
@@ -233,7 +233,7 @@
                             <div class="form-section mb-4">
                                 <div class="form-section-header">
                                     <div class="section-icon">💌</div>
-                                    <h4 class="form-section-title blue-text">Your Message</h4>
+                                    <h5 class="form-section-title blue-text">Your Message</h5>
                                 </div>
 
                                 <div class="mb-4">

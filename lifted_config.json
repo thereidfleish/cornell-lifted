@@ -30,7 +30,7 @@
     "attachment_message_group": "sp_25_p",
     "swap_from": "sp_25_p",
     "swap_to": "sp_25_e",
-    "swap_text": "<b>Can't make it on the last day of classes?</b> <a href=\"/swap-messages\">Click here</a> to have all your physical Lifted messages delivered as virtual eLifted messages on the last day of classes instead.  Hard deadline to do this is <b>4/27/25</b> since we send our print order the following day.",
+    "swap_text": "<b>Can't make it on the last day of classes?</b> <a href=\"/swap-messages\">Click here</a> to get your messages delivered virtually instead.  Hard deadline to do this is <b>4/27/25</b>.",
     "rich_text_types": {
         "form": "Form Description",
         "sender": "Sender Confirmation Email",
