@@ -8,7 +8,7 @@ from wtforms import Form, BooleanField, StringField, HiddenField, TextAreaField,
 import os
 import helpers
 
-from app import is_admin, get_db_connection
+from app import is_admin, get_db_connection, get_logs_connection
 
 core = Blueprint('core', __name__, template_folder='templates', static_folder='static')
 
@@ -45,8 +45,6 @@ def faqs():
 @core.get("/messages")
 def messages():
     if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"    
-        print(current_user.id, "(", current_user.name, ")", "accessed their messages page!")
-
         conn = get_db_connection()
                 
         received_cards = conn.execute("select * from messages where recipient_email=?", (current_user.email,)).fetchall()
@@ -73,13 +71,16 @@ def messages():
 
         conn.close()
 
+        # helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed Messages Page")
+
         return render_template(
             'messages.html',
             cards_dict=cards_dict,
             ranks_dict=ranks_dict,
             attachments=attachments,
             attachment_pref=attachment_pref,
-            message_confirmation=request.args.get("message_confirmation")
+            message_confirmation=request.args.get("message_confirmation"),
+            recipient_email=request.args.get("recipient_email")
             )
     else:
         return render_template('messages.html')
@@ -117,7 +118,7 @@ def get_card(id):
     conn.close()
 
     if card is None:
-        abort(404)
+        abort(404, "Card DNE")
     
     return card
 
@@ -130,10 +131,10 @@ def get_card_json(id):
     if is_admin() == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
-            abort(401)
+            abort(401, "Not your card")
         # So now we know the user is affiliated with the message in some way.  However, if the cards are hidden and the user was not a sender of the card, abort
         elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"] and card["sender_email"] != current_user.email:
-            abort(401)
+            abort(401, "Hidden Card")
     
     card_json = {
         "id": card["id"],
@@ -146,6 +147,8 @@ def get_card_json(id):
         "message_content": card["message_content"]
     }
 
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed Card ID {id}")
+
     return jsonify(card_json)
 
 @core.route("/get-card-pdf/<id>")
@@ -157,12 +160,14 @@ def get_card_pdf(id):
     if is_admin() == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
-            abort(401)
+            abort(401, "Not your card")
         # So now we know the user is affiliated with the message in some way.  However, if the cards are hidden, abort
         elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"]:
-            abort(401)
+            abort(401, "Hidden Card")
 
     helpers.cards_to_pptx_and_pdf([card], card['message_group'] if "override-template" not in request.args else request.args.get("override-template"), f"tmp_output/{id}")
+
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
 
     return send_file(f"tmp_output/{id}.pdf", download_name=f"Lifted Message #{id}", mimetype='application/pdf')
 
@@ -170,10 +175,10 @@ def check_if_can_edit_or_delete(card):
     if is_admin() == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not a sender of the message, abort
         if card["sender_email"] != current_user.email:
-            abort(401)
+            abort(401, "Not your card")
         # So now we know the user is a sender of the message.  However, if the form is closed, abort
         elif card["message_group"] != current_app.config["lifted_config"]["form_message_group"]:
-            abort(401)
+            abort(401, "Form is closed")
 
 @core.route("/edit-message/<id>", methods=["GET", "POST"])
 @login_required
@@ -200,7 +205,7 @@ def edit_message(id):
         form.recipient_email.data = card["recipient_email"]
 
     # (Disable validation for editing...due to complications with NetID validation, and also, if someone is savvy enough to bypass server-side validation, well, they can have their way)
-    if request.method == 'POST':        
+    if request.method == 'POST':
         sender_name = form.sender_name.data.strip()
         recipient_name = form.recipient_name.data.strip()
         message_content = form.message_content.data.strip()
@@ -225,11 +230,13 @@ def edit_message(id):
             if message_group == "none":
                 return "Sorry - the form is closed!"
             
-            id = conn.execute('update messages set sender_name=?, recipient_name=?, message_content=?  where id=? returning id',
-                         (sender_name, recipient_name, message_content, card["id"])).fetchone()
+            conn.execute('update messages set sender_name=?, recipient_name=?, message_content=?  where id=? returning id',
+                         (sender_name, recipient_name, message_content, card["id"]))
         
         conn.commit()
         conn.close()
+
+        helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Edited Card ID {id}") 
 
         return redirect(url_for('core.messages'))
     
@@ -248,6 +255,15 @@ def delete_message(id):
     conn.execute('delete from messages where id = ?', (id,))
     conn.commit()
     conn.close()
+
+    conn = get_logs_connection()
+    timestamp = datetime.now().replace(microsecond=0)
+    conn.execute('insert into recently_deleted_messages (created_timestamp, deleted_timestamp, message_group, sender_email, sender_name, recipient_email, recipient_name, message_content) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                         (card["created_timestamp"], timestamp, card["message_group"], card["sender_email"], card["sender_name"], card["recipient_email"], card["recipient_name"], card["message_content"])).fetchone()
+    conn.commit()
+    conn.close()
+
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Deleted Card ID {id}")
 
     if request.args.get("go_to_admin") == "true":
         return redirect(url_for("admin.admin_page"))
@@ -293,11 +309,11 @@ def send_message():
         else:
             message_group = current_app.config["lifted_config"]["form_message_group"]
             if message_group == "none":
-                return "Sorry - the form is closed!"
+                abort(401, "Form is closed")
             
             recipient_netID = form.recipient_netid.data.strip()
             if "@" in recipient_netID:
-                return "Haha nice try...it must be a valid NetID.  If you want to send something to a non-NetID, email us at lifted@cornell.edu :)"
+                abort(400, "Haha nice try...it must be a valid NetID.  If you want to send something to a non-NetID, email us at lifted@cornell.edu :)")
             recipient_email = recipient_netID + "@cornell.edu"
 
         if current_app.config["lifted_config"]["swap_from"] == message_group:
@@ -320,7 +336,7 @@ def send_message():
 
         helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
 
-        return redirect(url_for('core.messages', message_confirmation=True))
+        return redirect(url_for('core.messages', message_confirmation=True, recipient_email=recipient_email))
 
     dir_path = f'templates/rich_text/{current_app.config["lifted_config"]["form_message_group"]}/form.html'
     if Path(dir_path).exists():
@@ -394,5 +410,7 @@ def swap_messages():
     conn.execute("insert into swap_prefs (recipient_email, message_group_from, message_group_to) values (?, ?, ?)", (current_user.email, swap_from, swap_to))
     conn.commit()
     conn.close()
+
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Swapped Cards to eLifted")
     
     return redirect(url_for("core.messages"))

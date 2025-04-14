@@ -181,7 +181,7 @@
                 </form>
 
                 <div class="table-responsive mb-4">
-                    <table id="swap-prefs-table" class="table table-striped"
+                    <table id="attachments-table" class="table table-striped"
                         style="display: block; max-height: 300px; overflow: auto">
                         <thead>
                             <tr style="position: sticky; top: 0;">
@@ -446,6 +446,10 @@
 
             <div class="tab-pane fade" id="advanced-tab-pane" role="tabpanel" aria-labelledby="advanced-tab"
                 tabindex="0">
+                <h5>Recently Deleted Messages and Logs</h5>
+                <p class="mb-0">View recently deleted messages and other logs.</p>
+                <a class="btn btn-primary mb-2" href="/admin/logs" target="_blank">View Logs</a>
+
                 <h5>Impersonate User</h5>
                 <p>Enter a NetID to "impersonate" another user. This will "sign you in" as this user, so you can see
                     what they see. This is useful for testing purposes.</p>
@@ -522,7 +526,7 @@
                 <p>The attachment_prefs table. Num entries: {{ attachment_prefs | length }}</p>
                 <p>Deleting will remove the pref.</p>
                 <div class="table-responsive mb-4">
-                    <table id="swap-prefs-table" class="table table-striped"
+                    <table id="attachment-prefs-table" class="table table-striped"
                         style="display: block; max-height: 300px; overflow: auto">
                         <thead>
                             <tr style="position: sticky; top: 0;">

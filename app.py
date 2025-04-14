@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import json
 import sqlite3
 import os
+import helpers
 
 load_dotenv()
 
@@ -55,7 +56,9 @@ def after_setup(app):
         error_message_body = e.description
         
         if hasattr(current_user, "id"):
-            print(current_user.id, "(", current_user.name, ")", "had an error", e.code)
+            # print(current_user.id, "(", current_user.name, ")", "had an error", e.code)
+            helpers.log(current_user.id, current_user.full_name, "ERROR", str(e.code), error_message_body)
+
         
         if e.code == 400:
             error_code = "In other words, the server did not like something you just sent it.  Like if you sent your ex a Lifted message, they would probably not like it (please do that at your own risk — we are not endorsing this).  Or, if you were trying to reverse-engineer this web app, that's why you might be here.  Otherwise, I don't know what to tell you, it's probably something wrong on our end, so you should email us below."
@@ -108,9 +111,15 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def get_logs_connection():
+    conn = sqlite3.connect("db/logs.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
 class User(UserMixin):
-    def __init__(self, name, id):
+    def __init__(self, name, full_name, id):
         self.name = name
+        self.full_name = full_name
         self.id = id
         self.email = id + "@cornell.edu"
 
@@ -121,7 +130,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if is_admin() == False:
-            abort(401)
+            abort(401, "Not an admin!")
         return f(*args, **kwargs)
     return decorated_function
 
@@ -134,18 +143,20 @@ def get_impersonating_status():
 @login_manager.user_loader
 def load_user(user_id):
     # user_id = "atn45" # use to TEST a user!
-    user = User(name=session["given_name"], id=user_id)
+    user = User(name=session["given_name"], full_name=session["full_name"], id=user_id)
     return user
 
 def after_oidc_authorize(sender, **extras):
     oidc_profile = session["oidc_auth_profile"]
     session["given_name"] = oidc_profile["given_name"]
+    session["full_name"] = oidc_profile["name"]
     user = load_user(oidc_profile["sub"])
     login_user(user)
     # app.logger.info(current_user.id, ' logged in successfully')
     # print(current_user.id, ' logged in successfully')
-    print(current_user.id, "(", current_user.name, ")", "logged in successfully")
 
+    # helpers.log(current_user.id, current_user.full_name, "INFO", None, "OIDC Auth Success")
+    
 signals.after_authorize.connect(after_oidc_authorize)
 
 

@@ -26,7 +26,7 @@
                 {% if message_confirmation %}
                     <div class="alert alert-success" role="alert">
                         <h4 class="alert-heading">Message Submitted Successfully!</h4>
-                        <p>Your Lifted message was submitted successfully!  You can view it in your sent messages below.</p>
+                        <p>Your Lifted message to <b>{{ recipient_email }}</b> was submitted successfully!  You can view it in your sent messages below.</p>
                         <p>Your recipient was just notified that they've been Lifted, but
                             they won't get to see your message until the last day of classes!</p>
                         <p class="mb-0">To stay up-to-date with any last-minute reminders or changes, and to help Lift us,
@@ -385,6 +385,9 @@
             {{ components.confirm_modal("delete-card-modal", "Delete Message", "Are you sure you want to delete this
             message? This cannot be undone!",
             "Delete", "anchor") }}
+
+            {{ components.confirm_modal("swap-card-modal", "Get your cards delivered virtually?", "If you don't pick up your physical messages, you won't be able to view them virtually, so choose this option if you're not sure you can make it!",
+            "Yes", "anchor", "/swap-messages") }}
 
             {{ components.card_modal("card-modal", "Your Lifted Message", True) }}
 

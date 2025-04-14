@@ -2976,6 +2976,17 @@ body.messages-page .hero-subtitle {
     margin-bottom: 0px;
 }
 
+.swap-button {
+    display: inline-block;
+    border: none;
+    background-color: var(--cornell-red);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
 /* Compact attachment section styling */
 .attachment-section {
     background-color: rgba(255, 255, 255, 0.8);

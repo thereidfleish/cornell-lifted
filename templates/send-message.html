@@ -39,6 +39,19 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
+                    {% if form.errors.values() %}
+                        <div class="alert alert-danger" role="alert">
+                            <h5 class="alert-heading">Please fix the following errors:</h5>
+                            <ul class="mb-0">
+                                {% for error_messages in form.errors.values() %}
+                                {% for error_message in error_messages %}
+                                <li>{{error_message}}</li>
+                                {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
                     {% if current_user.is_authenticated and is_admin() and not is_edit %}
                     <div class="text-end mb-4">
                         <a href="/send-message?show_admin_overrides=true" class="btn btn-outline-primary">
@@ -74,19 +87,6 @@
                                     current_user.email }}</p>
                             </div>
                         </div>
-
-                        {% if form.errors.values() %}
-                        <div class="alert alert-danger" role="alert">
-                            <h5 class="alert-heading">Please fix the following errors:</h5>
-                            <ul class="mb-0">
-                                {% for error_messages in form.errors.values() %}
-                                {% for error_message in error_messages %}
-                                <li>{{error_message}}</li>
-                                {% endfor %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endif %}
 
                         <form method="post" class="lifted-form">
                             {% if show_admin_overrides %}
@@ -125,7 +125,7 @@
                                     <h5 class="form-section-title blue-text">Sender Information</h5>
                                 </div>
 
-                                <div class="mb-5">
+                                <div class="mb-4">
                                     {{ components.render_form_field(
                                     field=form.sender_name,
                                     description='This is your name that will appear on the card. If you want the letter
@@ -208,7 +208,7 @@
                                             <span class="results-icon">👥</span>
                                             <h6 class="results-title mb-0">Search Results</h6>
                                         </div>
-                                        <div class="table-responsive">
+                                        <div class="table-responsive search-results-table">
                                             <table id="people-info-table" class="table table-hover">
                                                 <thead>
                                                     <tr>
@@ -247,7 +247,8 @@
                             </div>
 
                             <div class="form-submit text-center mt-5">
-                                <button type="submit" class="btn cta-btn">{% if is_edit %}Update{% else %}Submit{% endif
+                                <button class="btn cta-btn" onclick="this.form.submit(); this.disabled=true; this.innerText='Loading...';">
+                                    {% if is_edit %}Update{% else %}Submit{% endif
                                     %} Message</button>
 
                                 {% if not is_edit %}

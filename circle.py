@@ -8,7 +8,7 @@ from wtforms import Form, BooleanField, StringField, HiddenField, TextAreaField,
 import os
 import helpers
 
-from app import is_admin, get_db_connection, admin_required
+from app import is_admin, get_db_connection, get_logs_connection, admin_required
 
 circle = Blueprint('circle', __name__, template_folder='templates', static_folder='static')
 
@@ -16,7 +16,7 @@ circle = Blueprint('circle', __name__, template_folder='templates', static_folde
 def circle_home():
     if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"
 
-        print(current_user.id, "(", current_user.name, ")", "accessed the tap page!")
+        helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Tried to access the Tap Page!")
 
         # Taps Table
         conn = get_db_connection()
@@ -25,7 +25,7 @@ def circle_home():
 
         # If the user was not tapped, abort
         if current_user.id not in [tap["netid"] for tap in taps] and not is_admin():
-            abort(403)
+            abort(403, "No Circle!")
             # return "We're sorry, but you do not have access to this page."
 
         form = TapResponseForm(request.form)

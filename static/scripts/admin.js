@@ -95,7 +95,7 @@ function handleMessagesQueryInputChange() {
 }
 
 const Font = Quill.import('attributors/style/font');
-Font.whitelist = ['georgia', 'arial', 'verdana'];
+Font.whitelist = ['georgia', 'arial', 'verdana', 'Schoolbell', 'Tenor Sans'];
 Quill.register(Font, true);
 
 var Size = Quill.import('attributors/style/size');

@@ -2,7 +2,17 @@ from comtypes import client, CoInitialize, CoUninitialize
 import win32com.client
 import csv
 import os
+from datetime import datetime
 from flask import current_app
+from app import get_logs_connection
+
+def log(user_email, user_name, log_type, error_code, log_content):
+    conn = get_logs_connection()
+    timestamp = datetime.now().replace(microsecond=0)
+    conn.execute("insert into logs (log_timestamp, user_email, user_name, log_type, error_code, log_content) values (?, ?, ?, ?, ?, ?)",
+                 (timestamp, user_email, user_name, log_type, error_code, log_content))
+    conn.commit()
+    conn.close()
 
 def process_cards_to_dict(cards):
     dict = {}

@@ -8,9 +8,30 @@ import os
 import mimetypes
 import helpers
 
-from app import admin_required, update_lifted_config, get_db_connection, load_user
+from app import admin_required, update_lifted_config, get_db_connection, get_logs_connection, load_user
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
+
+@admin.route("/admin/logs", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def logs_page():
+    if request.method == "POST":
+        return redirect(url_for('admin.logs_page')) # prevents form resubmission
+    
+    # Logs Table
+    conn = get_logs_connection()
+    logs = conn.execute("select * from logs order by id desc").fetchall()
+    conn.close()
+    
+    # Recently Deleted Table
+    conn = get_logs_connection()
+    recently_deleted_messages = conn.execute("select * from recently_deleted_messages order by id desc").fetchall()
+    conn.close()
+
+    return render_template("logs.html",
+                           logs=logs,
+                           recently_deleted_messages=recently_deleted_messages)
 
 @admin.route("/admin", methods=['GET', 'POST'])
 @login_required
@@ -218,7 +239,7 @@ def save_rich_text(message_group, type):
                 
         html_content = "<div style='background-color: white; padding: 15px; max-width: 1000px; margin-left: auto; margin-right: auto; border-radius: 5px'>" + html_content + "</div>"
 
-        html_content = "<div style='background-color: #cfecf7; padding: 15px;'>" + html_content + "</div>"
+        html_content = "<div style='background-color: #cfecf7; padding: 15px; margin-bottom: 50px;'>" + html_content + "</div>"
     
     
     dir_path = f"templates/rich_text/{message_group}"

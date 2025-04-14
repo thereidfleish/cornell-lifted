@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+{% import 'components.html' as components with context %}
+
+<head>
+    {{ components.header("Logs") }}
+</head>
+
+<body class="mx-2">
+    <main>
+        {{ components.sticky_navbar() }}
+
+        <h3 class="mt-3">Logs</h3>
+
+        <h5>Logs</h5>
+        <p>The logs table. Num entries: {{ logs | length }}</p>
+        <div class="table-responsive mb-4">
+            <table id="attachment-prefs-table" class="table table-striped"
+                style="display: block; max-height: 600px; overflow: auto">
+                <thead>
+                    <tr style="position: sticky; top: 0;">
+                        <th scope="col">ID</th>
+                        <th scope="col">Log Timestamp</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Error Code</th>
+                        <th scope="col">Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in logs %}
+                    <tr>
+                        <td>{{ record["id"] }}</td>
+                        <td>{{ record["log_timestamp"] }}</td>
+                        <td>{{ record["user_email"] }}</td>
+                        <td>{{ record["user_name"] }}</td>
+                        <td>{{ record["log_type"] }}</td>
+                        <td>{{ record["error_code"] }}</td>
+                        <td>{{ record["log_content"] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h5>Recently Deleted Messages</h5>
+        <p>The recently deleted messages table. Num entries: {{ recently_deleted_messages | length }}</p>
+        <div class="table-responsive mb-4">
+            <table id="attachment-prefs-table" class="table table-striped"
+                style="display: block; max-height: 600px; overflow: auto">
+                <thead>
+                    <tr style="position: sticky; top: 0;">
+                        <th scope="col">ID</th>
+                        <th scope="col">Created Timestamp</th>
+                        <th scope="col">Deleted Timestamp</th>
+                        <th scope="col">Message Group</th>
+                        <th scope="col">Sender Email</th>
+                        <th scope="col">Sender Name</th>
+                        <th scope="col">Recipient Email</th>
+                        <th scope="col">Recipient Name</th>
+                        <th scope="col">Message Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in recently_deleted_messages %}
+                    <tr>
+                        <td>{{ record["id"] }}</td>
+                        <td>{{ record["created_timestamp"] }}</td>
+                        <td>{{ record["deleted_timestamp"] }}</td>
+                        <td>{{ record["message_group"] }}</td>
+                        <td>{{ record["sender_email"] }}</td>
+                        <td>{{ record["sender_name"] }}</td>
+                        <td>{{ record["recipient_email"] }}</td>
+                        <td>{{ record["recipient_name"] }}</td>
+                        <td>{{ record["message_content"] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+    <footer>
+        {{ components.footer() }}
+    </footer>
+</body>
+
+<script src="/static/scripts/get-card-json.js"></script>
+<script src="/static/scripts/admin.js"></script>
+<script src="/static/scripts/themes.js"></script>
+<script src="/static/scripts/bootstrap.bundle.min.js"></script>
+
+
+</html>

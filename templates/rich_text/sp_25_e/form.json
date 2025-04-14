@@ -1,0 +1,168 @@
+{
+    "ops": [
+        {
+            "attributes": {
+                "font": "Schoolbell",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "eLifted Spring 2025"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px"
+            },
+            "insert": "We're back for Spring 2025!  Show your appreciation and lift some spirits!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Fill out the form here to send a thank you message to someone who has lifted you at Cornell.  "
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px"
+            },
+            "insert": "Your message will be delivered "
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px",
+                "underline": true
+            },
+            "insert": "virtually"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px"
+            },
+            "insert": " on the last day of classes ("
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "Tuesday, May 6th"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px"
+            },
+            "insert": ")."
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "italic": true,
+                "font": "Tenor Sans",
+                "size": "16px",
+                "bold": true
+            },
+            "insert": "The form will close on Monday, May 5th at 11:59 PM!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "Tenor Sans"
+            },
+            "insert": "Check us out at our Instagram "
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "font": "Tenor Sans",
+                "link": "https://www.instagram.com/cornelllifted"
+            },
+            "insert": "@cornelllifted"
+        },
+        {
+            "attributes": {
+                "size": "16px"
+            },
+            "insert": " and "
+        },
+        {
+            "attributes": {
+                "size": "16px",
+                "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+            },
+            "insert": "read"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px",
+                "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+            },
+            "insert": " more about Lifted"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px"
+            },
+            "insert": "If you have any questions, check out our "
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px",
+                "link": "https://cornelllifted.com/faqs"
+            },
+            "insert": "FAQs"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px"
+            },
+            "insert": " or feel free to contact us at "
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px",
+                "link": "mailto:lifted@cornell.edu"
+            },
+            "insert": "lifted@cornell.edu"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px",
+                "italic": true
+            },
+            "insert": "Note: To send a Lifted message through this form, you need to sign in with your Cornell NetID.  If you don't have one (e.g., you're a parent), send us an email and we'll send your message for you :)"
+        },
+        {
+            "insert": "\n"
+        }
+    ]
+}

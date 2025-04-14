@@ -196,14 +196,14 @@
 {% endif %}
 {% if field.errors %}
 {% for error in field.errors %}
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger mt-2" role="alert">
     {{ error }}
 </div>
 {% endfor %}
 {% endif %}
 {% endmacro %}
 
-{% macro confirm_modal(id, title_text, body_text, yes_text, type) %}
+{% macro confirm_modal(id, title_text, body_text, yes_text, type, href=None) %}
 <div class="modal fade" id="{{id}}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -217,7 +217,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Nevermind</button>
                 {% if type == "anchor" %}
-                <a class="btn btn-primary" id="{{id}}_yes_button">{{ yes_text }}</a>
+                <a class="btn btn-primary" id="{{id}}_yes_button" href="{{ href if href else '' }}">{{ yes_text }}</a>
                 {% elif type == "submit" %}
                 <button type="submit" class="btn btn-primary">{{ yes_text }}</button>
                 {% endif %}
@@ -237,7 +237,7 @@
             </div>
             <!-- <div class="form-container modal-body m-0"> -->
             {% if show_options %}
-            <div id="card-edit-delete-options" class="d-flex justify-content-between mb-4 d-none">
+            <div id="card-edit-delete-options" class="d-flex justify-content-between m-2 d-none">
                 <div>
                     <a id="edit-message-button" class="btn btn-outline-primary me-2">✍️
                         Edit</a>
@@ -260,7 +260,7 @@
             {% if show_options %}
             <!-- <hr class="my-4"> -->
 
-            <div id="card-print-options" class="mt-4 d-none">
+            <div id="card-print-options" class="mt-4 m-2 d-none">
                 <h5>Want to print your card?</h5>
                 <p>If you'd like to print your card, we suggest either printing with 100% size on normal
                     paper and
@@ -352,7 +352,9 @@
         <select class="ql-font">
             <option value="georgia">Georgia</option>
             <option value="arial">Arial</option>
-            <option value="verdana">Verdana (use for form)</option>
+            <option value="verdana">Verdana</option>
+            <option value="Schoolbell">Schoolbell</option>
+            <option value="Tenor Sans">Tenor Sans (use for form)</option>
         </select>
 
         <select class="ql-size">
