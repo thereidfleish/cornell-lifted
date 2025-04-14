@@ -24,15 +24,14 @@
                         experience</p>
                 </div>
                 {% if message_confirmation %}
-                <div class="alert alert-success" role="alert">
-                    <h4 class="alert-heading">Message Sent Successfully!</h4>
-                    <p>Your Lifted message was submitted successfully! You can view it in your sent messages below.</p>
-                    <p>Your recipient was just notified that they've been Lifted, but
-                        they won't get to see your message until the last day of classes!</p>
-                    <p>Feel free to Lift some more inspirational people in your life! And to stay up-to-date with any
-                        last-minute reminders or changes, and to help Lift us,
-                        follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
-                </div>
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Message Submitted Successfully!</h4>
+                        <p>Your Lifted message was submitted successfully!  You can view it in your sent messages below.</p>
+                        <p>Your recipient was just notified that they've been Lifted, but
+                            they won't get to see your message until the last day of classes!</p>
+                        <p class="mb-0">To stay up-to-date with any last-minute reminders or changes, and to help Lift us,
+                            follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -233,17 +232,6 @@
                                                                             <span class="radio-custom"></span>
                                                                         </div>
 
-                                                                        <div class="attachment-icon">
-                                                                            {% if attachment['attachment'] == 'Flower'
-                                                                            %}🌸
-                                                                            {% elif attachment['attachment'] ==
-                                                                            'Pinwheel' %}🎡
-                                                                            {% elif attachment['attachment'] ==
-                                                                            'Balloon' %}🎈
-                                                                            {% else %}🎁
-                                                                            {% endif %}
-                                                                        </div>
-
                                                                         <label
                                                                             class="form-check-label attachment-details"
                                                                             for="attachment_{{attachment['id']}}">
@@ -400,7 +388,8 @@
             {% endif %}
 
             {{ components.confirm_modal("delete-card-modal", "Delete Message", "Are you sure you want to delete this
-            message? This cannot be undone!") }}
+            message? This cannot be undone!",
+            "Delete", "anchor") }}
 
             {{ components.card_modal("card-modal", "Your Lifted Message", True) }}
 

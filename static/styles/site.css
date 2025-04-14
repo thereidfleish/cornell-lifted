@@ -1582,19 +1582,6 @@ textarea.form-control {
     font-style: normal;
 }
 
-.search-results-table {
-    border-radius: 8px;
-    border: 1px solid #eee;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-}
-
-.search-results-table thead th {
-    background-color: var(--cornell-blue);
-    color: white;
-    font-weight: 500;
-    padding: 12px 15px;
-}
-
 #people-info-table tbody tr {
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2082,19 +2069,28 @@ textarea.form-control {
     margin-right: 5px;
 }
 
-.search-results-table {
-    /* border-radius: 10px; */
+/* .search-results-table {
+    border-radius: 8px;
     border: 1px solid #eee;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    margin-top: 0px;
-    overflow: auto;
-}
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+} */
 
 .search-results-table thead th {
     background-color: var(--cornell-blue);
     color: white;
     font-weight: 500;
     padding: 12px 15px;
+}
+
+.search-results-table {
+    /* border-radius: 10px; */
+    display: block;
+    max-height: 300px;
+    overflow: auto;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-top: 0px;
+    
 }
 
 #people-info-table tbody tr {
@@ -2518,15 +2514,6 @@ body.fall .admin-section {
 
     .search-title h5 {
         font-size: 1.3rem;
-    }
-
-    #people-info-table thead th:nth-child(3),
-    #people-info-table thead th:nth-child(4),
-    #people-info-table thead th:nth-child(5),
-    #people-info-table tbody td:nth-child(3),
-    #people-info-table tbody td:nth-child(4),
-    #people-info-table tbody td:nth-child(5) {
-        display: none;
     }
 }
 

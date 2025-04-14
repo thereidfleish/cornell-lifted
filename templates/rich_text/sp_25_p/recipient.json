@@ -2,7 +2,7 @@
     "ops": [
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "{{LOGO}}"
         },
@@ -11,7 +11,7 @@
         },
         {
             "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "bold": true
             },
             "insert": "Someone at Cornell wrote you a Lifted message! \ud83d\udc8c"
@@ -21,7 +21,7 @@
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "We can't tell you who it is yet (it's a secret), but we can tell you that you're appreciated!"
         },
@@ -30,33 +30,33 @@
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "Your message will be posted on a notecard (for you to keep!) on the "
         },
         {
             "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "underline": true
             },
             "insert": "Arts Quad"
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": " on the last day of classes ("
         },
         {
             "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "bold": true
             },
             "insert": "Tuesday, May 6th"
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "), along with a balloon, flower, pinwheel, or more to celebrate the end of the semester."
         },
@@ -65,80 +65,55 @@
         },
         {
             "attributes": {
-                "font": "georgia",
-                "bold": true
-            },
-            "insert": "New this year!"
-        },
-        {
-            "attributes": {
-                "font": "georgia"
-            },
-            "insert": "  Choose which attachment you'd like to receive!  "
-        },
-        {
-            "attributes": {
-                "font": "georgia",
-                "link": "https://cornelllifted.com/"
-            },
-            "insert": "Click here to get your messages delivered virtually instead"
-        },
-        {
-            "attributes": {
-                "font": "georgia"
-            },
-            "insert": ".  Hard deadline to do this is 4/27/25."
-        },
-        {
-            "insert": "\n\n"
-        },
-        {
-            "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "bold": true
             },
             "insert": "Can't make it on the last day of classes?"
         },
         {
-            "attributes": {
-                "font": "georgia"
-            },
-            "insert": "  "
+            "insert": "\n"
         },
         {
             "attributes": {
-                "font": "georgia",
-                "link": "https://cornelllifted.com/"
+                "font": "verdana",
+                "link": "https://cornelllifted.com/messages"
             },
-            "insert": "Click here to get your messages delivered virtually instead"
+            "insert": "Get your messages delivered virtually instead"
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
-            "insert": ".  Hard deadline to do this is 4/27/25."
+            "insert": ".  Hard deadline to do this is "
+        },
+        {
+            "attributes": {
+                "font": "verdana",
+                "bold": true
+            },
+            "insert": "Sunday, April 27th at 11:59 PM."
         },
         {
             "insert": "\n\n"
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "Spread the love by writing your own Lifted message to a friend, staff, or faculty member who has made your year better. "
         },
         {
             "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "bold": true
             },
-            "insert": "The form closes on Sunday, April 27th at 11:59 PM!"
+            "insert": "The form closes on Friday, April 25th at 11:59 PM!"
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
-            "insert": " Any messages submitted after will be sent virtually to your recipient."
+            "insert": "  Any messages submitted after will be sent virtually to your recipient."
         },
         {
             "insert": "\n\n"
@@ -147,7 +122,8 @@
             "attributes": {
                 "link": "https://cornelllifted.com/send-message",
                 "underline": true,
-                "font": "georgia",
+                "size": "16px",
+                "font": "verdana",
                 "bold": true
             },
             "insert": "Send a Lifted Message"
@@ -160,7 +136,7 @@
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "See you then,"
         },
@@ -169,7 +145,7 @@
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "Cornell Lifted \ud83c\udf88"
         },
@@ -178,26 +154,35 @@
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
+            },
+            "insert": "P.S. New this year, you'll get a chance to pick whether you receive a balloon, flower, pinwheel, and more!  Keep an eye on your email after the form closes :)"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "font": "verdana"
             },
             "insert": "Check us out at our Instagram "
         },
         {
             "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "link": "https://www.instagram.com/cornelllifted"
             },
             "insert": "@cornelllifted"
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": " and on our website "
         },
         {
             "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "link": "https://cornelllifted.com/"
             },
             "insert": "cornelllifted.com"
@@ -207,13 +192,13 @@
         },
         {
             "attributes": {
-                "font": "georgia"
+                "font": "verdana"
             },
             "insert": "Read more about Lifted here: "
         },
         {
             "attributes": {
-                "font": "georgia",
+                "font": "verdana",
                 "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
             },
             "insert": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
