@@ -4061,3 +4061,69 @@ body.fall .timeline-date {
         font-size: 1.3rem;
     }
 }
+
+/* Collapsible timeline styling */
+.timeline-collapsed .hidden-semester {
+    display: none;
+}
+
+.toggle-older-semesters {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 10px 20px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    width: 250px;
+    color: var(--cornell-blue);
+    font-weight: 500;
+}
+
+.toggle-older-semesters:hover {
+    background-color: rgba(0, 118, 189, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.toggle-icon {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.timeline-expanded .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.timeline-marker-collapsed {
+    position: absolute;
+    left: -30px;
+    width: 30px;
+    height: 40px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    color: #888;
+    font-size: 0.9rem;
+    z-index: 2;
+}
+
+.semester-count-badge {
+    background-color: var(--cornell-blue);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    margin-left: 8px;
+}

@@ -86,7 +86,7 @@
                 </div>
 
                 <!-- Timeline with Card Preview -->
-                <div class="timeline-wrapper">
+                <div class="timeline-wrapper timeline-collapsed" id="timeline-container">
                     {% set all_event_groups = [] %}
                     {% for message_group_short_name, message_group_long_name in
                     lifted_config.message_group_list_map.items()
@@ -111,7 +111,7 @@
                     {% set sorted_events = all_event_groups|sort(attribute='sort_key', reverse=true) %}
 
                     {% for event in sorted_events %}
-                    <div class="timeline-event">
+                    <div class="timeline-event {% if loop.index > 2 %}hidden-semester{% endif %}">
                         <div class="timeline-marker">
                             <div class="timeline-date">
                                 <span class="timeline-year">{{ event.year }}</span>
@@ -353,7 +353,7 @@
             {% endfor %}
 
             <!-- Legacy years - 2017 and 2016 -->
-            <div class="timeline-event">
+            <div class="timeline-event hidden-semester">
                 <div class="timeline-marker">
                     <div class="timeline-date">
                         <span class="timeline-year">2017</span>
@@ -391,6 +391,14 @@
                 </div>
             </div>
 
+            {% if sorted_events|length > 2 %}
+            <button class="toggle-older-semesters" id="toggle-semesters">
+                <span class="toggle-icon">▼</span>
+                <span class="toggle-text">View Older Lifted Memories</span>
+                <span class="semester-count-badge">{{ sorted_events|length - 2 + 1}}</span>
+            </button>
+            {% endif %}
+
             {{ components.confirm_modal("delete-card-modal", "Delete Message", "Are you sure you want to delete this
             message? This cannot be undone!") }}
 
@@ -421,6 +429,28 @@
     <script src="/static/scripts/message-scripts.js"></script>
     <script src="/static/scripts/themes.js"></script>
     <script src="/static/scripts/bootstrap.bundle.min.js"></script>
+    <!-- Add this before </body>: -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButton = document.getElementById('toggle-semesters');
+            const timelineContainer = document.getElementById('timeline-container');
+
+            if (toggleButton) {
+                toggleButton.addEventListener('click', function () {
+                    timelineContainer.classList.toggle('timeline-collapsed');
+                    timelineContainer.classList.toggle('timeline-expanded');
+
+                    // Update the button text based on current state
+                    const toggleText = document.querySelector('.toggle-text');
+                    if (timelineContainer.classList.contains('timeline-collapsed')) {
+                        toggleText.textContent = 'View Older Lifted Memories';
+                    } else {
+                        toggleText.textContent = 'Hide Older Memories';
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
