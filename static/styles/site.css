@@ -1,10 +1,8 @@
-/* New Lifted Website Styles - Complete Updated Version */
+/* Imports */
+@import url(https://fonts.googleapis.com/css?family=Schoolbell&v1);
+@import url(https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap);
 
-/* Import fonts */
-@import url('https://fonts.googleapis.com/css?family=Schoolbell&v1');
-@import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
-
-/* Base colors */
+/* Variables */
 :root {
     --cornell-blue: #0076BD;
     --cornell-red: #B31B1B;
@@ -22,33 +20,22 @@
     --winter-blue-dark: #7bb5eb;
     --winter-accent: #9C27B0;
     --winter-background: #e3eeff;
-    --winter-background-alt: #d7e7ff;
+    --winter-background-alt: #d7e7ff
 }
 
-/* Typography */
+/* Base Styles */
 body {
     font-family: 'Tenor Sans', sans-serif;
     line-height: 1.6;
     color: var(--text-color);
-    background-color: #fffefa;
+    background-color: #fffefa
 }
 
-h1,
-h2 {
-    font-family: 'Schoolbell', arial, serif;
+h1, h2 {
+    font-family: Schoolbell, arial, serif;
 }
 
-h3,
-h4,
-h5 {
-    font-family: 'Tenor Sans', sans-serif;
-}
-
-p {
-    font-family: 'Tenor Sans', sans-serif;
-}
-
-.btn {
+h3, h4, h5, p, .btn {
     font-family: 'Tenor Sans', sans-serif;
 }
 
@@ -60,31 +47,16 @@ p {
     color: var(--cornell-red);
 }
 
-/* Increase page margins */
+/* Layout */
 .container {
     max-width: 1140px;
-    padding-left: 40px;
-    padding-right: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
-@media (min-width: 1400px) {
-    .container {
-        max-width: 1280px;
-    }
-}
-
-/* Add more horizontal padding on mobile */
-@media (max-width: 768px) {
-    .container {
-        padding-left: 25px;
-        padding-right: 25px;
-    }
-}
-
-/* Full-height sections */
 .section-container {
     min-height: auto;
-    padding: 40px 0px;
+    padding: 40px 0 0 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -92,7 +64,7 @@ p {
 }
 
 .section-title {
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     font-size: 3rem;
     margin-bottom: 30px;
     text-align: center;
@@ -119,21 +91,15 @@ p {
     font-weight: 400;
 }
 
-/* Navbar styling */
+/* Navigation */
 .sticky-navbar {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: white;
+    background-color: #fff;
     border-bottom: 1px solid var(--border-color);
     padding: 15px 0;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-}
-
-.navbar-brand .brand-text {
-    font-weight: 600;
-    font-size: 1.2rem;
-    color: var(--cornell-blue);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, .08);
 }
 
 .nav-links .btn-link {
@@ -141,7 +107,7 @@ p {
     text-decoration: none;
     font-weight: 500;
     padding: 8px 12px;
-    transition: color 0.3s ease;
+    transition: color .3s ease, transform .3s ease;
     font-family: 'Tenor Sans', sans-serif;
     font-size: 1rem;
 }
@@ -155,27 +121,26 @@ p {
     font-weight: 500;
     font-family: 'Tenor Sans', sans-serif;
     border-radius: 20px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .1);
+    transition: all .3s ease;
 }
 
 .action-nav .btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, .15);
 }
 
-/* Hamburger button styling */
 .navbar-toggler {
-    background: none;
+    background: transparent;
     border: none;
     padding: 8px;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    transition: background-color .3s;
 }
 
 .navbar-toggler:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, .05);
 }
 
 .navbar-toggler-icon {
@@ -185,28 +150,25 @@ p {
     color: var(--text-color);
 }
 
-/* Mobile menu styling */
 .mobile-menu {
     display: none;
-    background-color: white;
+    background-color: #fff;
     border-top: 1px solid var(--border-color);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
     overflow: hidden;
     max-height: 0;
-    transition: max-height 0.3s ease-out;
+    transition: max-height .3s ease-out;
 }
 
 .mobile-menu.show {
     display: block;
     max-height: 300px;
-    /* Adjust as needed */
 }
 
-/* Mobile link styling */
 .mobile-menu .btn-link {
     width: 100%;
     text-align: left;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, .05);
     margin: 0;
 }
 
@@ -218,39 +180,14 @@ p {
     padding-top: 10px;
 }
 
-/* Animation for menu items */
 .mobile-menu.show .btn {
-    animation: fadeInDown 0.3s forwards;
+    animation: fadeInDown .3s forwards;
 }
 
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive adjustments - already in your site.css but added here for reference */
-@media (max-width: 992px) {
-    .sticky-navbar .d-flex {
-        /* Keep as-is since we're using Bootstrap classes */
-    }
-
-    .navbar-brand {
-        margin-bottom: 0;
-        /* Changed to keep logo properly aligned */
-    }
-}
-
-/* Hero Logo Styling */
+/* Hero Section */
 .hero-logo {
     margin-bottom: 20px;
-    transition: all 0.5s ease;
+    transition: all .5s ease;
     max-width: 100%;
 }
 
@@ -258,23 +195,8 @@ p {
     transform: scale(1.05);
 }
 
-/* Media query adjustments for logo */
-@media (max-width: 992px) {
-    .hero-logo {
-        width: 220px;
-        margin: 0 auto 20px;
-    }
-}
-
-@media (max-width: 576px) {
-    .hero-logo {
-        width: 180px;
-    }
-}
-
-/* Hero Section with balloon background */
 .hero-section {
-    background: linear-gradient(135deg, #f7f7ff 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, #f7f7ff 0, #e9ecef 100%);
     padding: 100px 0 120px;
     min-height: 90vh;
     display: flex;
@@ -289,13 +211,13 @@ p {
 }
 
 .hero-title {
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     font-size: 4rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
     line-height: 1.2;
     color: var(--cornell-red);
-    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, .1);
     z-index: 3;
     position: relative;
 }
@@ -321,8 +243,8 @@ p {
     font-size: 1.1rem;
     font-weight: 500;
     border-radius: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+    transition: all .3s ease;
     position: relative;
     overflow: hidden;
     margin-bottom: 10px;
@@ -337,15 +259,10 @@ p {
     background-color: #9e1717;
     border-color: #9e1717;
     transform: translateY(-5px) rotate(-1deg);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, .2);
 }
 
-.hero-cta .btn-outline-primary:hover {
-    transform: translateY(-5px) rotate(1deg);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Floating balloons decoration */
+/* Balloon Decorations */
 .hero-decoration {
     position: absolute;
     top: 0;
@@ -357,13 +274,12 @@ p {
     z-index: 1;
 }
 
-/* Add balloon elements */
 .balloon {
     position: absolute;
     width: 60px;
     height: 75px;
     border-radius: 50%;
-    opacity: 0.65;
+    opacity: .65;
     animation: float-balloon 12s ease-in-out infinite;
 }
 
@@ -375,10 +291,9 @@ p {
     transform: translateX(-50%);
     width: 2px;
     height: 30px;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, .3);
 }
 
-/* Reposition balloons to the edges of the viewport */
 .balloon:nth-child(1) {
     background-color: var(--cornell-red);
     top: 5%;
@@ -414,21 +329,66 @@ p {
     animation-delay: -8s;
 }
 
+/* Animations */
 @keyframes float-balloon {
     0% {
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(0) rotate(0);
     }
-
     50% {
         transform: translateY(-30px) rotate(5deg);
     }
-
     100% {
-        transform: translateY(0) rotate(0deg);
+        transform: translateY(0) rotate(0);
     }
 }
 
-/* Fun image container */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+        transform: translateY(-25px) rotate(1deg);
+    }
+    100% {
+        transform: translateY(0) rotate(-2deg);
+    }
+}
+
+@keyframes gentle-float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Image Containers */
 .square-image-container {
     position: relative;
     width: 450px;
@@ -437,16 +397,9 @@ p {
     margin: 0 auto;
     border-radius: 25px;
     overflow: hidden;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-    background-color: white;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, .15);
+    background-color: #fff;
     padding: 12px;
-    /* transform: rotate(-2deg); */
-    /* border: 5px solid white; */
-}
-
-.square-image-container:hover .feature {
-    transform: translateY(-8px) rotate(1deg);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 .square-image {
@@ -454,14 +407,13 @@ p {
     height: 100%;
     object-fit: cover;
     border-radius: 18px;
-    transition: transform 0.5s ease;
+    transition: transform .5s ease;
 }
 
 .square-image-container:hover .square-image {
     transform: scale(1.03);
 }
 
-/* Handwritten note styling for image container */
 .square-image-container:before {
     content: '';
     position: absolute;
@@ -470,49 +422,33 @@ p {
     transform: translateX(-50%) rotate(5deg);
     width: 80px;
     height: 30px;
-    background-color: rgba(255, 235, 59, 0.8);
+    background-color: rgba(255, 235, 59, .8);
     z-index: 10;
     border-radius: 5px;
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, .1);
 }
 
-/* Animation for logo float with paper-like movement */
 .logo-float {
     animation: float 6s ease-in-out infinite;
     position: relative;
 }
 
-@keyframes float {
-    0% {
-        transform: translateY(0px) rotate(-2deg);
-    }
-
-    50% {
-        transform: translateY(-25px) rotate(1deg);
-    }
-
-    100% {
-        transform: translateY(0px) rotate(-2deg);
-    }
-}
-
-/* Feature boxes with paper styling */
+/* Feature Boxes */
 .feature-box {
-    background-color: white;
+    background: linear-gradient(#fff 0, #f9f9ff 100%);
     border-radius: 18px;
     padding: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .05);
+    transition: all .3s ease;
     height: 100%;
     position: relative;
     border: 1px solid #f0f0f0;
-    background: linear-gradient(#fff 0%, #f9f9ff 100%);
 }
 
 .feature-box:hover {
     transform: translateY(-8px) rotate(1deg);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .1);
 }
 
 .feature-icon {
@@ -530,7 +466,6 @@ p {
     color: var(--cornell-red);
 }
 
-/* Paper clip effect for feature boxes */
 .feature-box:after {
     content: '';
     position: absolute;
@@ -540,7 +475,7 @@ p {
     height: 30px;
     background-color: #ccc;
     border-radius: 50%;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, .2);
     transform: rotate(5deg);
     z-index: 1;
 }
@@ -554,10 +489,10 @@ p {
 }
 
 .stats-card {
-    background: white;
+    background: #fff;
     border-radius: 20px;
     padding: 40px 30px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
     text-align: center;
     position: relative;
     border: 1px var(--cornell-blue);
@@ -575,13 +510,6 @@ p {
     z-index: -1;
 }
 
-.stats-container {
-    padding: 30px;
-    background-color: var(--light-gray);
-    border-radius: 8px;
-    margin: 40px 0;
-}
-
 .stat-item {
     text-align: center;
     margin-bottom: 20px;
@@ -589,7 +517,7 @@ p {
 
 .stat-number {
     font-size: 3rem;
-    font-weight: bold;
+    font-weight: 700;
     color: var(--cornell-blue);
 }
 
@@ -599,7 +527,7 @@ p {
     font-weight: 500;
 }
 
-/* Action buttons */
+/* Action Buttons */
 .action-buttons {
     margin: 40px 0;
     text-align: center;
@@ -611,26 +539,15 @@ p {
     font-size: 1.1rem;
     font-weight: 500;
     border-radius: 30px;
-    transition: all 0.3s ease;
-}
-
-.action-buttons .btn-primary {
-    background-color: var(--cornell-red);
-    border-color: var(--cornell-red);
-}
-
-.action-buttons .btn-primary:hover {
-    background-color: #9e1717;
-    transform: translateY(-3px) rotate(-1deg);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    transition: all .3s ease;
 }
 
 .action-buttons .btn-outline-primary:hover {
     transform: translateY(-3px) rotate(1deg);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, .15);
 }
 
-/* Carousel styling */
+/* Carousel */
 .carousel-container {
     padding: 25px 45px;
     position: relative;
@@ -642,44 +559,17 @@ p {
     font-size: 1.6rem;
 }
 
-/* Combined section styling */
-#spread-love-memories {
-    padding: 70px 0;
-    background-color: #f7f9ff;
-}
-
-#spread-love-memories h3 {
-    font-family: 'Schoolbell', arial, serif;
-    color: var(--cornell-red);
-    position: relative;
-    font-weight: 700;
-    padding-bottom: 10px;
-    display: inline-block;
-    font-size: 2.5rem;
-}
-
-#spread-love-memories h3:after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 60px;
-    height: 3px;
-    background-color: var(--cornell-red);
-}
-
 .carousel {
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
 }
 
-/* Carousel navigation arrows */
 .custom-carousel-control {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, .7);
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -688,13 +578,13 @@ p {
     justify-content: center;
     cursor: pointer;
     z-index: 10;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+    transition: all .3s ease;
 }
 
 .custom-carousel-control:hover {
     background-color: var(--cornell-red);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .3);
 }
 
 .carousel-control-prev.custom-carousel-control {
@@ -705,28 +595,23 @@ p {
     right: -25px;
 }
 
-/* Example message cards with polaroid styling */
-.example-messages {
-    padding: 80px 0;
-}
-
+/* Example Cards */
 .example-card {
     border: none;
     border-radius: 0;
-    padding: 0;
-    margin-bottom: 30px;
     min-height: 280px;
-    transition: all 0.3s ease;
-    background-color: white;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transition: all .3s ease;
+    background-color: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
     display: flex;
     flex-direction: column;
     transform: rotate(1deg);
     padding: 12px 12px 30px 12px;
+    margin-bottom: 30px;
 }
 
 .example-card:hover {
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, .2);
     transform: translateY(-10px) rotate(-1deg);
 }
 
@@ -762,24 +647,12 @@ p {
     margin: 20px 0;
 }
 
-/* CTA Section with balloon styling */
-/* Enhanced CTA Section Styling */
-
+/* Call to Action Section */
 .cta-section {
     padding: 80px 0;
     position: relative;
     overflow: hidden;
     z-index: 0;
-}
-
-/* Spring theme */
-body.spring .cta-section {
-    background: linear-gradient(135deg, #e0f7fa 0%, #fff1f0 100%);
-}
-
-/* Fall theme */
-body.fall .cta-section {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe8e8 100%);
 }
 
 .cta-title {
@@ -814,23 +687,23 @@ body.fall .cta-section {
     font-weight: 500;
     border-radius: 30px;
     background-color: var(--cornell-red);
-    color: white;
+    color: #fff;
     border: none;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .2);
+    transition: all .3s ease;
     position: relative;
     z-index: 2;
 }
 
 .cta-btn:hover {
     transform: translateY(-5px) rotate(-1deg);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, .3);
     background-color: #9e1717;
-    color: white;
+    color: #fff;
 }
 
 .cta-info {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, .3);
     padding: 20px;
     border-radius: 12px;
     margin-top: 1.5rem;
@@ -847,56 +720,10 @@ body.fall .cta-section {
     font-weight: 500;
 }
 
-/* Additional animation for CTA */
-@keyframes gentle-float {
-    0% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-8px);
-    }
-
-    100% {
-        transform: translateY(0);
-    }
-}
-
 .cta-buttons .cta-btn {
     animation: gentle-float 4s ease-in-out infinite;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .cta-title {
-        font-size: 2.5rem;
-    }
-
-    .cta-subtitle {
-        font-size: 1.2rem;
-    }
-
-    .cta-btn {
-        padding: 12px 25px;
-        font-size: 1.1rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .cta-section {
-        padding: 60px 0;
-    }
-
-    .cta-title {
-        font-size: 2.2rem;
-    }
-
-    .cta-info {
-        padding: 15px;
-    }
-}
-
-/* Balloon decorations for CTA section */
 .cta-balloons {
     position: absolute;
     top: 0;
@@ -907,7 +734,6 @@ body.fall .cta-section {
     z-index: 1;
 }
 
-/* Reposition balloons in CTA section */
 .cta-balloons .balloon:nth-child(1) {
     bottom: 10%;
     left: 5%;
@@ -925,22 +751,22 @@ body.fall .cta-section {
     right: 8%;
 }
 
-/* Footer section */
+/* Footer */
 .footer-section {
     margin-top: 80px;
     padding: 50px 0 30px 0;
     border-top: 1px solid var(--border-color);
     background-color: #222;
-    color: white;
+    color: #fff;
 }
 
 .footer-section a {
-    color: rgba(255, 255, 255, 0.8);
-    transition: color 0.3s ease;
+    color: rgba(255, 255, 255, .8);
+    transition: color .3s ease;
 }
 
 .footer-section a:hover {
-    color: white;
+    color: #fff;
     text-decoration: none;
 }
 
@@ -972,63 +798,50 @@ body.fall .cta-section {
 }
 
 .footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, .1);
     margin-top: 40px;
     padding-top: 20px;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: .9rem;
+    color: rgba(255, 255, 255, .7);
 }
 
-/* Form styling */
+/* Forms */
 .form-container {
-    background-color: white;
+    background-color: #fff;
     border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    padding: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .08);
     margin: 40px 0;
     border: 1px solid #f0f0f0;
     position: relative;
 }
 
-/* .form-container:before {
-    content: '';
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background-color: var(--note-yellow);
-    top: -5px;
-    right: -5px;
-    transform: rotate(15deg);
-    z-index: -1;
-    border-radius: 0 15px 0 0;
-} */
-
 .form-label {
     font-weight: 600;
-    color: var(--text-color);
-    font-size: 1.0rem;
+    color: var(--cornell-blue);
+    font-size: 1rem;
+    margin-bottom: 8px;
 }
 
 .form-control {
     border-radius: 12px;
     border: 1px solid #e0e0e0;
     padding: 10px 15px;
+    transition: all .3s ease;
 }
 
 .form-control:focus {
-    box-shadow: 0 0 0 0.2rem rgba(179, 27, 27, 0.25);
+    box-shadow: 0 0 0 .2rem rgba(179, 27, 27, .25);
     border-color: var(--cornell-red);
+    transform: translateY(-2px);
 }
 
-/* Lifted card styling */
 .lifted-card {
-    background-color: white;
+    background-color: #fff;
     border-radius: 15px;
     border: none;
     padding: 15px 25px;
-    /* margin: 30px 0; */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    /* transform: rotate(-1deg); */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .1);
 }
 
 .lifted-card h4 {
@@ -1039,75 +852,68 @@ body.fall .cta-section {
     font-size: 1.8rem;
 }
 
-/* Message page styling */
+/* Message Tabs */
 .message-tab-container {
-    background-color: white;
+    background-color: #fff;
     border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .08);
     margin: 30px 0;
+    transform: rotate(-.5deg);
+}
+
+.nav-tabs {
+    border-bottom: 2px solid var(--cornell-red);
+    margin-bottom: 20px;
 }
 
 .nav-tabs .nav-link {
     color: var(--text-color);
+    font-family: 'Tenor Sans', sans-serif;
     font-weight: 500;
+    border: none;
+    padding: 12px 20px;
+    margin-right: 5px;
+    border-radius: 8px 8px 0 0;
+    transition: all .3s ease;
     font-size: 1rem;
 }
 
+.nav-tabs .nav-link:hover {
+    background-color: rgba(179, 27, 27, .05);
+    transform: translateY(-3px);
+}
+
 .nav-tabs .nav-link.active {
-    color: var(--cornell-blue);
+    color: #fff;
+    background-color: var(--cornell-red);
     font-weight: 600;
 }
 
 .message-icon {
-    transition: all 0.3s ease;
+    transition: all .3s ease;
 }
 
 .message-icon:hover {
     transform: scale(1.1) rotate(-5deg);
 }
 
-/* Adjust spacing between navbar and logo */
-.sticky-navbar+.section-container {
-    padding-top: 0px;
-}
-
-.section-container .text-center.mb-5 {
-    margin-top: 0px;
-    margin-bottom: 50px;
-}
-
-.section-container .text-center.mb-5 img {
-    width: 400px;
-    max-width: 90%;
-    height: auto;
-    margin-top: 0px;
-    margin-bottom: 70px;
-    transition: all 0.5s ease;
-}
-
-.section-container .text-center.mb-5 img:hover {
-    transform: rotate(3deg) scale(1.05);
-}
-
-/* FAQ Section Styling */
+/* FAQs Section */
 #faqs-content {
     padding: 80px 0;
     position: relative;
 }
 
-/* Move balloon decorations completely outside the content area */
 #faqs-content:before {
     content: '';
     position: absolute;
     top: 5%;
     right: -40px;
-    /* Moved far away from content */
     width: 60px;
     height: 75px;
     border-radius: 50%;
     background-color: var(--cornell-red);
-    opacity: 0.2;
+    opacity: .2;
     z-index: 0;
     pointer-events: none;
 }
@@ -1117,19 +923,17 @@ body.fall .cta-section {
     position: absolute;
     bottom: 10%;
     left: -40px;
-    /* Moved far away from content */
     width: 50px;
     height: 65px;
     border-radius: 50%;
     background-color: var(--cornell-blue);
-    opacity: 0.2;
+    opacity: .2;
     z-index: 0;
     pointer-events: none;
 }
 
-/* FAQ Category Styling */
 #faqs-content h3.blue-text {
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     font-size: 2.2rem;
     color: var(--cornell-blue);
     position: relative;
@@ -1147,7 +951,6 @@ body.fall .cta-section {
     background-color: var(--cornell-red);
 }
 
-/* Accordion Styling */
 .accordion {
     --bs-accordion-border-color: #e0e0e0;
     --bs-accordion-border-radius: 12px;
@@ -1162,7 +965,7 @@ body.fall .cta-section {
     --bs-accordion-body-padding-y: 1.5rem;
     --bs-accordion-active-color: var(--cornell-red);
     --bs-accordion-active-bg: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
     border-radius: 12px;
     overflow: hidden;
     background-color: transparent;
@@ -1173,12 +976,12 @@ body.fall .cta-section {
     margin-bottom: 10px;
     border-radius: 12px !important;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
     background-color: transparent;
 }
 
 .accordion-item:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, .08);
     transform: translateY(-2px);
 }
 
@@ -1186,26 +989,26 @@ body.fall .cta-section {
     font-family: 'Tenor Sans', sans-serif;
     font-weight: 500;
     font-size: 1.1rem;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
     position: relative;
     padding-right: 3rem;
 }
 
 .accordion-button:not(.collapsed) {
     color: var(--cornell-red);
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, .3);
     box-shadow: none;
     font-weight: 600;
 }
 
 .accordion-button:focus {
     box-shadow: none;
-    border-color: rgba(179, 27, 27, 0.25);
+    border-color: rgba(179, 27, 27, .25);
 }
 
 .accordion-button::after {
     background-size: 1.25rem;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
 }
 
 .accordion-body {
@@ -1224,7 +1027,7 @@ body.fall .cta-section {
     color: var(--cornell-blue);
     text-decoration: none;
     border-bottom: 1px dotted var(--cornell-blue);
-    transition: all 0.2s ease;
+    transition: all .2s ease;
 }
 
 .accordion-body a:hover {
@@ -1232,757 +1035,35 @@ body.fall .cta-section {
     border-color: var(--cornell-red);
 }
 
-/* FAQ Container - transparent background */
-#faqs-content .form-container {
-    background-color: transparent;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    position: relative;
-    z-index: 1;
-    border: none;
-}
-
-/* Remove container decorator */
-#faqs-content .form-container:before {
-    display: none;
-}
-
-/* FAQ-specific balloon decorations - positioned far outside content area */
-.faq-balloon {
-    position: absolute;
-    border-radius: 50%;
-    z-index: 0;
-    pointer-events: none;
-    display: none;
-    /* Hide by default to prevent overlap */
-}
-
-/* Fun decorative elements */
 .accordion-item:nth-child(3n+1) {
-    transform: rotate(-0.3deg);
+    transform: rotate(-.3deg);
 }
 
 .accordion-item:nth-child(3n+2) {
-    transform: rotate(0.3deg);
+    transform: rotate(.3deg);
 }
 
 .accordion-item:hover {
-    transform: translateY(-3px) rotate(0deg);
+    transform: translateY(-3px) rotate(0);
 }
 
-/* Call to action section */
-#faqs-content .text-center.mt-5 h4 {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    color: var(--cornell-blue);
-}
-
-/* CTA container styling with transparent background */
-.cta-container {
-    background-color: transparent;
-    border-radius: 15px;
-    padding: 30px;
-    margin-top: 50px;
-    position: relative;
-}
-
-/* Remove CTA decorator */
-.cta-container:before {
-    display: none;
-}
-
-/* Responsive adjustments for all elements */
-@media (max-width: 992px) {
-    .square-image-container {
-        width: 320px;
-        height: 320px;
-        margin: 40px auto 0;
-    }
-
-    .hero-section {
-        padding: 70px 0 100px;
-        min-height: 70vh;
-    }
-
-    .hero-title {
-        font-size: 3.5rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.5rem;
-    }
-
-    .feature-title {
-        font-size: 1.8rem;
-    }
-
-    /* FAQ specific mobile adjustments */
-    #faqs-content .form-container {
-        padding: 25px;
-    }
-
-    .accordion-button {
-        font-size: 1rem;
-        padding-right: 2.5rem;
-    }
-
-    #faqs-content h3.blue-text {
-        font-size: 1.8rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .square-image-container {
-        width: 280px;
-        height: 280px;
-    }
-
-    .hero-title {
-        font-size: 2.8rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.3rem;
-    }
-
-    .stat-number {
-        font-size: 3rem;
-    }
-
-    .balloon {
-        display: none;
-    }
-
-    .section-container .text-center.mb-5 img {
-        width: 300px;
-        /* Original size on mobile phones */
-    }
-
-    /* More responsive adjustments for FAQs */
-    .accordion-button {
-        padding: 1rem;
-        font-size: 0.95rem;
-    }
-
-    .accordion-body {
-        padding: 1rem;
-    }
-}
-
-/* Spring and Fall seasonal theming for entire site */
-/* Spring Theme */
-body.spring {
-    background: linear-gradient(135deg, #f0fff0 0%, #fff0f5 100%);
-}
-
-/* Spring-specific adjustments */
-body.spring .hero-section {
-    background: linear-gradient(135deg, #f4ffee 0%, #fcf4ff 100%);
-}
-
-body.spring .balloon:nth-child(1) {
-    background-color: #ff9a9e;
-    /* Light pink */
-}
-
-body.spring .balloon:nth-child(2) {
-    background-color: #a1c4fd;
-    /* Light blue */
-}
-
-body.spring .balloon:nth-child(3) {
-    background-color: #96e6a1;
-    /* Light green */
-}
-
-body.spring .balloon:nth-child(4) {
-    background-color: #d4fc79;
-    /* Light yellow-green */
-}
-
-body.spring .balloon:nth-child(5) {
-    background-color: #c2e9fb;
-    /* Light sky blue */
-}
-
-body.spring .stats-section {
-    background-color: #f8fbff;
-}
-
-body.spring .cta-section {
-    background: linear-gradient(135deg, #e0f7fa 0%, #fff1f0 100%);
-}
-
-/* Spring themed FAQ section */
-body.spring #faqs-content {
-    background: linear-gradient(135deg, #f9fffa 0%, #f9f9ff 100%);
-}
-
-/* Fall Theme */
-body.fall {
-    background: linear-gradient(135deg, #fffaf0 0%, #fff5ee 100%);
-}
-
-/* Fall-specific adjustments */
-body.fall .hero-section {
-    background: linear-gradient(135deg, #fff8ee 0%, #fef5ec 100%);
-}
-
-body.fall .balloon:nth-child(1) {
-    background-color: #fdcb6e;
-    /* Mustard */
-}
-
-body.fall .balloon:nth-child(2) {
-    background-color: #e17055;
-    /* Dark salmon */
-}
-
-body.fall .balloon:nth-child(3) {
-    background-color: #d1a683;
-    /* Light brown */
-}
-
-body.fall .balloon:nth-child(4) {
-    background-color: #b0785a;
-    /* Terracotta */
-}
-
-body.fall .balloon:nth-child(5) {
-    background-color: #eb7862;
-    /* Burnt orange */
-}
-
-body.fall .stats-section {
-    background-color: #fffbf7;
-}
-
-body.fall .cta-section {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe8e8 100%);
-}
-
-/* Fall themed FAQ section */
-body.fall #faqs-content {
-    background: linear-gradient(135deg, #fffcf5 0%, #fff9f7 100%);
-}
-
-/* Send Message Page Specific Styling */
-
-/* Main container styling */
-#send-message-section {
-    min-height: auto;
-    padding-top: 0px;
-    padding-bottom: 20px;
-}
-
-/* Form container with paper effect */
-.message-form-container {
-    position: relative;
-    padding: 40px;
-    margin-bottom: 60px;
-}
-
-.message-form-container:before {
-    content: '';
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background-color: var(--note-yellow);
-    top: -8px;
-    right: -8px;
-    /* transform: rotate(15deg); */
-    z-index: -1;
-    border-radius: 0 15px 0 0;
-}
-
-/* Form divider */
-.form-divider {
-    border-color: rgba(179, 27, 27, 0.2);
-    margin: 30px 0;
-}
-
-/* Form sections */
+/* Form Sections */
 .form-section {
-    background-color: rgba(248, 249, 250, 0.5);
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border: 1px solid #f0f0f0;
-}
-
-.form-section:hover {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    transform: translateY(-3px);
-}
-
-.form-section-title {
-    position: relative;
-    padding-bottom: 12px;
-    margin-bottom: 25px;
-    font-weight: 600;
-}
-
-.form-section-title:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background-color: var(--cornell-red);
-}
-
-/* Admin section styling */
-.admin-section {
-    background-color: rgba(0, 118, 189, 0.05);
-    border-color: rgba(0, 118, 189, 0.2) !important;
-}
-
-/* Form field styling enhancements */
-.form-label {
-    color: var(--cornell-blue);
-}
-
-.form-control {
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: var(--cornell-red);
-    box-shadow: 0 0 0 0.25rem rgba(179, 27, 27, 0.15);
-    transform: translateY(-2px);
-}
-
-textarea.form-control {
-    min-height: 120px;
-    line-height: 1.6;
-}
-
-/* Search UI enhancements */
-.recipient-search-section {
-    position: relative;
-}
-
-.search-input {
-    padding-left: 35px;
-    background-color: white;
-}
-
-.search-instructions {
-    font-size: 0.9rem;
-    color: #555;
-    font-style: italic;
-}
-
-.search-icon {
-    font-style: normal;
-}
-
-#people-info-table tbody tr {
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-#people-info-table tbody tr:hover {
-    background-color: rgba(0, 118, 189, 0.1);
-}
-
-.people-row-selected td {
-    background-color: #45da006c !important;
-}
-
-/* Submit button */
-.form-submit .btn-primary {
-    min-width: 200px;
-    padding: 12px 30px;
-    transition: all 0.3s ease;
-}
-
-.form-submit .btn-primary:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Status messages */
-#selected-person-status {
-    transition: all 0.3s ease;
-}
-
-#selected-person-status.alert-success {
-    background-color: rgba(40, 167, 69, 0.1);
-    border-color: rgba(40, 167, 69, 0.2);
-    color: #28a745;
-}
-
-/* Sign in container */
-.signin-container {
-    padding: 40px 0;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .message-form-container {
-        padding: 25px;
-    }
-
-    .form-section {
-        padding: 20px;
-    }
-
-    .form-section-title {
-        font-size: 1.2rem;
-    }
-}
-
-/* Spring theme styling */
-body.spring .form-section {
-    background-color: rgba(244, 255, 238, 0.5);
-}
-
-body.spring .admin-section {
-    background-color: rgba(161, 196, 253, 0.1);
-}
-
-/* Fall theme styling */
-body.fall .form-section {
-    background-color: rgba(255, 248, 238, 0.5);
-}
-
-body.fall .admin-section {
-    background-color: rgba(253, 203, 110, 0.1);
-}
-
-/* Animation for submit button */
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-.lifted-form:valid .form-submit .btn-primary {
-    animation: pulse 2s infinite;
-}
-
-/* Messages Page Specific Styling */
-
-/* Messages hero section with themed backgrounds */
-
-/* Hero title with fun styling */
-body.messages-page .hero-title {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 3.5rem;
-    color: var(--cornell-red);
-    position: relative;
-    z-index: 3;
-    margin-bottom: 1rem;
-}
-
-body.messages-page .hero-subtitle {
-    font-family: 'Tenor Sans', sans-serif;
-    font-size: 1.3rem;
-    color: #444;
-    position: relative;
-    z-index: 3;
-    margin-bottom: 2rem;
-}
-
-/* Spring theme for messages page */
-body.spring.messages-page .hero-section {
-    background: linear-gradient(135deg, #f4ffee 0%, #fcf4ff 100%);
-}
-
-/* Fall theme for messages page */
-body.fall.messages-page .hero-section {
-    background: linear-gradient(135deg, #fff8ee 0%, #fef5ec 100%);
-}
-
-/* Message tab container styling */
-.message-tab-container {
-    border-radius: 18px;
-    padding: 30px;
-    margin-bottom: 40px;
-    transform: rotate(-0.5deg);
-}
-
-/* Tab navigation styling */
-.nav-tabs {
-    border-bottom: 2px solid var(--cornell-red);
-    margin-bottom: 20px;
-}
-
-.nav-tabs .nav-link {
-    color: var(--text-color);
-    font-family: 'Tenor Sans', sans-serif;
-    font-weight: 500;
-    border: none;
-    padding: 12px 20px;
-    margin-right: 5px;
-    border-radius: 8px 8px 0 0;
-    transition: all 0.3s ease;
-}
-
-.nav-tabs .nav-link:hover {
-    background-color: rgba(179, 27, 27, 0.05);
-    transform: translateY(-3px);
-}
-
-.nav-tabs .nav-link.active {
-    color: white;
-    background-color: var(--cornell-red);
-    font-weight: 600;
-}
-
-/* Semester header styling */
-.semester-header h3 {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 2rem;
-    color: var(--cornell-blue);
-    position: relative;
-    display: inline-block;
-}
-
-.semester-header h3:after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background-color: var(--cornell-red);
-}
-
-.semester-header hr {
-    opacity: 0.15;
-    margin-top: 1.5rem;
-}
-
-/* Message group section styling */
-.message-group-section {
-    background-color: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    position: relative;
-    border: 1px solid #f0f0f0;
-}
-
-/* .message-group-section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-} */
-
-.message-group-section h4 {
-    font-family: 'Tenor Sans', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-
-/* Paperclip effect for message group boxes */
-.message-group-section:after {
-    content: '';
-    position: absolute;
-    top: -5px;
-    right: 25px;
-    width: 20px;
-    height: 30px;
-    background-color: #ccc;
-    border-radius: 50%;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    /* transform: rotate(5deg); */
-    z-index: 1;
-}
-
-/* Message icon styling */
-.message-icons-container {
-    padding: 10px 0;
-}
-
-.message-icon-wrapper {
-    transition: all 0.4s ease;
-    padding: 10px;
-    border-radius: 10px;
-    text-decoration: none;
-}
-
-.message-icon-wrapper:hover {
-    background-color: rgba(0, 118, 189, 0.05);
-}
-
-.message-icon-img {
-    transition: all 0.3s ease;
-}
-
-.message-icon-label {
-    color: var(--text-color);
-    font-weight: 500;
-    margin-top: 5px;
-    opacity: 0.8;
-}
-
-/* Legacy messages section */
-.legacy-message-section {
-    padding: 20px;
-    border-radius: 15px;
-    background-color: rgba(248, 249, 250, 0.5);
-}
-
-/* CTA section styling */
-.cta-section .stats-card {
-    background: white;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    position: relative;
-    border: 1px dashed var(--cornell-blue);
-    margin-bottom: 40px;
-    transform: rotate(0.5deg);
-}
-
-.cta-section .stats-card:before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 8px;
-    left: 8px;
-    border-radius: 20px;
-    border: 1px dashed var(--cornell-red);
-    z-index: -1;
-}
-
-.cta-section .stats-card h4 {
-    font-family: 'Schoolbell', arial, serif;
-    color: var(--cornell-red);
-    margin-bottom: 20px;
-    font-size: 1.8rem;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    body.messages-page .hero-title {
-        font-size: 2.5rem;
-    }
-
-    body.messages-page .hero-subtitle {
-        font-size: 1.2rem;
-    }
-
-    .message-tab-container {
-        padding: 20px 15px;
-    }
-
-    .nav-tabs .nav-link {
-        padding: 10px 15px;
-        font-size: 0.9rem;
-    }
-
-    .semester-header h3 {
-        font-size: 1.7rem;
-    }
-
-    .message-group-section {
-        padding: 20px 15px;
-    }
-}
-
-/* Send Message Page Specific Styling */
-
-/* Send message hero section */
-body.send-message-page .message-hero-section {
-    /* min-height: 50vh; */
-    padding: 50px 0 10px;
-}
-
-/* Hero title with consistent styling */
-body.send-message-page .hero-title {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 3.5rem;
-    color: var(--cornell-red);
-    position: relative;
-    z-index: 3;
-    margin-bottom: 1rem;
-}
-
-/* Form container styling */
-.message-form-container {
-    position: relative;
-    padding: 25px;
-    margin-bottom: 60px;
-    background-color: white;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    /* transform: rotate(-0.5deg); */
-}
-
-/* Form closed container */
-.form-closed-container {
-    text-align: center;
-    padding: 60px 30px;
-    margin: 40px 0;
-}
-
-.form-closed-container .feature-icon {
-    font-size: 3.5rem;
-    color: var(--cornell-blue);
-    margin-bottom: 20px;
-}
-
-.form-closed-container .feature-title {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 2.5rem;
-    color: var(--cornell-red);
-    margin-bottom: 20px;
-}
-
-/* Form divider styling */
-.form-divider {
-    border-color: rgba(179, 27, 27, 0.2);
-    margin: 30px 0;
-}
-
-/* User greeting badge */
-.user-badge {
-    background-color: rgba(0, 118, 189, 0.05);
-    border: 1px solid rgba(0, 118, 189, 0.2);
-    border-radius: 10px;
-    padding: 15px;
-    font-weight: 500;
-}
-
-/* Form sections */
-.form-section {
-    background-color: rgba(248, 249, 250, 0.5);
+    background-color: rgba(248, 249, 250, .5);
     border-radius: 15px;
     padding: 30px;
     margin-bottom: 35px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .05);
+    transition: all .3s ease;
     border: 1px solid #f0f0f0;
     position: relative;
 }
 
 .form-section:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .08);
 }
 
-/* Section headers with icons */
 .form-section-header {
     display: flex;
     align-items: center;
@@ -1992,7 +1073,7 @@ body.send-message-page .hero-title {
 .section-icon {
     font-size: 2rem;
     margin-right: 15px;
-    background-color: rgba(0, 118, 189, 0.1);
+    background-color: rgba(0, 118, 189, .1);
     color: var(--cornell-blue);
     width: 50px;
     height: 50px;
@@ -2008,231 +1089,47 @@ body.send-message-page .hero-title {
     font-weight: 600;
 }
 
-/* Admin section styling */
+.form-section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--cornell-red);
+}
+
 .admin-section {
-    background-color: rgba(0, 118, 189, 0.05);
-    border-color: rgba(0, 118, 189, 0.2);
+    background-color: rgba(0, 118, 189, .05);
+    border-color: rgba(0, 118, 189, .2);
 }
 
 .admin-section .section-icon {
-    background-color: rgba(179, 27, 27, 0.1);
+    background-color: rgba(179, 27, 27, .1);
     color: var(--cornell-red);
 }
 
-/* Form field styling enhancements */
-.form-label {
-    color: var(--cornell-blue);
-    font-weight: 600;
-    margin-bottom: 8px;
+.form-divider {
+    border-color: rgba(179, 27, 27, .2);
+    margin: 30px 0;
 }
 
-.form-control {
-    border-radius: 10px;
-    border: 1px solid #e0e0e0;
-    padding: 12px 15px;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: var(--cornell-red);
-    box-shadow: 0 0 0 0.25rem rgba(179, 27, 27, 0.15);
-    transform: translateY(-2px);
-}
-
-textarea.form-control {
-    min-height: 150px;
-    line-height: 1.6;
-}
-
-/* Search UI enhancements */
-.search-container {
-    background-color: rgba(248, 249, 250, 0.7);
-    border-radius: 10px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-.search-input {
-    padding-left: 35px;
-    background-color: white;
-    font-size: 1.1rem;
-}
-
-.search-instructions {
-    font-size: 0.9rem;
-    color: #555;
-    font-style: italic;
-}
-
-.search-icon {
-    font-style: normal;
-    margin-right: 5px;
-}
-
-/* .search-results-table {
-    border-radius: 8px;
-    border: 1px solid #eee;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-} */
-
-.search-results-table thead th {
-    background-color: var(--cornell-blue);
-    color: white;
-    font-weight: 500;
-    padding: 12px 15px;
-}
-
-.search-results-table {
-    /* border-radius: 10px; */
-    display: block;
-    max-height: 300px;
-    overflow: auto;
-    border: 1px solid #eee;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    margin-top: 0px;
-    
-}
-
-#people-info-table tbody tr {
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-#people-info-table tbody tr:hover {
-    background-color: rgba(0, 118, 189, 0.1);
-    transform: translateY(-2px);
-}
-
-/* Submit button styling */
-.form-submit .cta-btn {
-    padding: 14px 40px;
-    font-size: 1.3rem;
-    font-weight: 500;
-    border-radius: 30px;
-    background-color: var(--cornell-red);
-    color: white;
-    border: none;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    animation: gentle-float 4s ease-in-out infinite;
-}
-
-.form-submit .cta-btn:hover {
-    transform: translateY(-5px) rotate(-1deg);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
-    background-color: #9e1717;
-}
-
-.form-note {
-    font-style: italic;
-    color: #666;
-}
-
-/* Sign in container */
-.signin-container {
-    padding: 40px 0;
-}
-
-.signin-container .feature-box {
-    padding: 50px 30px;
-}
-
-/* Status messages */
-#selected-person-status {
-    transition: all 0.3s ease;
-    border-radius: 10px;
-}
-
-#selected-person-status.alert-success {
-    background-color: rgba(40, 167, 69, 0.1);
-    border-color: rgba(40, 167, 69, 0.2);
-    color: #28a745;
-}
-
-/* Spring theme styling */
-body.spring.send-message-page .hero-section {
-    background: linear-gradient(135deg, #f4ffee 0%, #fcf4ff 100%);
-}
-
-body.spring .form-section {
-    background-color: rgba(244, 255, 238, 0.5);
-}
-
-body.spring .admin-section {
-    background-color: rgba(161, 196, 253, 0.1);
-}
-
-/* Fall theme styling */
-body.fall.send-message-page .hero-section {
-    background: linear-gradient(135deg, #fff8ee 0%, #fef5ec 100%);
-}
-
-body.fall .form-section {
-    background-color: rgba(255, 248, 238, 0.5);
-}
-
-body.fall .admin-section {
-    background-color: rgba(253, 203, 110, 0.1);
-}
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .message-form-container {
-        padding: 30px;
-    }
-
-    body.send-message-page .hero-title {
-        font-size: 2.8rem;
-    }
-
-    .form-section {
-        padding: 25px;
-    }
-
-    .section-icon {
-        font-size: 1.5rem;
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media (max-width: 576px) {
-    .message-form-container {
-        padding: 20px;
-    }
-
-    body.send-message-page .hero-title {
-        font-size: 2.2rem;
-    }
-
-    .form-section {
-        padding: 20px 15px;
-    }
-
-    .form-submit .cta-btn {
-        padding: 12px 30px;
-        font-size: 1.1rem;
-    }
-}
-
-/* Recipient Search Section Styling */
-
-/* Main container with paper-like styling */
+/* Search Functionality */
 .recipient-search-section {
+    position: relative;
     margin: 30px 0;
 }
 
 .search-paper-container {
-    background-color: white;
+    background-color: #fff;
     border-radius: 15px;
     padding: 30px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
     position: relative;
     border: 1px solid #f0f0f0;
-    transform: rotate(0.5deg);
+    transform: rotate(.5deg);
 }
 
-/* Add paperclip decoration */
 .search-paper-container:after {
     content: '';
     position: absolute;
@@ -2242,17 +1139,11 @@ body.fall .admin-section {
     height: 25px;
     background-color: #ccc;
     border-radius: 50%;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, .2);
     transform: rotate(5deg);
     z-index: 1;
 }
 
-/* Hide the original form field */
-#recipient_netid {
-    display: none;
-}
-
-/* Search header with icon */
 .search-header {
     display: flex;
     align-items: center;
@@ -2262,7 +1153,7 @@ body.fall .admin-section {
 .search-icon-wrapper {
     width: 60px;
     height: 60px;
-    background-color: rgba(0, 118, 189, 0.1);
+    background-color: rgba(0, 118, 189, .1);
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -2276,7 +1167,7 @@ body.fall .admin-section {
 }
 
 .search-title h5 {
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     color: var(--cornell-blue);
     font-size: 1.5rem;
 }
@@ -2286,10 +1177,15 @@ body.fall .admin-section {
     font-style: italic;
 }
 
-/* Enhanced search input */
 .search-input-container {
     position: relative;
     margin-bottom: 15px;
+}
+
+.search-input {
+    padding-left: 35px;
+    background-color: #fff;
+    font-size: 1.1rem;
 }
 
 .input-icon {
@@ -2301,23 +1197,12 @@ body.fall .admin-section {
     z-index: 10;
 }
 
-.enhanced-search-input {
-    padding-left: 40px;
-    height: 50px;
-    font-size: 1.1rem;
-    border-radius: 25px;
-    border: 2px solid #e0e0e0;
-    transition: all 0.3s ease;
+.search-instructions {
+    font-size: .9rem;
+    color: #555;
+    font-style: italic;
 }
 
-.enhanced-search-input:focus,
-.enhanced-search-input.input-active {
-    border-color: var(--cornell-blue);
-    box-shadow: 0 0 0 0.25rem rgba(0, 118, 189, 0.15);
-    transform: translateY(-2px);
-}
-
-/* Example tags */
 .search-examples {
     display: flex;
     flex-wrap: wrap;
@@ -2325,37 +1210,116 @@ body.fall .admin-section {
     margin-top: 10px;
 }
 
-.example-tag {
-    display: inline-block;
-    padding: 5px 12px;
-    background-color: rgba(0, 118, 189, 0.08);
-    border-radius: 15px;
-    font-size: 0.9rem;
-    color: var(--cornell-blue);
-    cursor: pointer;
-    transition: all 0.2s ease;
+.search-icon {
+    font-style: normal;
+    margin-right: 5px;
 }
 
-.example-tag:hover {
-    background-color: rgba(0, 118, 189, 0.15);
+/* Search Results */
+.search-results-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    max-height: 300px;
+    overflow: auto;
+}
+
+.results-header {
+    display: flex;
+    align-items: center;
+    background-color: var(--cornell-blue);
+    color: #fff;
+    padding: 10px 15px;
+}
+
+.results-icon {
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+.results-title {
+    flex: 1;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.results-count {
+    font-size: .9rem;
+    opacity: .8;
+}
+
+.search-results-table {
+    max-height: 300px;
+    overflow: auto;
+    background-color: #fff;
+    display: block;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .05);
+    margin-top: 0;
+}
+
+#people-info-table {
+    margin-bottom: 0;
+}
+
+#people-info-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid var(--cornell-blue);
+    padding: 12px 10px;
+    font-weight: 600;
+    color: var(--cornell-blue);
+    font-size: .9rem
+}
+
+#people-info-table tbody tr {
+    cursor: pointer;
+    transition: all .25s ease
+}
+
+#people-info-table tbody tr:hover {
+    background-color: rgba(0, 118, 189, .08);
     transform: translateY(-2px);
 }
 
-/* Person status message */
+#people-info-table tbody tr:active {
+    background-color: rgba(0, 118, 189, .15);
+    transform: scale(.99)
+}
+
+#people-info-table td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    font-size: .95rem
+}
+
+.people-row-selected td {
+    background-color: #45da006c !important;
+}
+
+.no-results-message {
+    padding: 30px;
+    text-align: center;
+    color: #666;
+    background-color: #f8f9fa;
+    font-style: italic;
+}
+
+/* Status Messages */
 .person-status-message {
     display: flex;
     align-items: center;
     padding: 15px;
     border-radius: 10px;
-    background-color: rgba(220, 53, 69, 0.08);
-    border: 1px solid rgba(220, 53, 69, 0.2);
+    background-color: rgba(220, 53, 69, .08);
+    border: 1px solid rgba(220, 53, 69, .2);
     color: #dc3545;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
 }
 
 .person-status-message.alert-success {
-    background-color: rgba(40, 167, 69, 0.08);
-    border-color: rgba(40, 167, 69, 0.2);
+    background-color: rgba(40, 167, 69, .08);
+    border-color: rgba(40, 167, 69, .2);
     color: #28a745;
 }
 
@@ -2369,13 +1333,24 @@ body.fall .admin-section {
     line-height: 1.4;
 }
 
-/* Search guidance */
+#selected-person-status {
+    transition: all .3s ease;
+    border-radius: 10px;
+}
+
+#selected-person-status.alert-success {
+    background-color: rgba(40, 167, 69, .1);
+    border-color: rgba(40, 167, 69, .2);
+    color: #28a745;
+}
+
+/* Search Guidance */
 .search-guidance {
     display: flex;
     padding: 15px;
-    background-color: rgba(255, 193, 7, 0.08);
+    background-color: rgba(255, 193, 7, .08);
     border-radius: 10px;
-    border: 1px solid rgba(255, 193, 7, 0.2);
+    border: 1px solid rgba(255, 193, 7, .2);
 }
 
 .guidance-icon {
@@ -2392,7 +1367,7 @@ body.fall .admin-section {
 .guidance-list {
     padding-left: 20px;
     margin-bottom: 0;
-    font-size: 0.9rem;
+    font-size: .9rem;
     color: #666;
 }
 
@@ -2400,328 +1375,92 @@ body.fall .admin-section {
     margin-bottom: 5px;
 }
 
-/* Search results container */
-.search-results-container {
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    overflow: auto;
+/* Message Gallery */
+.message-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
 }
 
-.results-header {
+.message-thumbnail {
+    background: transparent;
+    border: none;
     display: flex;
     align-items: center;
-    background-color: var(--cornell-blue);
-    color: white;
-    padding: 10px 15px;
-}
-
-.results-icon {
-    margin-right: 10px;
-    font-size: 1.1rem;
-}
-
-.results-title {
-    flex: 1;
-    margin-bottom: 0;
-    font-size: 1rem;
-}
-
-.results-count {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-/* Results table styling */
-.search-results-table {
-    max-height: 300px;
-    overflow: auto;
-    background-color: white;
-}
-
-#people-info-table {
-    margin-bottom: 0;
-}
-
-#people-info-table thead th {
-    position: sticky;
-    top: 0;
-    background-color: #f8f9fa;
-    border-bottom: 2px solid var(--cornell-blue);
-    padding: 12px 10px;
-    font-weight: 600;
-    color: var(--cornell-blue);
-    font-size: 0.9rem;
-}
-
-#people-info-table tbody tr {
-    cursor: pointer;
-    transition: all 0.25s ease;
-}
-
-#people-info-table tbody tr:hover {
-    background-color: rgba(0, 118, 189, 0.08);
-}
-
-#people-info-table tbody tr:active {
-    background-color: rgba(0, 118, 189, 0.15);
-    transform: scale(0.99);
-}
-
-#people-info-table td {
-    padding: 12px 10px;
-    vertical-align: middle;
-    font-size: 0.95rem;
-}
-
-/* No results message */
-.no-results-message {
-    padding: 30px;
-    text-align: center;
-    color: #666;
-    background-color: #f8f9fa;
-    font-style: italic;
-}
-
-/* Animation for status changes */
-@keyframes status-pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.03);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .search-paper-container {
-        padding: 20px;
-    }
-
-    .search-icon-wrapper {
-        width: 50px;
-        height: 50px;
-    }
-
-    .search-large-icon {
-        font-size: 1.5rem;
-    }
-
-    .search-title h5 {
-        font-size: 1.3rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .search-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .search-icon-wrapper {
-        margin-right: 0;
-        margin-bottom: 15px;
-    }
-
-    .enhanced-search-input {
-        height: 45px;
-        font-size: 1rem;
-    }
-
-    .person-status-message,
-    .search-guidance {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .status-icon,
-    .guidance-icon {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-}
-
-.message-counter {
-    color: #666;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.message-counter.limit-exceeded {
-    color: #dc3545;
-    font-weight: bold;
-    animation: pulse 1s infinite;
-}
-
-.counter-item {
-    display: inline-block;
-}
-
-.progress {
-    height: 6px;
-    border-radius: 3px;
-}
-
-.progress-bar {
-    transition: width 0.3s ease, background-color 0.3s ease;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-/* Basic hero section styling */
-body.messages-page .hero-section {
-    min-height: 45vh;
-    padding: 50px 0 50px;
-}
-
-body.messages-page .hero-title {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 3.5rem;
-    color: var(--cornell-red);
-    margin-bottom: 1rem;
-}
-
-body.messages-page .hero-subtitle {
-    font-family: 'Tenor Sans', sans-serif;
-    font-size: 1.3rem;
-    color: #444;
-    margin-bottom: 2rem;
-}
-
-/* Sign-in box styling */
-.signin-box {
-    padding: 60px 30px;
-}
-
-.signin-box .feature-icon {
-    font-size: 3.5rem;
-    margin-bottom: 1.5rem;
-}
-
-/* User welcome section */
-.user-welcome {
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+    transition: all .3s ease;
+    text-decoration: none;
     position: relative;
-    padding: 25px 30px;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    margin-bottom: 40px;
+    margin: 8px;
 }
 
-.welcome-heading {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 2rem;
-    color: var(--cornell-red);
-    margin-bottom: 0.5rem;
+.message-thumbnail:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
 }
 
-.welcome-text {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 0;
-}
-
-.user-welcome .cta-btn {
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    animation: none;
-}
-
-/* Message stats styling */
-.message-stat-card {
-    background: white;
-    border-radius: 15px;
-    padding: 30px 20px;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+.thumbnail-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     height: 100%;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.message-stat-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-}
-
-.stat-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.stat-number {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 2.5rem;
-    color: var(--cornell-blue);
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    font-size: 1.1rem;
-    color: #666;
-    margin-bottom: 0;
-}
-
-/* Messages timeline section */
-.messages-timeline {
-    position: relative;
-    padding: 20px 0;
-}
-
-.section-title-small {
-    font-family: 'Schoolbell', arial, serif;
+.message-icon-img {
+    width: 40px;
+    height: auto;
+    transition: all .3s ease;
     font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-number {
+    position: absolute;
+    bottom: -15px;
+    font-size: .75rem;
+    color: #fff;
+    transition: all .3s ease;
+    background-color: var(--cornell-red);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.message-thumbnail:hover .message-number {
+    bottom: -10px;
+    color: var(--cornell-blue);
+}
+
+.received-icon {
     color: var(--cornell-red);
-    margin-bottom: 0;
-    position: relative;
 }
 
-.message-filter .btn-group {
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    border-radius: 25px;
-    overflow: hidden;
+.sent-icon {
+    color: var(--cornell-blue);
 }
 
-.message-filter .btn {
-    padding: 8px 15px;
-    font-size: 0.95rem;
-    border-radius: 0;
+/* Message Timeline */
+.timeline-container {
+    display: flex;
+    min-height: 70vh;
+    margin-bottom: 50px;
 }
 
-.message-filter .btn:first-child {
-    border-top-left-radius: 25px;
-    border-bottom-left-radius: 25px;
-}
-
-.message-filter .btn:last-child {
-    border-top-right-radius: 25px;
-    border-bottom-right-radius: 25px;
-}
-
-.message-filter .btn.active {
-    background-color: var(--cornell-blue);
-    color: white;
-    border-color: var(--cornell-blue);
-}
-
-/* Timeline styling */
 .timeline-wrapper {
     position: relative;
     padding-left: 30px;
@@ -2754,22 +1493,22 @@ body.messages-page .hero-subtitle {
 .timeline-date {
     width: 30px;
     height: 120px;
-    background-color: white;
+    background-color: #fff;
     border-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
     margin-top: -20px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, .05);
     padding: 10px 0;
 }
 
 .timeline-year {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     font-size: 1.1rem;
     color: var(--cornell-red);
     margin-bottom: 10px;
@@ -2778,7 +1517,7 @@ body.messages-page .hero-subtitle {
 .timeline-season {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-size: 0.8rem;
+    font-size: .8rem;
     color: var(--cornell-blue);
 }
 
@@ -2786,12 +1525,70 @@ body.messages-page .hero-subtitle {
     margin-left: 20px;
 }
 
+.timeline-semester {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.timeline-marker-collapsed {
+    position: absolute;
+    left: -30px;
+    width: 30px;
+    height: 40px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .08);
+    color: #888;
+    font-size: .9rem;
+    z-index: 2;
+}
+
+.timeline-collapsed .hidden-semester {
+    display: none;
+}
+
+.toggle-older-semesters {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 10px 20px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .05);
+    width: 250px;
+    color: var(--cornell-blue);
+    font-weight: 500;
+}
+
+.toggle-older-semesters:hover {
+    background-color: rgba(0, 118, 189, .05);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+}
+
+.toggle-icon {
+    margin-right: 8px;
+    transition: transform .3s ease;
+}
+
+.timeline-expanded .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Event Headers */
 .event-header {
     margin-bottom: 20px;
 }
 
 .event-title {
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     font-size: 1.8rem;
     color: var(--cornell-blue);
     margin-bottom: 0;
@@ -2810,25 +1607,82 @@ body.messages-page .hero-subtitle {
     background-color: var(--cornell-red);
 }
 
-/* Message group cards */
-.message-group-card {
-    background-color: white;
+.semester-header h3 {
+    font-family: Schoolbell, arial, serif;
+    font-size: 2rem;
+    color: var(--cornell-blue);
+    position: relative;
+    display: inline-block;
+}
+
+.semester-header h3:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--cornell-red);
+}
+
+.semester-header hr {
+    opacity: .15;
+    margin-top: 1.5rem;
+}
+
+.semester-heading {
+    font-family: Schoolbell, arial, serif;
+    font-size: 1.8rem;
+    color: var(--cornell-blue);
+    margin-bottom: 15px;
+    margin-left: 15px;
+}
+
+/* Message Groups */
+.message-group-section {
+    background-color: #fff;
     border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .05);
+    transition: all .3s ease;
+    position: relative;
+    border: 1px solid #f0f0f0;
+}
+
+.message-group-section h4 {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.message-group-section:after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: 25px;
+    width: 20px;
+    height: 30px;
+    background-color: #ccc;
+    border-radius: 50%;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, .2);
+    z-index: 1;
+}
+
+.message-group-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+    transition: all .3s ease;
+    border: 1px solid rgba(0, 0, 0, .05);
     height: auto;
     overflow: hidden;
 }
 
-/* .message-group-card:hover {
-    transform: translateY(-8px) rotate(1deg);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-} */
-
 .message-group-card .card-header {
-    background-color: rgba(0, 118, 189, 0.05);
-    border-bottom: 1px solid rgba(0, 118, 189, 0.1);
+    background-color: rgba(0, 118, 189, .05);
+    border-bottom: 1px solid rgba(0, 118, 189, .1);
     padding: 15px 20px;
 }
 
@@ -2843,29 +1697,77 @@ body.messages-page .hero-subtitle {
     padding: 20px;
 }
 
-/* Message tabs */
+/* Message Tabs */
 .message-tabs .nav-pills {
     margin-bottom: 20px;
 }
 
 .message-tabs .nav-pills .nav-link {
     padding: 8px 16px;
-    font-size: 0.9rem;
+    font-size: .9rem;
     border-radius: 20px;
     color: #666;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
 }
 
 .message-tabs .nav-pills .nav-link:hover {
-    background-color: rgba(0, 118, 189, 0.05);
+    background-color: rgba(0, 118, 189, .05);
 }
 
 .message-tabs .nav-pills .nav-link.active {
     background-color: var(--cornell-blue);
-    color: white;
+    color: #fff;
 }
 
-/* Message count and badges */
+.tab-buttons {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    padding: 5px 15px;
+    font-size: .9rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.tab-button.active {
+    background-color: var(--cornell-blue);
+    color: #fff;
+    font-weight: 500;
+}
+
+.tab-button:first-child {
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+}
+
+.tab-button:last-child {
+    border-radius: 0 5px 5px 0;
+}
+
+.messages-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+/* Message Category */
+.message-category {
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+
+.category-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--cornell-red);
+}
+
 .message-count {
     display: flex;
     align-items: center;
@@ -2880,53 +1782,52 @@ body.messages-page .hero-subtitle {
     width: 28px;
     height: 28px;
     background-color: var(--cornell-blue);
-    color: white;
+    color: #fff;
     border-radius: 50%;
-    font-size: 0.9rem;
+    font-size: .9rem;
     font-weight: 600;
     margin-right: 8px;
 }
 
 .rank-badge {
-    /* display: inline-flex; */
     align-items: center;
-    background-color: rgba(255, 215, 0, 0.1);
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    background-color: rgba(255, 215, 0, .1);
+    border: 1px solid rgba(255, 215, 0, .3);
     color: #996515;
     padding: 5px 12px;
     border-radius: 20px;
-    font-size: 0.9rem;
+    font-size: .9rem;
 }
 
 .rank-icon {
     margin-right: 8px;
 }
 
-/* Empty and locked message states */
+/* Message States */
 .empty-message {
     padding: 30px;
     text-align: center;
     color: #888;
     font-style: italic;
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: rgba(0, 0, 0, .02);
     border-radius: 10px;
 }
 
 .locked-message {
     padding: 15px 15px;
     text-align: center;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(248, 249, 252, 0.8));
+    background: linear-gradient(to bottom, rgba(255, 255, 255, .8), rgba(248, 249, 252, .8));
     border-radius: 15px;
-    border: 1px rgba(0, 118, 189, 0.3);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    border: 1px rgba(0, 118, 189, .3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
     position: relative;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform .3s ease, box-shadow .3s ease;
 }
 
 .locked-message:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, .08);
 }
 
 .locked-icon {
@@ -2934,18 +1835,18 @@ body.messages-page .hero-subtitle {
     margin-bottom: 20px;
     color: var(--cornell-blue);
     display: inline-block;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, .7);
     width: 80px;
     height: 80px;
     line-height: 80px;
     border-radius: 50%;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
     position: relative;
     z-index: 1;
 }
 
 .locked-title {
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     font-size: 1.7rem;
     color: var(--cornell-red);
     margin-bottom: 15px;
@@ -2956,33 +1857,60 @@ body.messages-page .hero-subtitle {
 .locked-message p {
     color: #555;
     max-width: 100%;
-    /* margin-left: auto;
-    margin-right: auto; */
     position: relative;
     z-index: 1;
     font-size: small;
 }
 
 .locked-note {
-    font-size: 0.9rem;
+    font-size: .9rem;
     color: #777;
     font-style: italic;
     position: relative;
     z-index: 1;
     padding: 8px 15px;
-    background-color: rgba(0, 118, 189, 0.05);
+    background-color: rgba(0, 118, 189, .05);
     border-radius: 20px;
     display: inline-block;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
-/* Compact attachment section styling */
+/* Empty States */
+.empty-timeline {
+    padding: 60px 30px;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .05);
+    margin: 40px 0;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #ccc;
+}
+
+.empty-title {
+    font-family: Schoolbell, arial, serif;
+    font-size: 2rem;
+    color: var(--cornell-blue);
+    margin-bottom: 15px;
+}
+
+.empty-text {
+    color: #666;
+    max-width: 500px;
+    margin: 0 auto 20px;
+}
+
+/* Attachments */
 .attachment-section {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, .8);
     border-radius: 12px;
     padding: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    border: 1px dashed rgba(0, 118, 189, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .05);
+    border: 1px dashed rgba(0, 118, 189, .2);
     margin-top: 12px;
     margin-bottom: 12px;
 }
@@ -2991,17 +1919,17 @@ body.messages-page .hero-subtitle {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
-    font-size: 0.95rem;
+    font-size: .95rem;
 }
 
 .new-badge {
     display: inline-block;
     background-color: var(--cornell-red);
-    color: white;
+    color: #fff;
     padding: 2px 6px;
     border-radius: 10px;
-    font-size: 0.7rem;
-    font-weight: bold;
+    font-size: .7rem;
+    font-weight: 700;
     margin-right: 6px;
     transform: rotate(-3deg);
 }
@@ -3011,19 +1939,18 @@ body.messages-page .hero-subtitle {
     align-items: center;
     padding: 6px 8px;
     margin-bottom: 6px;
-    background-color: white;
+    background-color: #fff;
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: all .2s ease;
     border: 1px solid transparent;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .05);
 }
 
 .attachment-option.checked {
     border-color: var(--cornell-blue);
-    background-color: rgba(0, 118, 189, 0.05);
+    background-color: rgba(0, 118, 189, .05);
 }
 
-/* Hide the default radio button */
 .attachment-option .form-check-input {
     margin-right: 6px;
 }
@@ -3045,123 +1972,101 @@ body.messages-page .hero-subtitle {
 .attachment-name {
     font-weight: 500;
     color: var(--cornell-blue);
-    font-size: 0.9rem;
+    font-size: .9rem;
     margin-right: 6px;
 }
 
 .attachment-count {
     display: inline-block;
-    background-color: rgba(0, 118, 189, 0.08);
+    background-color: rgba(0, 118, 189, .08);
     padding: 1px 6px;
     border-radius: 12px;
-    font-size: 0.7rem;
+    font-size: .7rem;
     color: #666;
 }
 
 .attachment-option.disabled {
-    opacity: 0.6;
+    opacity: .6;
 }
 
-/* Media queries for responsiveness */
-@media (max-width: 768px) {
-    .locked-message {
-        padding: 15px 10px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
-    }
-
-    .locked-icon {
-        margin-bottom: 15px;
-    }
-
-    .locked-title {
-        font-size: 1.8rem;
-        margin-bottom: 12px;
-        color: var(--cornell-red);
-    }
-}
-
-/* Message gallery */
-.message-gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.message-thumbnail {
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    text-decoration: none;
+/* User Welcome & Stats */
+.user-welcome {
     position: relative;
-    margin: 8px;
+    padding: 25px 30px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+    margin-bottom: 40px;
 }
 
-.message-thumbnail:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+.welcome-heading {
+    font-family: Schoolbell, arial, serif;
+    font-size: 2rem;
+    color: var(--cornell-red);
+    margin-bottom: .5rem;
 }
 
-.thumbnail-content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.message-icon-img {
-    width: 40px;
-    height: auto;
-    transition: all 0.3s ease;
-}
-
-.message-number {
-    position: absolute;
-    bottom: -15px;
-    font-size: 0.75rem;
+.welcome-text {
     color: #666;
-    transition: all 0.3s ease;
+    font-size: .9rem;
+    margin-bottom: 0;
 }
 
-.message-thumbnail:hover .message-number {
-    bottom: -10px;
-    color: var(--cornell-blue);
+.user-welcome .cta-btn {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    animation: none;
 }
 
-.message-gallery {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 15px;
+.message-stat-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+    height: 100%;
+    transition: all .3s ease;
+    border: 1px solid rgba(0, 0, 0, .05);
+    animation: fadeIn .6s ease-out forwards;
+    opacity: 0;
 }
 
-/* Help section */
+.message-stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, .12);
+}
+
+.message-stat-card:nth-child(1) {
+    animation-delay: .1s;
+}
+
+.message-stat-card:nth-child(2) {
+    animation-delay: .3s;
+}
+
+.message-stat-card:nth-child(3) {
+    animation-delay: .5s;
+}
+
+.message-stat-card:nth-child(4) {
+    animation-delay: .7s;
+}
+
+/* Help Sections */
 .messages-help {
     margin-top: 60px;
     margin-bottom: 30px;
     padding: 0 15px;
-    /* Add padding instead of fixed margins */
 }
 
 .help-container {
-    background-color: white;
+    background-color: #fff;
     border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
     padding: 30px;
     width: 90%;
     max-width: 1140px;
-    /* Match container max-width */
     margin: 0 auto;
-    /* Center the container */
     position: relative;
     text-align: center;
 }
@@ -3179,7 +2084,7 @@ body.messages-page .hero-subtitle {
 }
 
 .help-title {
-    font-family: 'Schoolbell', arial, serif;
+    font-family: Schoolbell, arial, serif;
     font-size: 2.5rem;
     color: var(--cornell-red);
     margin-bottom: 15px;
@@ -3189,792 +2094,11 @@ body.messages-page .hero-subtitle {
     margin-bottom: 15px;
 }
 
-/* Make help section mobile responsive */
-@media (max-width: 768px) {
-    .help-title {
-        font-size: 2rem;
-    }
-
-    .help-container {
-        padding: 20px;
-    }
-}
-
-@media (max-width: 576px) {
-    .help-title {
-        font-size: 1.8rem;
-    }
-
-    .help-text {
-        font-size: 0.95rem;
-    }
-}
-
-/* Spring theme adjustments */
-body.spring.messages-page .hero-section {
-    background: linear-gradient(135deg, #f4ffee 0%, #fcf4ff 100%);
-}
-
-/* body.spring .timeline-date {
-    background-color: rgba(244, 255, 238, 0.9);
-} */
-
-/* body.spring .message-group-card .card-header {
-    background-color: rgba(150, 230, 161, 0.1);
-    border-bottom: 1px solid rgba(150, 230, 161, 0.2);
-} */
-
-/* Fall theme adjustments */
-body.fall.messages-page .hero-section {
-    background: linear-gradient(135deg, #fff8ee 0%, #fef5ec 100%);
-}
-
-/* body.fall .timeline-date {
-    background-color: rgba(255, 248, 238, 0.9);
-} */
-
-/* body.fall .message-group-card .card-header {
-    background-color: rgba(253, 203, 110, 0.1);
-    border-bottom: 1px solid rgba(253, 203, 110, 0.2);
-} */
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.message-stat-card {
-    animation: fadeIn 0.6s ease-out forwards;
-    opacity: 0;
-}
-
-.message-stat-card:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.message-stat-card:nth-child(2) {
-    animation-delay: 0.3s;
-}
-
-.message-stat-card:nth-child(3) {
-    animation-delay: 0.5s;
-}
-
-.message-stat-card:nth-child(4) {
-    animation-delay: 0.7s;
-}
-
-/* Empty state styling */
-.empty-timeline {
-    padding: 60px 30px;
-    text-align: center;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    margin: 40px 0;
-}
-
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    color: #ccc;
-}
-
-.empty-title {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 2rem;
-    color: var(--cornell-blue);
-    margin-bottom: 15px;
-}
-
-.empty-text {
-    color: #666;
-    max-width: 500px;
-    margin: 0 auto 20px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    body.messages-page .hero-title {
-        font-size: 2.8rem;
-    }
-
-    body.messages-page .hero-subtitle {
-        font-size: 1.2rem;
-    }
-
-    .welcome-heading {
-        font-size: 2rem;
-    }
-
-    .stat-number {
-        font-size: 2.2rem;
-    }
-
-    .timeline-wrapper:before {
-        left: 12px;
-    }
-
-    .timeline-marker {
-        left: -25px;
-    }
-
-    .timeline-date {
-        width: 25px;
-        height: 100px;
-    }
-
-    .timeline-year {
-        font-size: 0.9rem;
-    }
-
-    .timeline-season {
-        font-size: 0.7rem;
-    }
-
-    .event-title {
-        font-size: 1.6rem;
-    }
-
-    .help-title {
-        font-size: 1.6rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .user-welcome {
-        padding: 20px;
-        text-align: center;
-    }
-
-    .user-welcome .cta-btn {
-        margin-top: 15px;
-    }
-
-    .message-filter {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .timeline-wrapper {
-        padding-left: 20px;
-    }
-
-    .timeline-wrapper:before {
-        left: 9px;
-    }
-
-    .timeline-marker {
-        left: -20px;
-    }
-
-    .timeline-date {
-        width: 20px;
-        height: 80px;
-    }
-
-    .timeline-year {
-        font-size: 0.8rem;
-    }
-
-    .timeline-season {
-        font-size: 0.6rem;
-    }
-
-    .event-title {
-        font-size: 1.4rem;
-    }
-
-    .message-group-card .group-title {
-        font-size: 1.2rem;
-    }
-
-    .message-group-card .card-body {
-        padding: 15px;
-    }
-
-    .help-container {
-        padding: 20px;
-        text-align: center;
-    }
-}
-
-@media (max-width: 576px) {
-    body.messages-page .hero-title {
-        font-size: 2.2rem;
-    }
-
-    .stat-icon {
-        font-size: 2rem;
-    }
-
-    .stat-number {
-        font-size: 1.8rem;
-    }
-
-    .section-title-small {
-        font-size: 1.6rem;
-    }
-
-    .message-filter .btn {
-        padding: 6px 10px;
-        font-size: 0.8rem;
-    }
-
-    .timeline-content {
-        margin-left: 15px;
-    }
-
-    .event-title {
-        font-size: 1.3rem;
-    }
-
-    .message-tabs .nav-pills .nav-link {
-        padding: 5px 10px;
-        font-size: 0.8rem;
-    }
-
-    .message-gallery {
-        gap: 8px;
-    }
-
-    .message-thumbnail {
-        width: 60px;
-        height: 60px;
-    }
-
-    .message-icon-img {
-        width: 35px;
-    }
-}
-
-body.fall {
-    background: linear-gradient(135deg, var(--winter-background) 0%, var(--winter-background-alt) 100%) !important;
-}
-
-/* Override hero section background */
-body.fall .hero-section {
-    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background-alt) 100%) !important;
-}
-
-/* Override CTA section background */
-body.fall .cta-section {
-    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background) 100%) !important;
-}
-
-/* Override FAQ section background */
-body.fall #faqs-content {
-    background: linear-gradient(135deg, var(--winter-background) 0%, var(--winter-blue-light) 100%) !important;
-}
-
-/* Override Stats section background */
-body.fall .stats-section {
-    background-color: var(--winter-blue-light) !important;
-}
-
-/* Override Message page background */
-body.fall.messages-page .hero-section {
-    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background-alt) 100%) !important;
-}
-
-/* Override Send message page background */
-body.fall.send-message-page .hero-section {
-    background: linear-gradient(135deg, var(--winter-blue-light) 0%, var(--winter-background-alt) 100%) !important;
-}
-
-/* Hide all balloons in fall theme */
-body.fall .balloon {
-    display: none !important;
-}
-
-/* Snowflake styling - full definition */
-.snowflake {
-    position: absolute;
-    color: var(--winter-blue-medium);
-    font-size: 2em;
-    opacity: 0.9;
-    animation-name: fall-rotate;
-    animation-duration: 10s;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-    z-index: 1;
-    pointer-events: none;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
-}
-
-/* Different sizes and animations for variety */
-.snowflake:nth-child(1) {
-    top: 5%;
-    left: 3%;
-    animation-delay: 0s;
-    font-size: 2.4em;
-    color: var(--winter-blue-dark);
-}
-
-.snowflake:nth-child(2) {
-    top: 20%;
-    right: 3%;
-    animation-delay: -2s;
-    font-size: 2.2em;
-    color: var(--winter-blue-medium);
-}
-
-.snowflake:nth-child(3) {
-    bottom: 10%;
-    right: 5%;
-    animation-delay: -4s;
-    font-size: 2.5em;
-    color: #ffffff;
-}
-
-.snowflake:nth-child(4) {
-    bottom: 30%;
-    left: 2%;
-    animation-delay: -6s;
-    font-size: 2.1em;
-    color: var(--winter-blue-light);
-}
-
-.snowflake:nth-child(5) {
-    top: 40%;
-    right: 7%;
-    animation-delay: -8s;
-    font-size: 2.3em;
-    color: var(--winter-blue-dark);
-}
-
-/* Snowflake falling and rotating animation */
-@keyframes fall-rotate {
-    0% {
-        transform: translateY(0) rotate(0deg);
-    }
-
-    50% {
-        transform: translateY(30px) rotate(180deg);
-    }
-
-    100% {
-        transform: translateY(0) rotate(360deg);
-    }
-}
-
-/* Snowflake character with glow */
-.snowflake:before {
-    content: "❄";
-    text-shadow: 0 0 8px var(--winter-blue-medium), 0 0 15px rgba(168, 216, 255, 0.8);
-}
-
-/* Variations for snowflake shapes */
-.snowflake:nth-child(2n):before {
-    content: "❅";
-}
-
-.snowflake:nth-child(3n):before {
-    content: "❆";
-}
-
-/* Position snowflakes in CTA section */
-.cta-snowflakes .snowflake:nth-child(1) {
-    bottom: 10%;
-    left: 5%;
-    top: auto;
-}
-
-.cta-snowflakes .snowflake:nth-child(2) {
-    bottom: 20%;
-    right: 5%;
-    top: auto;
-}
-
-.cta-snowflakes .snowflake:nth-child(3) {
-    top: 10%;
-    right: 8%;
-}
-
-/* Additional styles to override other fall-specific elements */
-body.fall .form-section {
-    background-color: rgba(217, 234, 255, 0.5) !important;
-}
-
-body.fall .admin-section {
-    background-color: rgba(168, 216, 255, 0.1) !important;
-}
-
-body.fall .message-group-card .card-header {
-    background-color: rgba(168, 216, 255, 0.2) !important;
-    border-bottom: 1px solid rgba(168, 216, 255, 0.3) !important;
-}
-
-body.fall .timeline-date {
-    background-color: rgba(217, 234, 255, 0.9) !important;
-}
-
-/* Ensure responsive behavior is maintained */
-@media (max-width: 576px) {
-    .snowflake {
-        font-size: 1.5em;
-    }
-
-    .snowflake:nth-child(1) {
-        font-size: 1.8em;
-    }
-
-    .snowflake:nth-child(2) {
-        font-size: 1.6em;
-    }
-
-    .snowflake:nth-child(3) {
-        font-size: 2em;
-    }
-
-    .snowflake:nth-child(4) {
-        font-size: 1.4em;
-    }
-
-    .snowflake:nth-child(5) {
-        font-size: 1.7em;
-    }
-}
-
-#card-header {
-    margin-bottom: -150px;
-}
-
-/* Message thumbnail and icon styling */
-.message-thumbnail {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    text-decoration: none;
-    position: relative;
-    margin: 8px;
-}
-
-.message-thumbnail:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-}
-
-.thumbnail-content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-/* Style for emoji icons */
-.message-icon-img {
-    font-size: 2rem;
-    /* Increase the size */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    transition: all 0.3s ease;
-}
-
-/* Style for numbered indicators */
-.message-number {
-    position: absolute;
-    bottom: -15px;
-    font-size: 0.75rem;
-    color: #666;
-    transition: all 0.3s ease;
-}
-
-.message-thumbnail:hover .message-number {
-    bottom: -10px;
-    color: var(--cornell-blue);
-}
-
-/* For message cards that have been viewed (optional) */
-.message-icon-img.viewed {
-    color: #ccc;
-    /* Lighter color for viewed messages */
-}
-
-/* Add some color to the heart emoji */
-.received-icon {
-    color: #B31B1B;
-    /* Cornell red from your CSS variables */
-}
-
-.sent-icon {
-    color: #0076BD;
-    /* Cornell blue from your CSS variables */
-}
-
-/* Timeline layout styling */
-.timeline-container {
-    display: flex;
-    min-height: 70vh;
-    margin-bottom: 50px;
-}
-
-.timeline-sidebar {
-    width: 40%;
-    border-right: 1px solid var(--border-color);
-    padding-right: 20px;
-    flex-shrink: 0;
-    overflow-y: auto;
-    max-height: 80vh;
-}
-
-.card-preview-area {
-    flex: 1;
-    padding: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-.vertical-timeline {
-    position: relative;
-    padding-left: 30px;
-}
-
-.vertical-timeline::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 15px;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--cornell-red), var(--cornell-blue));
-    z-index: 1;
-}
-
-.timeline-semester {
-    position: relative;
-    margin-bottom: 40px;
-}
-
-.semester-dot {
-    position: absolute;
-    left: -30px;
-    top: 5px;
-    width: 30px;
-    height: 30px;
-    background-color: var(--cornell-blue);
-    border-radius: 50%;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.semester-heading {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 1.8rem;
-    color: var(--cornell-blue);
-    margin-bottom: 15px;
-    margin-left: 15px;
-}
-
-.message-category {
-    margin-bottom: 20px;
-    padding-left: 10px;
-}
-
-.category-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: var(--cornell-red);
-}
-
-.tab-buttons {
-    display: flex;
-    margin-bottom: 15px;
-}
-
-.tab-button {
-    padding: 5px 15px;
-    font-size: 0.9rem;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.tab-button.active {
-    background-color: var(--cornell-blue);
-    color: white;
-    font-weight: 500;
-}
-
-.tab-button:first-child {
-    border-radius: 5px 0 0 5px;
-    border-right: none;
-}
-
-.tab-button:last-child {
-    border-radius: 0 5px 5px 0;
-}
-
-.messages-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 25px;
-}
-
-/* Styling to match the original card image */
-.message-indicator {
-    width: 55px;
-    height: 55px;
-    background-color: white;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    margin: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e0e0e0;
-    text-decoration: none;
-}
-
-.message-indicator:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.message-indicator.active {
-    border: 2px solid var(--cornell-red);
-    background-color: #efefef;
-}
-
-.message-icon-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 2px;
-}
-
-.message-indicator.active .message-icon-container {
-    border: 1px solid #B31B1B;
-    box-shadow: 0 0 0 2px rgba(179, 27, 27, 0.3);
-}
-
-.message-icon {
-    font-size: 1.5rem;
-    transition: all 0.2s ease;
-    margin-bottom: 8px;
-}
-
-.received-icon {
-    color: #B31B1B;
-}
-
-.sent-icon {
-    color: #0076BD;
-}
-
-.message-number {
-    /* font-size: 0.7rem;
-            color: #666;
-            position: absolute;
-            bottom: 3px; */
-
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: #B31B1B;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Empty state */
-.empty-card-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 400px;
-    max-width: 650px;
-    width: 100%;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-    text-align: center;
-    padding: 30px;
-}
-
-.empty-icon {
-    font-size: 3rem;
-    color: #ddd;
-    margin-bottom: 20px;
-}
-
-.empty-title {
-    font-family: 'Schoolbell', arial, serif;
-    font-size: 1.8rem;
-    color: var(--cornell-blue);
-    margin-bottom: 15px;
-}
-
-.empty-text {
-    color: #666;
-    margin-bottom: 0;
-    max-width: 400px;
-}
-
-.empty-message.small,
-.locked-message.small {
-    padding: 10px;
-    text-align: center;
-    color: #888;
-    font-style: italic;
-    background-color: rgba(0, 0, 0, 0.02);
-    border-radius: 8px;
-    margin: 0;
-    font-size: 0.9rem;
-    width: 100%;
-}
-
-/* Card styling */
+/* Card Containers */
 .card-container {
-    background-color: white;
+    background-color: #fff;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
     overflow: hidden;
     padding: 20px;
     position: relative;
@@ -3985,132 +2109,670 @@ body.fall .timeline-date {
     top: 15px;
     left: 15px;
     background-color: var(--cornell-blue);
-    color: white;
+    color: #fff;
     border: none;
     border-radius: 5px;
     padding: 5px 10px;
-    font-size: 0.9rem;
+    font-size: .9rem;
     cursor: pointer;
 }
 
-/* Lifted card styling - directly from your original CSS */
+/* Sign-in Containers */
+.signin-container {
+    padding: 40px 0;
+}
 
-.lifted-card h4 {
+.signin-box {
+    padding: 60px 30px;
+}
+
+.signin-box .feature-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-closed-container {
+    text-align: center;
+    padding: 60px 30px;
+    margin: 40px 0;
+}
+
+.form-closed-container .feature-icon {
+    font-size: 3.5rem;
     color: var(--cornell-blue);
-    border-bottom: 2px solid var(--cornell-red);
-    padding-bottom: 10px;
     margin-bottom: 20px;
-    font-size: 1.8rem;
 }
 
-.message-content {
-    white-space: pre-line;
-    font-size: 1.1rem;
-    line-height: 1.6;
+.form-closed-container .feature-title {
+    font-family: Schoolbell, arial, serif;
+    font-size: 2.5rem;
+    color: var(--cornell-red);
+    margin-bottom: 20px;
 }
 
-/* Responsive adjustments */
+/* Theme Styles */
+body.spring {
+    background: linear-gradient(135deg, #f0fff0 0, #fff0f5 100%);
+}
+
+body.spring .hero-section {
+    background: linear-gradient(135deg, #f4ffee 0, #fcf4ff 100%);
+}
+
+body.spring .balloon:nth-child(1) {
+    background-color: #ff9a9e;
+}
+
+body.spring .balloon:nth-child(2) {
+    background-color: #a1c4fd;
+}
+
+body.spring .balloon:nth-child(3) {
+    background-color: #96e6a1;
+}
+
+body.spring .balloon:nth-child(4) {
+    background-color: #d4fc79;
+}
+
+body.spring .balloon:nth-child(5) {
+    background-color: #c2e9fb;
+}
+
+body.spring .stats-section {
+    background-color: #f8fbff;
+}
+
+body.spring .cta-section {
+    background: linear-gradient(135deg, #e0f7fa 0, #fff1f0 100%);
+}
+
+body.spring #faqs-content {
+    background: linear-gradient(135deg, #f9fffa 0, #f9f9ff 100%);
+}
+
+body.spring.messages-page .hero-section {
+    background: linear-gradient(135deg, #f4ffee 0, #fcf4ff 100%);
+}
+
+body.spring.send-message-page .hero-section {
+    background: linear-gradient(135deg, #f4ffee 0, #fcf4ff 100%);
+}
+
+body.spring .form-section {
+    background-color: rgba(244, 255, 238, .5);
+}
+
+body.spring .admin-section {
+    background-color: rgba(161, 196, 253, .1);
+}
+
+body.fall {
+    background: linear-gradient(135deg, var(--winter-background) 0, var(--winter-background-alt) 100%);
+}
+
+body.fall .hero-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0, var(--winter-background-alt) 100%);
+}
+
+body.fall .balloon:nth-child(1) {
+    background-color: #fdcb6e;
+}
+
+body.fall .balloon:nth-child(2) {
+    background-color: #e17055;
+}
+
+body.fall .balloon:nth-child(3) {
+    background-color: #d1a683;
+}
+
+body.fall .balloon:nth-child(4) {
+    background-color: #b0785a;
+}
+
+body.fall .balloon:nth-child(5) {
+    background-color: #eb7862;
+}
+
+body.fall .stats-section {
+    background-color: #fffbf7;
+}
+
+body.fall .cta-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0, var(--winter-background) 100%);
+}
+
+body.fall #faqs-content {
+    background: linear-gradient(135deg, var(--winter-background) 0, var(--winter-blue-light) 100%);
+}
+
+body.fall.messages-page .hero-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0, var(--winter-background-alt) 100%);
+}
+
+body.fall.send-message-page .hero-section {
+    background: linear-gradient(135deg, var(--winter-blue-light) 0, var(--winter-background-alt) 100%);
+}
+
+body.fall .balloon {
+    display: none;
+}
+
+body.fall .form-section {
+    background-color: rgba(217, 234, 255, .5);
+}
+
+body.fall .admin-section {
+    background-color: rgba(168, 216, 255, .1);
+}
+
+body.fall .message-group-card .card-header {
+    background-color: rgba(168, 216, 255, .2);
+    border-bottom: 1px solid rgba(168, 216, 255, .3);
+}
+
+body.fall .timeline-date {
+    background-color: rgba(217, 234, 255, .9);
+}
+
+/* Page-specific Styles */
+body.messages-page .hero-section {
+    min-height: 45vh;
+    padding: 50px 0 50px;
+}
+
+body.messages-page .hero-title {
+    font-family: Schoolbell, arial, serif;
+    font-size: 3.5rem;
+    color: var(--cornell-red);
+    position: relative;
+    z-index: 3;
+    margin-bottom: 1rem;
+}
+
+body.messages-page .hero-subtitle {
+    font-family: 'Tenor Sans', sans-serif;
+    font-size: 1.3rem;
+    color: #444;
+    position: relative;
+    z-index: 3;
+    margin-bottom: 2rem;
+}
+
+body.send-message-page .message-hero-section {
+    padding: 50px 0 10px;
+}
+
+body.send-message-page .hero-title {
+    font-family: Schoolbell, arial, serif;
+    font-size: 3.5rem;
+    color: var(--cornell-red);
+    position: relative;
+    z-index: 3;
+    margin-bottom: 1rem;
+}
+
+.message-form-container {
+    position: relative;
+    padding: 10px;
+    margin-bottom: 60px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .1);
+}
+
+.user-badge {
+    background-color: rgba(0, 118, 189, .05);
+    border: 1px solid rgba(0, 118, 189, .2);
+    border-radius: 10px;
+    padding: 15px;
+    font-weight: 500;
+}
+
+.form-submit .cta-btn {
+    padding: 14px 40px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    border-radius: 30px;
+    background-color: var(--cornell-red);
+    color: #fff;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .2);
+    transition: all .3s ease;
+    animation: gentle-float 4s ease-in-out infinite;
+}
+
+.form-submit .cta-btn:hover {
+    transform: translateY(-5px) rotate(-1deg);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, .3);
+    background-color: #9e1717;
+}
+
+.form-note {
+    font-style: italic;
+    color: #666;
+}
+
+.form-submit .btn-primary {
+    min-width: 200px;
+    padding: 12px 30px;
+    transition: all .3s ease;
+}
+
+.form-submit .btn-primary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, .1);
+}
+
+/* Progress Indicators */
+.progress {
+    height: 6px;
+    border-radius: 3px;
+}
+
+.progress-bar {
+    transition: width .3s ease, background-color .3s ease;
+}
+
+/* Media Queries */
 @media (max-width: 992px) {
+    .hero-logo {
+        width: 220px;
+        margin: 0 auto 20px;
+    }
+    
+    .hero-section {
+        padding: 45px 0 10px;
+        min-height: 70vh;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+    }
+    
+    .feature-title {
+        font-size: 1.8rem;
+    }
+    
+    #faqs-content .form-container {
+        padding: 25px;
+    }
+    
+    .accordion-button {
+        font-size: 1rem;
+        padding-right: 2.5rem;
+    }
+    
+    #faqs-content h3.blue-text {
+        font-size: 1.8rem;
+    }
+    
+    body.messages-page .hero-title {
+        font-size: 2.8rem;
+    }
+    
+    body.messages-page .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .welcome-heading {
+        font-size: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 2.2rem;
+    }
+    
+    .timeline-wrapper:before {
+        left: 12px;
+    }
+    
+    .timeline-marker {
+        left: -25px;
+    }
+    
+    .timeline-date {
+        width: 25px;
+        height: 100px;
+    }
+    
+    .timeline-year {
+        font-size: .9rem;
+    }
+    
+    .timeline-season {
+        font-size: .7rem;
+    }
+    
+    .event-title {
+        font-size: 1.6rem;
+    }
+    
+    .help-title {
+        font-size: 1.6rem;
+    }
+    
     .timeline-container {
         flex-direction: column;
     }
-
-    .timeline-sidebar {
-        width: 100%;
-        max-height: none;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        padding-right: 0;
-        padding-bottom: 30px;
-        margin-bottom: 30px;
+    
+    body.send-message-page .hero-title {
+        font-size: 2.8rem;
     }
+    
+    .form-section {
+        padding: 25px;
+    }
+    
+    .section-icon {
+        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+    }
+}
 
-    .card-preview-area {
-        padding: 0;
+@media (max-width: 768px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .cta-title {
+        font-size: 2.5rem;
+    }
+    
+    .cta-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .cta-btn {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+    
+    .help-title {
+        font-size: 2rem;
+    }
+    
+    .help-container {
+        padding: 20px;
+    }
+    
+    .user-welcome {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .user-welcome .cta-btn {
+        margin-top: 15px;
+    }
+    
+    .message-filter {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .timeline-wrapper {
+        padding-left: 20px;
+    }
+    
+    .timeline-wrapper:before {
+        left: 9px;
+    }
+    
+    .timeline-marker {
+        left: -20px;
+    }
+    
+    .timeline-date {
+        width: 20px;
+        height: 80px;
+    }
+    
+    .timeline-year {
+        font-size: .8rem;
+    }
+    
+    .timeline-season {
+        font-size: .6rem;
+    }
+    
+    .event-title {
+        font-size: 1.4rem;
+    }
+    
+    .message-group-card .group-title {
+        font-size: 1.2rem;
+    }
+    
+    .message-group-card .card-body {
+        padding: 15px;
+    }
+    
+    .help-container {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+    
+    .form-section-title {
+        font-size: 1.2rem;
+    }
+    
+    .search-paper-container {
+        padding: 20px;
+    }
+    
+    .search-icon-wrapper {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .search-large-icon {
+        font-size: 1.5rem;
+    }
+    
+    .search-title h5 {
+        font-size: 1.3rem;
+    }
+    
+    .message-tab-container {
+        padding: 20px 15px;
+    }
+    
+    .nav-tabs .nav-link {
+        padding: 10px 15px;
+        font-size: .9rem;
+    }
+    
+    .semester-header h3 {
+        font-size: 1.7rem;
+    }
+    
+    .message-group-section {
+        padding: 20px 15px;
+    }
+    
+    .body.messages-page .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .body.messages-page .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .locked-message {
+        padding: 15px 10px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .06);
+    }
+    
+    .locked-icon {
+        margin-bottom: 15px;
+    }
+    
+    .locked-title {
+        font-size: 1.8rem;
+        margin-bottom: 12px;
+        color: var(--cornell-red);
+    }
+    
+    .search-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .search-icon-wrapper {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .person-status-message,
+    .search-guidance {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .guidance-icon,
+    .status-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
     }
 }
 
 @media (max-width: 576px) {
+    .hero-logo {
+        width: 180px;
+    }
+    
+    .square-image-container {
+        width: 280px;
+        height: auto;
+        margin-top: 25px;
+    }
+    
+    .hero-title {
+        font-size: 2.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+    }
+    
+    .balloon {
+        display: none;
+    }
+    
+    .section-container .text-center.mb-5 img {
+        width: 300px;
+    }
+    
+    .accordion-button {
+        padding: 1rem;
+        font-size: .95rem;
+    }
+    
+    .accordion-body {
+        padding: 1rem;
+    }
+    
+    .cta-section {
+        padding: 60px 0;
+    }
+    
+    .cta-title {
+        font-size: 2.2rem;
+    }
+    
+    .cta-info {
+        padding: 15px;
+    }
+    
+    .help-title {
+        font-size: 1.8rem;
+    }
+    
+    .help-text {
+        font-size: .95rem;
+    }
+    
+    .message-form-container {
+        padding: 10px;
+    }
+    
+    body.send-message-page .hero-title {
+        font-size: 2.2rem;
+    }
+    
+    .form-section {
+        padding: 20px 15px;
+    }
+    
+    .form-submit .cta-btn {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 1.8rem;
+    }
+    
+    .message-filter .btn {
+        padding: 6px 10px;
+        font-size: .8rem;
+    }
+    
+    .timeline-content {
+        margin-left: 15px;
+    }
+    
+    .event-title {
+        font-size: 1.3rem;
+    }
+    
+    .message-tabs .nav-pills .nav-link {
+        padding: 5px 10px;
+        font-size: .8rem;
+    }
+    
+    .message-gallery {
+        gap: 8px;
+    }
+    
+    .message-thumbnail {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .message-icon-img {
+        width: 35px;
+    }
+    
     .semester-heading {
         font-size: 1.5rem;
     }
-
+    
     .category-title {
         font-size: 1.1rem;
     }
-
-    .message-indicator {
-        width: 40px;
-        height: 40px;
-    }
-
+    
     .message-icon {
         font-size: 1.3rem;
     }
-}
-
-/* Collapsible timeline styling */
-.timeline-collapsed .hidden-semester {
-    display: none;
-}
-
-.toggle-older-semesters {
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 10px 20px;
-    margin: 20px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    width: 250px;
-    color: var(--cornell-blue);
-    font-weight: 500;
-}
-
-.toggle-older-semesters:hover {
-    background-color: rgba(0, 118, 189, 0.05);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-}
-
-.toggle-icon {
-    margin-right: 8px;
-    transition: transform 0.3s ease;
-}
-
-.timeline-expanded .toggle-icon {
-    transform: rotate(180deg);
-}
-
-.timeline-marker-collapsed {
-    position: absolute;
-    left: -30px;
-    width: 30px;
-    height: 40px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-    color: #888;
-    font-size: 0.9rem;
-    z-index: 2;
-}
-
-.semester-count-badge {
-    background-color: var(--cornell-blue);
-    color: white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    margin-left: 8px;
 }
