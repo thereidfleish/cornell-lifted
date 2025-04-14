@@ -84,6 +84,13 @@ def after_setup(app):
         else:
             suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(num % 10, 'th')
         return str(num) + suffix
+    
+    @app.template_filter('pluralize')
+    def pluralize(number, singular = '', plural = 's'):
+        if number == 1:
+            return singular
+        else:
+            return plural
 
 # Load Lifted configuration
 def load_lifted_config():
