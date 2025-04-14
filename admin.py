@@ -213,7 +213,7 @@ def save_rich_text(message_group, type):
         # html_content = html_content.replace("<p><br></p>", "")
 
         html_content = html_content.replace("{{LOGO}}", """<img src='https://cornelllifted.com/static/images/logo.png'
-                                            style='display: block; max-width: 300px; margin-left: auto; margin-right: auto;'>
+                                            style='display: block; max-width: 200px; margin-left: auto; margin-right: auto;'>
                                             """)
                 
         html_content = "<div style='background-color: white; padding: 15px; max-width: 1000px; margin-left: auto; margin-right: auto; border-radius: 5px'>" + html_content + "</div>"

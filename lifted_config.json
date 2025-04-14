@@ -26,11 +26,11 @@
         "sp_25_e",
         "fa_24_p"
     ],
-    "form_message_group": "sp_25_p",
-    "attachment_message_group": "sp_25_p",
+    "form_message_group": "none",
+    "attachment_message_group": "none",
     "swap_from": "sp_25_p",
     "swap_to": "sp_25_e",
-    "swap_text": "<b>Can't make it on the last day of classes?</b> <a href=\"/swap-messages\">Click here</a> to get your messages delivered virtually instead.  Hard deadline to do this is <b>4/27/25</b>.",
+    "swap_text": "<b>Can't make it on the last day of classes?</b> <a href=\"/swap-messages\">Click here</a> to get your messages delivered virtually on the last day of classes instead.  Hard deadline to do this is <b>4/27/25 at 11:59 PM!</b>",
     "rich_text_types": {
         "form": "Form Description",
         "sender": "Sender Confirmation Email",

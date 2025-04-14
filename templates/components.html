@@ -203,7 +203,7 @@
 {% endif %}
 {% endmacro %}
 
-{% macro confirm_modal(id, title_text, body_text) %}
+{% macro confirm_modal(id, title_text, body_text, yes_text, type) %}
 <div class="modal fade" id="{{id}}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -216,7 +216,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Nevermind</button>
-                <a id="{{id}}_yes_button">Yes</a>
+                {% if type == "anchor" %}
+                <a class="btn btn-primary" id="{{id}}_yes_button">{{ yes_text }}</a>
+                {% elif type == "submit" %}
+                <button type="submit" class="btn btn-primary">{{ yes_text }}</button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -245,7 +249,6 @@
 
             <div class="lifted-card">
                 <h4 class="text-center blue-text" id="card-recipient-id"></h4>
-                <hr>
                 <p><b>To:</b> <span id="card-recipient-name"></span></p>
                 <p style="white-space: pre-line" class="message-content" id="card-message-content">
                     Loading

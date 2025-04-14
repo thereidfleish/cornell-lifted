@@ -24,15 +24,14 @@
                         experience</p>
                 </div>
                 {% if message_confirmation %}
-                <div class="alert alert-success" role="alert">
-                    <h4 class="alert-heading">Message Sent Successfully!</h4>
-                    <p>Your Lifted message was submitted successfully! You can view it in your sent messages below.</p>
-                    <p>Your recipient was just notified that they've been Lifted, but
-                        they won't get to see your message until the last day of classes!</p>
-                    <p>Feel free to Lift some more inspirational people in your life! And to stay up-to-date with any
-                        last-minute reminders or changes, and to help Lift us,
-                        follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
-                </div>
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Message Submitted Successfully!</h4>
+                        <p>Your Lifted message was submitted successfully!  You can view it in your sent messages below.</p>
+                        <p>Your recipient was just notified that they've been Lifted, but
+                            they won't get to see your message until the last day of classes!</p>
+                        <p class="mb-0">To stay up-to-date with any last-minute reminders or changes, and to help Lift us,
+                            follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -111,7 +110,7 @@
                     {% set sorted_events = all_event_groups|sort(attribute='sort_key', reverse=true) %}
 
                     {% for event in sorted_events %}
-                    <div class="timeline-event {% if loop.index > 2 %}hidden-semester{% endif %}">
+                    <div class="timeline-event {% if loop.index > 3 %}hidden-semester{% endif %}">
                         <div class="timeline-marker">
                             <div class="timeline-date">
                                 <span class="timeline-year">{{ event.year }}</span>
@@ -160,6 +159,8 @@
 
                                                     <div class="tab-content">
                                                         <!-- Received Tab -->
+                                                        {% set received_message_count = cards_dict['received'][message_group_short_name] |
+                                                        length %}
                                                         <div class="tab-pane fade show active"
                                                             id="{{ message_group_short_name }}-received"
                                                             role="tabpanel">
@@ -173,11 +174,8 @@
                                                             </div>
                                                             {% else %}
                                                             <div class="message-count mb-3">
-                                                                <span class="count-badge">{{
-                                                                    cards_dict['received'][message_group_short_name] |
-                                                                    length
-                                                                    }}</span>
-                                                                messages received
+                                                                <span class="count-badge">{{ received_message_count }}</span>
+                                                                message{{ received_message_count|pluralize() }} received
                                                             </div>
                                                             {% if ranks_dict['received'].get(message_group_short_name,
                                                             99) <= 3 %} <div class="rank-badge mb-3">
@@ -202,10 +200,8 @@
                                                             {% if "_p" in message_group_short_name %}
                                                             <!-- <div class="locked-icon">🎈</div> -->
                                                             <h5 class="locked-title">🎈 Coming Soon!</h5>
-                                                            <p>Pick up your {{
-                                                                cards_dict['received'][message_group_short_name] |
-                                                                length
-                                                                }} physical card(s) on the last day of classes!</p>
+                                                            
+                                                            <p>Pick up your {{ received_message_count }} physical card{{ received_message_count|pluralize() }} on the <b>Arts Quad before 7 PM</b> on the last day of classes <b>(Tuesday, May 6th)!</b></p>
                                                             <p class="locked-note">Check your "You've been Lifted!"
                                                                 email for details</p>
 
@@ -233,17 +229,6 @@
                                                                             <span class="radio-custom"></span>
                                                                         </div>
 
-                                                                        <div class="attachment-icon">
-                                                                            {% if attachment['attachment'] == 'Flower'
-                                                                            %}🌸
-                                                                            {% elif attachment['attachment'] ==
-                                                                            'Pinwheel' %}🎡
-                                                                            {% elif attachment['attachment'] ==
-                                                                            'Balloon' %}🎈
-                                                                            {% else %}🎁
-                                                                            {% endif %}
-                                                                        </div>
-
                                                                         <label
                                                                             class="form-check-label attachment-details"
                                                                             for="attachment_{{attachment['id']}}">
@@ -267,9 +252,7 @@
                                                             {% else %}
                                                             <div class="locked-icon">💌</div>
                                                             <h5 class="locked-title">Coming Soon!</h5>
-                                                            <p>Your {{ cards_dict['received'][message_group_short_name]
-                                                                |
-                                                                length }} eLifted messages will be available on the last
+                                                            <p>Your {{ received_message_count }} eLifted message{{ received_message_count|pluralize() }} will be available here on the last
                                                                 day of classes!</p>
                                                             {% endif %}
                                                         </div>
@@ -296,6 +279,8 @@
                                                     </div>
 
                                                     <!-- Sent Tab -->
+                                                    {% set sent_message_count = cards_dict['sent'][message_group_short_name] |
+                                                    length %}
                                                     <div class="tab-pane fade" id="{{ message_group_short_name }}-sent"
                                                         role="tabpanel">
 
@@ -308,10 +293,8 @@
                                                         </div>
                                                         {% else %}
                                                         <div class="message-count mb-3">
-                                                            <span class="count-badge">{{
-                                                                cards_dict['sent'][message_group_short_name] | length
-                                                                }}</span>
-                                                            messages sent
+                                                            <span class="count-badge">{{ sent_message_count }}</span>
+                                                            message{{ sent_message_count|pluralize() }} sent
                                                         </div>
 
                                                         {% if ranks_dict['sent'].get(message_group_short_name, 99) <= 3
@@ -391,16 +374,17 @@
                 </div>
             </div>
 
-            {% if sorted_events|length > 2 %}
+            {% if sorted_events|length > 3 %}
             <button class="toggle-older-semesters" id="toggle-semesters">
                 <span class="toggle-icon">▼</span>
                 <span class="toggle-text">View Older Lifted Memories</span>
-                <span class="semester-count-badge">{{ sorted_events|length - 2 + 1}}</span>
+                <span class="semester-count-badge">{{ sorted_events|length - 3 + 1}}</span>
             </button>
             {% endif %}
 
             {{ components.confirm_modal("delete-card-modal", "Delete Message", "Are you sure you want to delete this
-            message? This cannot be undone!") }}
+            message? This cannot be undone!",
+            "Delete", "anchor") }}
 
             {{ components.card_modal("card-modal", "Your Lifted Message", True) }}
 
