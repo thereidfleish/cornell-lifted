@@ -48,3 +48,23 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+  const toggleButton = document.getElementById('toggle-semesters');
+  const timelineContainer = document.getElementById('timeline-container');
+
+  if (toggleButton) {
+    toggleButton.addEventListener('click', function () {
+      timelineContainer.classList.toggle('timeline-collapsed');
+      timelineContainer.classList.toggle('timeline-expanded');
+
+      // Update the button text based on current state
+      const toggleText = document.querySelector('.toggle-text');
+      if (timelineContainer.classList.contains('timeline-collapsed')) {
+        toggleText.textContent = 'View Older Lifted Memories';
+      } else {
+        toggleText.textContent = 'Hide Older Memories';
+      }
+    });
+  }
+});
