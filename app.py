@@ -53,7 +53,7 @@ def after_setup(app):
     def handle_exception(e):    
         error_code = e.code
         error_message_title = e.name
-        error_message_body = e.description
+        error_message_body = "[ " + request.url + " ] " + e.description
         
         if hasattr(current_user, "id"):
             # print(current_user.id, "(", current_user.name, ")", "had an error", e.code)
