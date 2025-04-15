@@ -395,6 +395,18 @@ def get_person_info():
     
     return jsonify({"results": sorted(master_dict, key=lambda x: x["NetID"])})
 
+@core.route("/easter-egg/<netID>")
+@login_required
+def easter_egg(netID):
+    result = ""
+
+    if is_admin(write_required=True, custom_netID=netID):
+        result = "🎈💮"
+    elif is_admin(write_required=False, custom_netID=netID):
+        result = "🎈"
+
+    return jsonify({"result": result})
+
 @core.route("/swap-messages")
 @login_required
 def swap_messages():

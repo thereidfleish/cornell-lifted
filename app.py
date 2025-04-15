@@ -136,9 +136,9 @@ def admin_required(write_required):
         return decorated_function
     return decorator
 
-def is_admin(write_required):
+def is_admin(write_required, custom_netID=False):
     conn = get_db_connection()
-    admins = conn.execute("select * from admins where id=?", (current_user.id,)).fetchone()
+    admins = conn.execute("select * from admins where id=?", (custom_netID if custom_netID else current_user.id,)).fetchone()
     conn.close()
 
     if write_required:

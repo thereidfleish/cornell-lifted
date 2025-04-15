@@ -49,24 +49,31 @@ function handlePeopleSearchInputChange(my_netid) {
     }, 1000); // 1000ms = 1 second
 }
 
-function selectPerson(row, person, my_netid) {
+async function selectPerson(row, person, my_netid) {
     // Clear previous selection
     document.querySelectorAll("#people-info-table tr").forEach(r => r.classList.remove("people-row-selected"));
 
     // Highlight the selected row
     row.classList.add("people-row-selected");
 
-    // Some fun Easter Eggs :)
     var selectedPersonTextInfo = `Selected <b>${person.NetID} (${person.Name}, ${person["Primary Affiliation"]})</b>`
-    if (person.NetID == "rf377" || person.NetID == "abb234") {
-        selectedPersonTextInfo += " - 👀"
-    }
+
+    // Some fun Easter Eggs :)
+    try {
+        const easterEggRes = await fetch(`/easter-egg/${person.NetID}`);
+        const easterEgg = await easterEggRes.json();
+
+        selectedPersonTextInfo += easterEgg["result"]
+      } catch (error) {
+        console.log("easter egg failed, but we don't rly care lol")
+      }
+
     if (person.NetID == my_netid) {
         selectedPersonTextInfo += " - Wait, that's you!  While you can <i>technically</i> send a Lifted message to yourself, we encourage you to also spread the love to those around you :)"
     }
 
     // Update the status bar
-    selectedPersonStatus = document.getElementById("selected-person-status");;
+    selectedPersonStatus = document.getElementById("selected-person-status");
     selectedPersonStatus.className = "mt-4"
     const goodAffiliations = ["student", "faculty", "staff", "academic", "temporary"]
     if (!goodAffiliations.includes(person["Primary Affiliation"])) {
