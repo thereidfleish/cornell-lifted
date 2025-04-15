@@ -1109,6 +1109,12 @@ h3, h4, h5, p, .btn {
     color: var(--cornell-red);
 }
 
+/* Used to disable read-only items on admin view, do not delete or ask Reid */
+.admin-read-only {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
 .form-divider {
     border-color: rgba(179, 27, 27, .2);
     margin: 30px 0;
@@ -1779,14 +1785,14 @@ h3, h4, h5, p, .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
-    background-color: var(--cornell-blue);
-    color: #fff;
+    width: 22px;
+    height: 22px;
+    background-color: var(--winter-blue-light);
+    color: black;
     border-radius: 50%;
-    font-size: .9rem;
+    font-size: .8rem;
     font-weight: 600;
-    margin-right: 8px;
+    margin-left: 4px;
 }
 
 .rank-badge {

@@ -16,12 +16,6 @@ async function processAllCards() {
   }
 }
 
-function deleteMessageConfirmation(id) {
-  if (confirm('Are you sure you want to delete this message?  This cannot be undone')) {
-    window.open(`/delete-message/${id}?go_to_admin=true`, "_self");
-  }
-}
-
 async function handleMessagesQuery(inputText, messageGroupSelect) {
   queryStatus = document.getElementById("message-query-status")
   queryStatus.textContent = "Loading..."

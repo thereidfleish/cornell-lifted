@@ -19,7 +19,7 @@ def create_app():
     app = Flask(__name__)
 
     ### COMMENT OUT BEFORE DEPLOYING!!!!! ###
-    # app.debug = True
+    app.debug = True
 
     ### Put T/F for if windows or mac!!!!! ###
     is_windows = True
@@ -126,16 +126,25 @@ class User(UserMixin):
     def is_authenticated(self):
         return True
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if is_admin() == False:
-            abort(401, "Not an admin!")
-        return f(*args, **kwargs)
-    return decorated_function
+def admin_required(write_required):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if is_admin(write_required) == False:
+                abort(401, "Not an admin!" + " Also, write is required." if write_required else "")
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
-def is_admin():
-    return current_user.id in current_app.config["lifted_config"]["admins"]
+def is_admin(write_required):
+    conn = get_db_connection()
+    admins = conn.execute("select * from admins where id=?", (current_user.id,)).fetchone()
+    conn.close()
+
+    if write_required:
+        return admins != None and admins["write"] == True
+
+    return admins != None
 
 def get_impersonating_status():
     return session.get("impersonating")

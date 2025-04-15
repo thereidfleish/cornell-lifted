@@ -14,7 +14,7 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
 
 @admin.route("/admin/logs", methods=['GET', 'POST'])
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def logs_page():
     if request.method == "POST":
         return redirect(url_for('admin.logs_page')) # prevents form resubmission
@@ -35,7 +35,7 @@ def logs_page():
 
 @admin.route("/admin", methods=['GET', 'POST'])
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def admin_page():
     if request.method == "POST":
         return redirect(url_for('admin.admin_page')) # prevents form resubmission
@@ -68,6 +68,11 @@ def admin_page():
             if "~" not in stem and ext in all_cards_files_dict[stem]["to_process"]:
                 all_cards_files_dict[stem]["done"] += ext + ", "
     
+    # Admins Table
+    conn = get_db_connection()
+    admins = conn.execute("select * from admins").fetchall()
+    conn.close()
+    
     # Swap Prefs Table
     conn = get_db_connection()
     swap_prefs = conn.execute("select * from swap_prefs").fetchall()
@@ -86,13 +91,14 @@ def admin_page():
     return render_template("admin.html",
                            all_cards_files_dict=all_cards_files_dict,
                            pptx_templates_files=pptx_templates_files,
+                           admins=admins,
                            swap_prefs=swap_prefs,
                            attachments=attachments,
                            attachment_prefs=attachment_prefs)
 
 @admin.post("/add-message-group")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def add_message_group():
     old_dict = current_app.config["lifted_config"]["message_group_list_map"]
     new_dict = {}
@@ -118,7 +124,7 @@ def add_message_group():
 
 @admin.post("/update-hidden-cards/<message_group>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def update_hidden_cards(message_group):
     if request.form.get('hidden-cards') != None: # meaning a checkbox was ticked "on"
         current_app.config["lifted_config"]["hidden_cards"].append(message_group)
@@ -132,7 +138,7 @@ def update_hidden_cards(message_group):
 # NEED TO IMPLEMENT MESSAGE DELETING!!!!
 @admin.route("/remove-message-group/<message_group>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def remove_message_group(message_group):
     old_dict = current_app.config["lifted_config"]["message_group_list_map"]
     current_app.config["lifted_config"]["message_group_list_map"] = {short_name: long_name for short_name, long_name in old_dict.items() if short_name != message_group}
@@ -145,7 +151,7 @@ def remove_message_group(message_group):
 
 @admin.post("/update-form-message-group")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def update_form_message_group():
     current_app.config["lifted_config"]["form_message_group"] = request.form.get("form-message-group")
     update_lifted_config(current_app.config["lifted_config"])
@@ -153,7 +159,7 @@ def update_form_message_group():
 
 @admin.post("/update-attachment-message-group")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def update_attachment_message_group():
     current_app.config["lifted_config"]["attachment_message_group"] = request.form.get("attachment-message-group")
     update_lifted_config(current_app.config["lifted_config"])
@@ -161,7 +167,7 @@ def update_attachment_message_group():
 
 @admin.route("/delete-attachment/<id>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def delete_attachment(id):
     conn = get_db_connection()
     conn.execute('delete from attachments where id = ?', (id,))
@@ -172,7 +178,7 @@ def delete_attachment(id):
 
 @admin.post("/add-attachment/<message_group>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def add_attachment(message_group):
     attachment = request.form["attachment-name"]
     count = request.form["attachment-count"]
@@ -186,7 +192,7 @@ def add_attachment(message_group):
 
 @admin.route("/delete-attachment-pref/<id>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def delete_attachment_pref(id):
     conn = get_db_connection()
     conn.execute('delete from attachment_prefs where id = ?', (id,))
@@ -197,7 +203,7 @@ def delete_attachment_pref(id):
 
 @admin.post("/update-swapping-config")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def update_swapping_config():
     current_app.config["lifted_config"]["swap_from"] = request.form.get("swap-from")
     current_app.config["lifted_config"]["swap_to"] = request.form.get("swap-to")
@@ -207,7 +213,7 @@ def update_swapping_config():
 
 @admin.route("/delete-swap-pref/<id>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def delete_swap_pref(id):
     conn = get_db_connection()
     conn.execute('delete from swap_prefs where id = ?', (id,))
@@ -218,7 +224,7 @@ def delete_swap_pref(id):
 
 @admin.post("/save-rich-text/<message_group>/<type>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def save_rich_text(message_group, type):
     data = request.get_json()
     html_content = data["html"]
@@ -263,7 +269,7 @@ def save_rich_text(message_group, type):
 
 @admin.route("/get-rich-text/<message_group>/<type>")
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def get_rich_text(message_group, type):
     dir_path_delta = f"templates/rich_text/{message_group}/{type}.json"
     dir_path_subject = f"templates/rich_text/{message_group}/{type}.txt"
@@ -282,19 +288,19 @@ def get_rich_text(message_group, type):
 
 @admin.route("/get-all-cards/<filename>")
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def get_all_cards(filename):
     return send_file(f"all_cards_output/{filename}", mimetype=mimetypes.guess_type(filename)[0])
 
 @admin.route("/get-pptx-template/<message_group>")
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def get_pptx_template(message_group):
     return send_file(f"pptx_templates/{message_group}", mimetype=mimetypes.guess_type(message_group)[0])
 
 @admin.post("/upload-pptx-template/<message_group>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def upload_pptx_template(message_group):
     file = request.files['file']
     if os.path.splitext(file.filename)[1] != ".pptx":
@@ -304,7 +310,7 @@ def upload_pptx_template(message_group):
 
 @admin.route("/query-messages")
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def query_messages():
     query = request.args.get("q")
     message_group = request.args.get("mg")
@@ -339,7 +345,7 @@ def query_messages():
 
 @admin.route("/process-all-cards/<message_group>")
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def process_all_cards(message_group):
     print("Starting task")
     sql = "select * from messages where message_group=?" + (" order by recipient_email asc" if request.args.get('alphabetical') == "true" else "")
@@ -366,7 +372,7 @@ def process_all_cards(message_group):
 
 @admin.post("/impersonate")
 @login_required
-@admin_required
+@admin_required(write_required=False)
 def impersonate():
     netID = request.form.get("impersonate_netid")
     user = load_user(netID)
@@ -382,17 +388,25 @@ def end_impersonate():
 
 @admin.post("/add-admin")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def add_admin():
-    current_app.config["lifted_config"]["admins"].append(request.form.get("admin_add"))
-    update_lifted_config(current_app.config["lifted_config"])
+    netID = request.form["admin_netid"]
+    write_perm = True if request.form.get("admin_write_perm") else False
+
+    conn = get_db_connection()
+    conn.execute("insert into admins (id, write) values (?, ?)",
+                 (netID, write_perm))
+    conn.commit()
+    conn.close()
+
     return redirect(url_for('admin.admin_page'))
 
-@admin.route("/remove-admin/<admin>")
+@admin.route("/remove-admin/<id>")
 @login_required
-@admin_required
-def remove_admin(admin):
-    if admin in current_app.config["lifted_config"]["admins"]:
-        current_app.config["lifted_config"]["admins"].remove(admin)
-    update_lifted_config(current_app.config["lifted_config"])
+@admin_required(write_required=True)
+def remove_admin(id):
+    conn = get_db_connection()
+    conn.execute('delete from admins where id = ?', (id,))
+    conn.commit()
+    conn.close()
     return redirect(url_for('admin.admin_page'))

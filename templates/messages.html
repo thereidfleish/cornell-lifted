@@ -140,12 +140,19 @@
 
                                             <div class="card-body">
                                                 <div class="message-tabs">
+                                                    {% set received_message_count = cards_dict['received'][message_group_short_name] |
+                                                        length %}
+                                                    {% set sent_message_count = cards_dict['sent'][message_group_short_name] |
+                                                    length %}
                                                     <ul class="nav nav-pills mb-3" role="tablist">
                                                         <li class="nav-item" role="presentation">
                                                             <button class="nav-link active" data-bs-toggle="pill"
                                                                 data-bs-target="#{{ message_group_short_name }}-received"
                                                                 type="button" role="tab" aria-selected="true">
                                                                 Received
+                                                                {% if received_message_count > 0 %}
+                                                                <span class="count-badge">{{ received_message_count }}</span>
+                                                                {% endif %}
                                                             </button>
                                                         </li>
                                                         <li class="nav-item" role="presentation">
@@ -153,14 +160,15 @@
                                                                 data-bs-target="#{{ message_group_short_name }}-sent"
                                                                 type="button" role="tab" aria-selected="false">
                                                                 Sent
+                                                                {% if sent_message_count > 0 %}
+                                                                <span class="count-badge">{{ sent_message_count }}</span>
+                                                                {% endif %}
                                                             </button>
                                                         </li>
                                                     </ul>
 
                                                     <div class="tab-content">
                                                         <!-- Received Tab -->
-                                                        {% set received_message_count = cards_dict['received'][message_group_short_name] |
-                                                        length %}
                                                         <div class="tab-pane fade show active"
                                                             id="{{ message_group_short_name }}-received"
                                                             role="tabpanel">
@@ -173,10 +181,6 @@
                                                                     %}physical {% endif %}Lifted messages.</p>
                                                             </div>
                                                             {% else %}
-                                                            <div class="message-count mb-3">
-                                                                <span class="count-badge">{{ received_message_count }}</span>
-                                                                message{{ received_message_count|pluralize() }} received
-                                                            </div>
                                                             {% if ranks_dict['received'].get(message_group_short_name,
                                                             99) <= 3 %} <div class="rank-badge mb-3">
                                                                 <span class="rank-icon">🏆</span>
@@ -279,8 +283,6 @@
                                                     </div>
 
                                                     <!-- Sent Tab -->
-                                                    {% set sent_message_count = cards_dict['sent'][message_group_short_name] |
-                                                    length %}
                                                     <div class="tab-pane fade" id="{{ message_group_short_name }}-sent"
                                                         role="tabpanel">
 
@@ -292,11 +294,6 @@
                                                                 %}physical {% endif %}Lifted messages.</p>
                                                         </div>
                                                         {% else %}
-                                                        <div class="message-count mb-3">
-                                                            <span class="count-badge">{{ sent_message_count }}</span>
-                                                            message{{ sent_message_count|pluralize() }} sent
-                                                        </div>
-
                                                         {% if ranks_dict['sent'].get(message_group_short_name, 99) <= 3
                                                             %} <div class="rank-badge mb-3">
                                                             <span class="rank-icon">🏆</span>
@@ -383,10 +380,10 @@
             {% endif %}
 
             {{ components.confirm_modal("delete-card-modal", "Delete Message", "Are you sure you want to delete this
-            message? This cannot be undone!",
+            message? This cannot be undone! Keep in mind that your recipient already received a notification that they've been Lifted - if you'd like us to (anonymously) let your recipient know they are no longer Lifted, send us an email at lifted@cornell.edu",
             "Delete", "anchor") }}
 
-            {{ components.confirm_modal("swap-card-modal", "Get your cards delivered virtually?", "If you don't pick up your physical messages, you won't be able to view them virtually, so choose this option if you're not sure you can make it!",
+            {{ components.confirm_modal("swap-card-modal", "Get your cards delivered virtually?", "Not sure you'll make it on the last day of classes?  We recommend choosing this option - otherwise, if you don't pick up your physical cards, you won't be able to view them virtually.",
             "Yes", "anchor", "/swap-messages") }}
 
             {{ components.card_modal("card-modal", "Your Lifted Message", True) }}

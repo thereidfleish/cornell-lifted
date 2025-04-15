@@ -38,6 +38,13 @@
 --     attachment_id INTEGER NOT NULL
 -- );
 
+-- DROP TABLE IF EXISTS admins;
+
+-- CREATE TABLE admins (
+--     id TEXT PRIMARY KEY,
+--     write BOOLEAN NOT NULL
+-- );
+
 -- DROP TABLE IF EXISTS cp_taps;
 
 -- CREATE TABLE cp_taps (

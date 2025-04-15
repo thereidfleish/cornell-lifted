@@ -19,7 +19,7 @@
         {% if current_user.is_authenticated %}
         <!-- <p>Hi, {{ current_user.name }}! You are signed in as {{ current_user.email }}</p> -->
 
-        {% if is_admin() %}
+        {% if is_admin(write_required=True) %}
         <h5 class="circle-white-text">Add Candidate</h5>
         <p class="circle-white-text">Add candidate to the tap pool. This will allow them to log in and accept or reject
             a tap</p>
@@ -34,6 +34,8 @@
             </div>
             <button type="submit" class="btn btn-dark">Add Candidate</button>
         </form>
+        {% endif %}
+        {% if is_admin(write_required=False) %}
 
         <h5 class="mt-3 circle-white-text">Tap Responses</h5>
         <div class="table-responsive mb-4">

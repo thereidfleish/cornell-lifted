@@ -68,7 +68,7 @@
                 "font": "verdana",
                 "bold": true
             },
-            "insert": "Can't make it on the last day of classes?"
+            "insert": "Can't make it to the Arts Quad by 7 PM on the last day of classes?"
         },
         {
             "insert": "\n"
@@ -78,13 +78,13 @@
                 "font": "verdana",
                 "link": "https://cornelllifted.com/messages"
             },
-            "insert": "Get your messages delivered virtually instead"
+            "insert": "Get your physical cards delivered virtually on the last day of classes instead"
         },
         {
             "attributes": {
                 "font": "verdana"
             },
-            "insert": ".  Hard deadline to do this is "
+            "insert": ".  Hard deadline to request this is "
         },
         {
             "attributes": {
@@ -92,6 +92,12 @@
                 "bold": true
             },
             "insert": "Sunday, April 27th at 11:59 PM."
+        },
+        {
+            "attributes": {
+                "font": "verdana"
+            },
+            "insert": "  If you don't do this, you won't be able to view them virtually."
         },
         {
             "insert": "\n\n"

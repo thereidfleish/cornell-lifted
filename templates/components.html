@@ -41,7 +41,7 @@
             <div class="d-none d-lg-flex align-items-center">
                 <div class="nav-links me-4">
                     <a href="/faqs" class="btn btn-link">FAQs</a>
-                    {% if current_user.is_authenticated and is_admin() %}
+                    {% if current_user.is_authenticated and is_admin(write_required=False) %}
                     <a href="/admin" class="btn btn-link">Admin</a>
                     {% endif %}
                 </div>
@@ -59,7 +59,7 @@
         <div class="container py-3">
             <div class="nav-links mb-3">
                 <a href="/faqs" class="btn btn-link d-block text-start py-2">FAQs</a>
-                {% if current_user.is_authenticated and is_admin() %}
+                {% if current_user.is_authenticated and is_admin(write_required=False) %}
                 <a href="/admin" class="btn btn-link d-block text-start py-2">Admin</a>
                 {% endif %}
             </div>

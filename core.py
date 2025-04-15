@@ -128,7 +128,7 @@ def get_card_json(id):
     card = get_card(id)
 
     # First check if the user is an admin.  If so, they can bypass all the remaining checks
-    if is_admin() == False:
+    if is_admin(write_required=False) == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
             abort(401, "Not your card")
@@ -147,7 +147,7 @@ def get_card_json(id):
         "message_content": card["message_content"]
     }
 
-    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed Card ID {id}")
+    # helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed Card ID {id}")
 
     return jsonify(card_json)
 
@@ -157,7 +157,7 @@ def get_card_pdf(id):
     card = get_card(id)
     
     # note: THE LOGIC HERE IS SLIGHTLY DIFFERENT THAN FOR HTML, since we don't want anyone downloading a PDF before its unhidden
-    if is_admin() == False:
+    if is_admin(write_required=False) == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
             abort(401, "Not your card")
@@ -172,7 +172,7 @@ def get_card_pdf(id):
     return send_file(f"tmp_output/{id}.pdf", download_name=f"Lifted Message #{id}", mimetype='application/pdf')
 
 def check_if_can_edit_or_delete(card):
-    if is_admin() == False:
+    if is_admin(write_required=True) == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not a sender of the message, abort
         if card["sender_email"] != current_user.email:
             abort(401, "Not your card")
@@ -188,7 +188,7 @@ def edit_message(id):
     check_if_can_edit_or_delete(card)
 
     show_admin_overrides = False
-    if current_user.is_authenticated and is_admin() and request.args.get("show_admin_overrides") == "true":
+    if current_user.is_authenticated and is_admin(write_required=True) and request.args.get("show_admin_overrides") == "true":
         show_admin_overrides = True
 
     form = RegistrationForm(request.form)
@@ -287,7 +287,7 @@ def send_message():
     form = RegistrationForm(request.form)
 
     show_admin_overrides = False
-    if current_user.is_authenticated and is_admin() and request.args.get("show_admin_overrides") == "true":
+    if current_user.is_authenticated and is_admin(write_required=True) and request.args.get("show_admin_overrides") == "true":
         show_admin_overrides = True
 
                                                 # (Disable validation for admin overrides)

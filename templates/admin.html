@@ -12,6 +12,8 @@
     <main>
         {{ components.sticky_navbar() }}
 
+        {% set admin_write_required = not is_admin(write_required=True) %}
+
         <h3 class="mt-3">Admin Dashboard</h3>
 
         {{ components.tab_bar("admin-tab-bar", lifted_config.admin_tabs.keys(),
@@ -30,7 +32,7 @@
                 </p>
 
                 <p class="mb-1"><b>Add physical and eLifted message groups</b></p>
-                <form method="post" action="/add-message-group">
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/add-message-group">
                     <div class="d-inline-flex border border-2 rounded mb-2 p-2">
                         <div>
                             <div class="form-check">
@@ -101,7 +103,7 @@
                             <tr>
                                 <td>{{message_group_long_name}}</td>
                                 <td>
-                                    <form method="post" action="/update-hidden-cards/{{message_group_short_name}}">
+                                    <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-hidden-cards/{{message_group_short_name}}">
                                         <input class="form-check-input" type="checkbox" name="hidden-cards"
                                             value="{{message_group_short_name}}" id="{{message_group_short_name}}"
                                             onchange="this.form.submit();" {{ "disabled" if message_group_short_name not
@@ -121,7 +123,7 @@
                                         href="/get-card-pdf/16193?override-template={{message_group_short_name}}"
                                         target="_blank">Test PDF (long card)</a>
                                     {% endif %}
-                                    <form method="post" enctype="multipart/form-data"
+                                    <form class="{{'admin-read-only' if admin_write_required}}" method="post" enctype="multipart/form-data"
                                         action="/upload-pptx-template/{{message_group_short_name}}">
                                         <input class="form-control form-control-sm" type="file" name="file"
                                             id="pptx_template_upload" onchange="this.form.submit();"
@@ -130,7 +132,7 @@
                                     </form>
                                 </td>
                                 <td>{{message_group_short_name}}</td>
-                                <td><a href="/remove-message-group/{{message_group_short_name}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/remove-message-group/{{message_group_short_name}}">🗑️</a></td>
 
                             </tr>
                             {% endfor %}
@@ -147,7 +149,7 @@
                     end the physical form.</p>
                 <p>Set this to <b>None</b> to close the form entirely.</p>
 
-                <form method="post" action="/update-form-message-group">
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-form-message-group">
                     {{ components.message_group_radio(id="form-message-group",
                     onclick_fn="this.form.submit()",
                     checked_expr=lifted_config.form_message_group,
@@ -158,7 +160,7 @@
                 <p>Add, remove, and edit attachments for the following message group</p>
                 
                 <p><b>Current Message Group:</b> Set this to the message group that people will pick an attachment for.  Set this to <b>None</b> to not allow any choosing attachments.</p>
-                <form method="post" action="/update-attachment-message-group">
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-attachment-message-group">
                     {{ components.message_group_radio(id="attachment-message-group",
                     onclick_fn="this.form.submit()",
                     checked_expr=lifted_config.attachment_message_group,
@@ -166,7 +168,7 @@
                 </form>
 
                 <p class="mb-1"><b>Add Attachments and Counts:</b> This will add for the message group selected above.</p>
-                <form method="post" action="/add-attachment/{{lifted_config.attachment_message_group}}">
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/add-attachment/{{lifted_config.attachment_message_group}}">
                     <div class="d-inline-flex border border-2 rounded mb-2 p-2">
                         <div class="d-flex align-items-center ms-4">
                             <label for="attachment-name-input" class="form-label m-2">Name</label>
@@ -199,7 +201,7 @@
                                 <td>{{ record["message_group"] }}</td>
                                 <td>{{ record["attachment"] }}</td>
                                 <td>{{ record["count"] }}</td>
-                                <td><a href="/delete-attachment/{{record['id']}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/delete-attachment/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -216,7 +218,7 @@
                 <p>Set to <b>None</b> to disable. <b>Be sure to turn this off right before you export the cards as
                         PDFs!</b></p>
 
-                <form method="post" action="/update-swapping-config">
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-swapping-config">
                     <div class="d-flex">
                         <div class="me-2">
                             <p><b>Swap From</b></p>
@@ -272,7 +274,7 @@
                         {{ components.tab_bar("rich-text-type-tab-bar", lifted_config.rich_text_types.keys(),
                         lifted_config.rich_text_types.values()) }}
 
-                        <div class="tab-content pt-2" id="rich-text-type-tab-content">
+                        <div class="tab-content pt-2 {{'admin-read-only' if admin_write_required}}" id="rich-text-type-tab-content">
                             {% for type_short_name, type_long_name in lifted_config.rich_text_types.items() %}
 
                             <div class="tab-pane fade{% if loop.index0 == 0 %} show active{% endif %} mt-2"
@@ -346,7 +348,7 @@
                 </div>
 
                 {{ components.confirm_modal("delete-card-modal", "Delete Message",
-                "Are you sure you want to delete this message?  This cannot be undone!",
+                "Are you sure you want to delete this message?  This cannot be undone!  Also, consider if you want to notify the recipient that they are no longer Lifted if this is their only card.",
                 "Delete", "anchor") }}
                 
                 {{ components.card_modal("card-modal", "Lifted Message", False) }}
@@ -383,7 +385,7 @@
 
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" value="" id="pptx-pdf-checkbox">
-                    <label class="form-check-label" for="pptx-pdf-checkbox">
+                    <label class="form-check-label {{'admin-read-only' if admin_write_required}}" for="pptx-pdf-checkbox">
                         Download PPTX and PDF in addition to CSV (check this to enable PPTX/PDF downloads, but uncheck
                         this if you only want a CSV)
                     </label>
@@ -465,11 +467,17 @@
                 <p>Add and remove admins by NetID. Admins have access to the Admin Dashboard, and can view, edit, and
                     delete any and all Lifted messages. In other words, you have a lot of power - admins should only be
                     (trusted) CP members!</p>
-                <form method="post" action="/add-admin">
-                    <div class="d-flex align-items-center mb-4">
-                        <input type="text" class="form-control w-25" id="admin_add" name="admin_add" placeholder="rf377"
-                            required />
-                        <button type="submit" class="btn btn-primary ms-4">Add Admin</button>
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/add-admin">
+                    <div class="d-inline-flex border border-2 rounded mb-2 p-2">
+                        <div class="d-flex align-items-center ms-4">
+                            <label for="admin-netid-input" class="form-label m-2">NetID</label>
+                            <input type="text" class="form-control" id="admin_netid" name="admin_netid" required />
+
+                            <label for="admin-write-checkbox" class="form-label m-2">Write Perm</label>
+                            <input type="checkbox" id="admin_write_perm" name="admin_write_perm">
+                            <button type="submit" class="btn btn-primary ms-4 mx-2">Add Admin</button>
+                        </div>
+
                     </div>
                 </form>
                 <div class="table-responsive mb-4">
@@ -478,14 +486,16 @@
                         <thead>
                             <tr style="position: sticky; top: 0;">
                                 <th scope="col">NetID</th>
+                                <th scope="col">Write Perm</th>
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for admin in lifted_config.admins %}
+                            {% for admin in admins %}
                             <tr>
-                                <td>{{ admin }}</td>
-                                <td><a href="/remove-admin/{{admin}}">🗑️</a></td>
+                                <td>{{ admin["id"] }}</td>
+                                <td>{{ admin["write"] }}</td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/remove-admin/{{admin['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -515,7 +525,7 @@
                                 <td>{{ record["recipient_email"] }}</td>
                                 <td>{{ record["message_group_from"] }}</td>
                                 <td>{{ record["message_group_to"] }}</td>
-                                <td><a href="/delete-swap-pref/{{record['id']}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/delete-swap-pref/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -544,7 +554,7 @@
                                 <td>{{ record["recipient_email"] }}</td>
                                 <td>{{ record["message_group"] }}</td>
                                 <td>{{ record["attachment_id"] }}</td>
-                                <td><a href="/delete-attachment-pref/{{record['id']}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/delete-attachment-pref/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>

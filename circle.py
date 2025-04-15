@@ -24,7 +24,7 @@ def circle_home():
         conn.close()
 
         # If the user was not tapped, abort
-        if current_user.id not in [tap["netid"] for tap in taps] and not is_admin():
+        if current_user.id not in [tap["netid"] for tap in taps] and not is_admin(write_required=False):
             abort(403, "No Circle!")
             # return "We're sorry, but you do not have access to this page."
 
@@ -77,7 +77,7 @@ class TapResponseForm(Form):
 
 @circle.post("/add-tap")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def add_tap():
     netID = request.form['netID-input'].strip().lower()
     name = request.form['name-input'].strip()
@@ -92,7 +92,7 @@ def add_tap():
 
 @circle.get("/delete-tap/<netID>")
 @login_required
-@admin_required
+@admin_required(write_required=True)
 def delete_tap(netID):
     conn = get_db_connection()
     conn.execute('delete from cp_taps where netid = ?', (netID,))

@@ -52,7 +52,7 @@
                         </div>
                     {% endif %}
 
-                    {% if current_user.is_authenticated and is_admin() and not is_edit %}
+                    {% if current_user.is_authenticated and is_admin(write_required=True) and not is_edit %}
                     <div class="text-end mb-4">
                         <a href="/send-message?show_admin_overrides=true" class="btn btn-outline-primary">
                             <i class="fas fa-cog"></i> Enable Admin Overrides
