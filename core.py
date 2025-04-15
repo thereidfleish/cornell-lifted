@@ -401,9 +401,9 @@ def easter_egg(netID):
     result = ""
 
     if is_admin(write_required=True, custom_netID=netID):
-        result = "🎈💮"
+        result = " 🎈🌸"
     elif is_admin(write_required=False, custom_netID=netID):
-        result = "🎈"
+        result = " 🎈"
 
     return jsonify({"result": result})
 
