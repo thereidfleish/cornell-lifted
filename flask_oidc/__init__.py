@@ -228,7 +228,8 @@ class OpenIDConnect:
             try:
                 self.ensure_active_token(token)
             except AuthlibBaseError as e:
-                logger.info(f"Could not refresh token {token!r}: {e}")
+                # logger.info(f"Could not refresh token {token!r}: {e}")
+                return
                 ### DISABLED ###
                 # return redirect("{}?reason=expired".format(url_for("oidc_auth.logout")))
         except Exception as e:
