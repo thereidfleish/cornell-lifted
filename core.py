@@ -42,6 +42,10 @@ def home():
 def faqs():
     return render_template("faqs.html", helpers=helpers)
 
+@core.get("/about-this-website")
+def about_this_website():
+    return render_template("about-this-website.html")
+
 @core.get("/messages")
 def messages():
     if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"    
