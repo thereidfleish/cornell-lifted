@@ -315,6 +315,9 @@ def query_messages():
     query = request.args.get("q")
     message_group = request.args.get("mg")
 
+    if current_user.id != "rf377":
+        helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Queried '{query}' for {message_group}")
+
     conn = get_db_connection()
 
     query_sql = ""
