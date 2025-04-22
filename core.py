@@ -171,7 +171,7 @@ def get_card_pdf(id):
 
     helpers.cards_to_pptx_and_pdf([card], card['message_group'] if "override-template" not in request.args else request.args.get("override-template"), f"tmp_output/{id}")
 
-    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
+    # helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
 
     return send_file(f"tmp_output/{id}.pdf", download_name=f"Lifted Message #{id}", mimetype='application/pdf')
 

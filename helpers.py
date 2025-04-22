@@ -35,7 +35,7 @@ def process_ranks_to_dict(ranks):
 
 def cards_to_pptx_and_pdf(cards, message_group, output_filepath):
     if current_app.config["is_windows"]:
-        print("Beginning replacing placeholders")
+        # print("Beginning replacing placeholders")
         CoInitialize()
 
         powerpoint = client.CreateObject("PowerPoint.Application")
@@ -81,10 +81,10 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath):
             presentation.Slides(presentation.Slides.Count).Delete()
             print("Saving PPTX...")
             presentation.SaveAs(os.path.abspath(f"{output_filepath}.pptx"))
-        print("Converting and Saving PPTX to PDF...")
+        # print("Converting and Saving PPTX to PDF...")
         presentation.SaveAs(os.path.abspath(f"{output_filepath}.pdf"), 32)
         presentation.Close()
-        print("Done!")
+        # print("Done!")
         # powerpoint.Quit()
         # CoUninitialize()
     else:
