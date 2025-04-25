@@ -190,17 +190,6 @@ def add_attachment(message_group):
     
     return redirect(url_for("admin.admin_page"))
 
-@admin.route("/delete-attachment-pref/<id>")
-@login_required
-@admin_required(write_required=True)
-def delete_attachment_pref(id):
-    conn = get_db_connection()
-    conn.execute('delete from attachment_prefs where id = ?', (id,))
-    conn.commit()
-    conn.close()
-
-    return redirect(url_for("admin.admin_page"))
-
 @admin.post("/update-swapping-config")
 @login_required
 @admin_required(write_required=True)
@@ -216,7 +205,15 @@ def update_swapping_config():
 @admin_required(write_required=True)
 def delete_swap_pref(id):
     conn = get_db_connection()
+
+    # The below code will move all the eLifted messages back to physical, but I recommend we don't use this
+    # because it can be problematic (e.g., we don't want to move eLifted messages to physical that were sent after the physical deadline)
+    # swap_pref = conn.execute('select * from swap_prefs where id = ?', (id,)).fetchone()
+    # conn.execute('update messages set message_group=? where message_group=? and recipient_email=?',
+    #                      (swap_pref["message_group_from"], swap_pref["message_group_to"], swap_pref["recipient_email"]))
+    
     conn.execute('delete from swap_prefs where id = ?', (id,))
+
     conn.commit()
     conn.close()
 

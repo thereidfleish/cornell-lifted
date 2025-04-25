@@ -89,13 +89,17 @@ def messages():
     else:
         return render_template('messages.html')
     
-@core.post("/set-attachment")
+@core.post("/set-attachment-pref")
 @login_required
 def set_attachment():
     attachment_id = request.form["id"]
     message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
     conn = get_db_connection()
+    attachment = conn.execute("select * from attachments where id=?", (attachment_id,)).fetchone()
+    if attachment["count"] < 1:
+        return f"Sorry, there are no more {attachment["attachment"]} left :("
+
     conn.execute("update attachments set count=count-1 where id=?", (attachment_id,))
 
     prev_attachment = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
@@ -114,6 +118,24 @@ def set_attachment():
     conn.close()
     
     return redirect(url_for("core.messages"))
+
+@core.route("/delete-attachment-pref/<id>")
+@login_required
+def delete_attachment_pref(id):
+    conn = get_db_connection()
+    attachment_pref = conn.execute('select * from attachment_prefs where id = ?', (id,)).fetchone()
+    conn.close()
+
+    if attachment_pref["recipient_email"] == current_user.email or is_admin(write_required=True):
+        conn = get_db_connection()
+        conn.execute("update attachments set count=count+1 where id=?", (attachment_pref["attachment_id"],))
+        conn.execute('delete from attachment_prefs where id = ?', (id,))
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("core.messages"))
+
+    abort(401, "Not your account")
 
 def get_card(id):
     conn = get_db_connection()
@@ -421,6 +443,15 @@ def swap_messages():
         return "Cannot swap at this time.  swap_from=none in Lifted config."
 
     conn = get_db_connection()
+
+    # Delete attachment pref if there is one
+    attachment_pref = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
+                                       (current_user.email, current_app.config["lifted_config"]["attachment_message_group"])).fetchone()
+    if attachment_pref:
+        conn.execute("update attachments set count=count+1 where id=?", (attachment_pref["attachment_id"],))
+        conn.execute('delete from attachment_prefs where id = ?', (attachment_pref["id"],))
+
+
     conn.execute('update messages set message_group=? where message_group=? and recipient_email=?',
                          (swap_to, swap_from, current_user.email))
     conn.execute("insert into swap_prefs (recipient_email, message_group_from, message_group_to) values (?, ?, ?)", (current_user.email, swap_from, swap_to))

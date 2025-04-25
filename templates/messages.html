@@ -24,14 +24,15 @@
                         experience</p>
                 </div>
                 {% if message_confirmation %}
-                    <div class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Message Submitted Successfully!</h4>
-                        <p>Your Lifted message to <b>{{ recipient_email }}</b> was submitted successfully!  You can view it in your sent messages below.</p>
-                        <p>Your recipient was just notified that they've been Lifted, but
-                            they won't get to see your message until the last day of classes!</p>
-                        <p class="mb-0">To stay up-to-date with any last-minute reminders or changes, and to help Lift us,
-                            follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
-                    </div>
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Message Submitted Successfully!</h4>
+                    <p>Your Lifted message to <b>{{ recipient_email }}</b> was submitted successfully! You can view it
+                        in your sent messages below.</p>
+                    <p>Your recipient was just notified that they've been Lifted, but
+                        they won't get to see your message until the last day of classes!</p>
+                    <p class="mb-0">To stay up-to-date with any last-minute reminders or changes, and to help Lift us,
+                        follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
@@ -140,9 +141,11 @@
 
                                             <div class="card-body">
                                                 <div class="message-tabs">
-                                                    {% set received_message_count = cards_dict['received'][message_group_short_name] |
-                                                        length %}
-                                                    {% set sent_message_count = cards_dict['sent'][message_group_short_name] |
+                                                    {% set received_message_count =
+                                                    cards_dict['received'][message_group_short_name] |
+                                                    length %}
+                                                    {% set sent_message_count =
+                                                    cards_dict['sent'][message_group_short_name] |
                                                     length %}
                                                     <ul class="nav nav-pills mb-3" role="tablist">
                                                         <li class="nav-item" role="presentation">
@@ -151,7 +154,8 @@
                                                                 type="button" role="tab" aria-selected="true">
                                                                 Received
                                                                 {% if received_message_count > 0 %}
-                                                                <span class="count-badge">{{ received_message_count }}</span>
+                                                                <span class="count-badge">{{ received_message_count
+                                                                    }}</span>
                                                                 {% endif %}
                                                             </button>
                                                         </li>
@@ -161,7 +165,8 @@
                                                                 type="button" role="tab" aria-selected="false">
                                                                 Sent
                                                                 {% if sent_message_count > 0 %}
-                                                                <span class="count-badge">{{ sent_message_count }}</span>
+                                                                <span class="count-badge">{{ sent_message_count
+                                                                    }}</span>
                                                                 {% endif %}
                                                             </button>
                                                         </li>
@@ -204,8 +209,12 @@
                                                             {% if "_p" in message_group_short_name %}
                                                             <!-- <div class="locked-icon">🎈</div> -->
                                                             <h5 class="locked-title">🎈 Coming Soon!</h5>
-                                                            
-                                                            <p>Pick up your {{ received_message_count }} physical card{{ received_message_count|pluralize() }} on the <b>Arts Quad before 7 PM</b> on the last day of classes <b>(Tuesday, May 6th)!</b></p>
+
+                                                            <p>Pick up your {{ received_message_count }} physical card{{
+                                                                received_message_count|pluralize() }} on the <b>Arts
+                                                                    Quad before 7 PM</b> on the last day of classes
+                                                                <b>(Tuesday, May 6th)!</b>
+                                                            </p>
                                                             <p class="locked-note">Check your "You've been Lifted!"
                                                                 email for details</p>
 
@@ -215,9 +224,12 @@
                                                             <div class="attachment-section mt-3">
                                                                 <div class="attachment-header">
                                                                     <span class="new-badge">New!</span>
-                                                                    <b>Choose your message attachment!</b>
+                                                                    <b>Choose your card attachment!</b>
                                                                 </div>
-                                                                <form method="post" action="/set-attachment">
+                                                                <p>You'll receive this alongside your card{{
+                                                                    received_message_count|pluralize() }}!  If you only want your card{{
+                                                                        received_message_count|pluralize() }}, leave this blank.</p>
+                                                                <form method="post" action="/set-attachment-pref">
                                                                     {% for attachment in attachments %}
                                                                     <div
                                                                         class="attachment-option {% if attachment['id']==attachment_pref['attachment_id'] %}checked{% endif %} {% if attachment['count'] < 1 %}disabled{% endif %}">
@@ -243,6 +255,9 @@
                                                                         </label>
                                                                     </div>
                                                                     {% endfor %}
+                                                                    {% if attachment_pref %}
+                                                                    <p class="mb-0 mt-3 text-start"><a href="/delete-attachment-pref/{{attachment_pref['id']}}">Clear Selection</a></p>
+                                                                    {% endif %}
                                                                 </form>
                                                             </div>
                                                             {% endif %}
@@ -256,7 +271,9 @@
                                                             {% else %}
                                                             <div class="locked-icon">💌</div>
                                                             <h5 class="locked-title">Coming Soon!</h5>
-                                                            <p>Your {{ received_message_count }} eLifted message{{ received_message_count|pluralize() }} will be available here on the last
+                                                            <p>Your {{ received_message_count }} eLifted message{{
+                                                                received_message_count|pluralize() }} will be available
+                                                                here on the last
                                                                 day of classes!</p>
                                                             {% endif %}
                                                         </div>
@@ -301,7 +318,12 @@
                                                                 ranks_dict['sent'][message_group_short_name] | int |
                                                                 ordinal }}</strong> most messages out of all
                                                             Cornellians!
+
                                                     </div>
+                                                    {% endif %}
+
+                                                    {% if "e" in message_group_short_name %}
+                                                    <p style="font-size: small;">If a physical card you sent ends up here, it's because your recipient requested their physical cards to be delivered virtually instead.  See <a href="/faqs">FAQs</a>.</p>
                                                     {% endif %}
 
                                                     <div class="message-gallery">
@@ -380,10 +402,15 @@
             {% endif %}
 
             {{ components.confirm_modal("delete-card-modal", "Delete Message", "Are you sure you want to delete this
-            message? This cannot be undone! Keep in mind that your recipient already received a notification that they've been Lifted - if you'd like us to (anonymously) let your recipient know they are no longer Lifted, send us an email at lifted@cornell.edu",
+            message? This cannot be undone! Keep in mind that your recipient already received a notification that
+            they've been Lifted - if you'd like us to (anonymously) let your recipient know they are no longer Lifted,
+            send us an email at lifted@cornell.edu",
             "Delete", "anchor") }}
 
-            {{ components.confirm_modal("swap-card-modal", "Get your cards delivered virtually?", "Even if you're not sure you'll make it on the last day of classes, we strongly recommend choosing this option - otherwise, if you don't pick up your physical cards, you won't be able to view them virtually.",
+            {{ components.confirm_modal("swap-card-modal", "Get your cards delivered virtually?", "Even if you're not
+            sure you'll make it on the last day of classes, we strongly recommend choosing this option - otherwise, if
+            you don't pick up your physical cards, you won't be able to view them virtually.<br><br>You'll receive your
+            cards as a PDF that you can print out!",
             "Yes", "anchor", "/swap-messages") }}
 
             {{ components.card_modal("card-modal", "Your Lifted Message", True) }}
