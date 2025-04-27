@@ -8,6 +8,7 @@ async function getCardJson(cardId, currentUserEmail, currentMessageGroup, hidden
       const card = await response.json();
     
       document.getElementById('card-recipient-id').textContent = card["recipient_email"].split("@")[0];
+      document.getElementById('card-attachment').textContent = card["attachment"];
       document.getElementById('card-recipient-name').textContent = card["recipient_name"];
       document.getElementById('card-message-content').textContent = card["message_content"];
       document.getElementById('card-sender-name').textContent = card["sender_name"];

@@ -44,6 +44,7 @@ def faqs():
 
 @core.get("/about-this-website")
 def about_this_website():
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed About This Website")
     return render_template("about-this-website.html")
 
 @core.get("/messages")
@@ -69,7 +70,7 @@ def messages():
 
         current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
-        attachments = conn.execute("select * from attachments where message_group=?", (current_attachment_message_group,)).fetchall()
+        attachments = conn.execute("select * from attachments where message_group=? order by id desc", (current_attachment_message_group,)).fetchall()
         attachment_pref = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
                                        (current_user.email, current_attachment_message_group)).fetchone()
 
@@ -139,8 +140,11 @@ def delete_attachment_pref(id):
 
 def get_card(id):
     conn = get_db_connection()
-    card = conn.execute("select * from messages where id=?", (id,)).fetchone()
-    # card = conn.execute("select * from messages", (id,)).fetch()
+    sql = """select messages.*, attachment_prefs.attachment_id, attachments.attachment from messages
+             left join attachment_prefs on messages.recipient_email = attachment_prefs.recipient_email and messages.message_group = attachment_prefs.message_group
+             left join attachments on attachment_prefs.attachment_id = attachments.id
+             where messages.id=?"""
+    card = conn.execute(sql, (id,)).fetchone()
     conn.close()
 
     if card is None:
@@ -170,7 +174,8 @@ def get_card_json(id):
         "sender_name": card["sender_name"],
         "recipient_email": card["recipient_email"],
         "recipient_name": card["recipient_name"],
-        "message_content": card["message_content"]
+        "message_content": card["message_content"],
+        "attachment": card["attachment"]
     }
 
     # helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed Card ID {id}")
@@ -191,7 +196,11 @@ def get_card_pdf(id):
         elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"]:
             abort(401, "Hidden Card")
 
-    helpers.cards_to_pptx_and_pdf([card], card['message_group'] if "override-template" not in request.args else request.args.get("override-template"), f"tmp_output/{id}")
+    override_template = request.args.get("override-template", False)
+    helpers.cards_to_pptx_and_pdf(cards=[card],
+                                  message_group=override_template if override_template else card['message_group'],
+                                  output_filepath=f"tmp_output/{id}",
+                                  override_template=True if override_template else False)
 
     # helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
 

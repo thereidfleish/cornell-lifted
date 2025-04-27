@@ -85,7 +85,7 @@ def admin_page():
 
     # Attachment Prefs Table
     conn = get_db_connection()
-    attachment_prefs = conn.execute("select * from attachment_prefs").fetchall()
+    attachment_prefs = conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id").fetchall()
     conn.close()
 
     return render_template("admin.html",
@@ -348,7 +348,12 @@ def query_messages():
 @admin_required(write_required=False)
 def process_all_cards(message_group):
     print("Starting task")
-    sql = "select * from messages where message_group=?" + (" order by recipient_email asc" if request.args.get('alphabetical') == "true" else "")
+    
+    sql = """select messages.*, attachment_prefs.attachment_id, attachments.attachment from messages
+             left join attachment_prefs on messages.recipient_email = attachment_prefs.recipient_email and messages.message_group = attachment_prefs.message_group
+             left join attachments on attachment_prefs.attachment_id = attachments.id
+             where messages.message_group=?""" + (" order by recipient_email asc" if request.args.get('alphabetical') == "true" else "")
+    
     conn = get_db_connection()
     cards = conn.execute(sql, (message_group,)).fetchall()
     conn.close()

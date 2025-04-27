@@ -4,7 +4,7 @@ import csv
 import os
 from datetime import datetime
 from flask import current_app
-from app import get_logs_connection
+from app import get_logs_connection, get_db_connection
 
 def log(user_email, user_name, log_type, error_code, log_content):
     conn = get_logs_connection()
@@ -33,28 +33,49 @@ def process_ranks_to_dict(ranks):
 
     return dict
 
-def cards_to_pptx_and_pdf(cards, message_group, output_filepath):
+def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_template=False):
     if current_app.config["is_windows"]:
         # print("Beginning replacing placeholders")
         CoInitialize()
 
         powerpoint = client.CreateObject("PowerPoint.Application")
 
-        # NEED with window to be true for text resizing to work!!!!
-        input_pptx = f"pptx_templates/{message_group}.pptx"
-        presentation = powerpoint.Presentations.Open(os.path.abspath(input_pptx), WithWindow=True)
+        # Eventually remove this once we migrate over to using dicts instead of SQLite Row objects everywhere
+        cards = [dict(row) for row in cards]
 
         num_cards = len(cards)
 
+        conn = get_db_connection()
+        attachments = conn.execute("select * from attachments where message_group=? order by id desc",
+                                        (message_group,)).fetchall()
+        conn.close()
+
+        attachment_id_to_slide_num_dict = {
+            "default": 1
+        }
+        
+        for idx, attachment in enumerate(attachments):
+            attachment_id_to_slide_num_dict[attachment['id']] = idx + 2
+
+            if override_template:
+                new_card = cards[0].copy()
+                new_card["attachment_id"] = attachment['id']
+                cards.append(new_card)
+                
+        # NEED with window to be true for text resizing to work!!!!
+        input_pptx = f"pptx_templates/{message_group}.pptx"
+        presentation = powerpoint.Presentations.Open(os.path.abspath(input_pptx), WithWindow=True)
+        
         for i, card in enumerate(cards):
-            if num_cards > 1:
+            if num_cards > 1 and not override_template:
                 if i % 100 == 0:
                     progress = round(i/num_cards*100 ,2)
                     with open(f"{output_filepath}.txt", "a") as file:
                         file.write(f"\n{progress}%")
                     print(f"{progress}% converting cards to pptx")
 
-                presentation.Slides(presentation.Slides.Count).Duplicate()
+            card_attachment_id = card["attachment_id"] if card["attachment_id"] else "default"
+            presentation.Slides(attachment_id_to_slide_num_dict[card_attachment_id]).Duplicate().MoveTo(presentation.Slides.Count)
 
             replacements_dict = {
                             "{{NET_ID}}": card["recipient_email"].split("@")[0],
@@ -63,7 +84,7 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath):
                             "{{MESSAGE}}": card["message_content"]
                         }
             # Iterate through shapes
-            for shape in presentation.Slides(presentation.Slides.Count - 1 if num_cards > 1 else presentation.Slides.Count).Shapes:
+            for shape in presentation.Slides(presentation.Slides.Count).Shapes:
                 if shape.HasTextFrame:
                     text_frame = shape.TextFrame2
                     text_range = text_frame.TextRange
@@ -77,8 +98,10 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath):
 
                     text_frame.AutoSize = 2
 
-        if num_cards > 1:
-            presentation.Slides(presentation.Slides.Count).Delete()
+        for i in range(len(attachments)+1):
+            presentation.Slides(1).Delete()
+        
+        if num_cards > 1 and not override_template:
             print("Saving PPTX...")
             presentation.SaveAs(os.path.abspath(f"{output_filepath}.pptx"))
         # print("Converting and Saving PPTX to PDF...")

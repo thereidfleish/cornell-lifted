@@ -67,12 +67,15 @@
                     <li>Select <b>Hide Cards</b> to hide the cards from the user on the website and prevent them from
                         accessing them. Do not unhide before Lifted Day!</li>
                     <li>
-                        Upload a card template in PPTX format with the proper placeholder (download a previous example
-                        to see them). You can make one in Google Slides and then download as PPTX if you'd like. Be sure
-                        to also set the <a href="https://support.google.com/docs/answer/10364036?hl=en">AutoFit settings
-                            for the textbox to <b>Shrink text on overflow</b></a>.
+                        Upload a card template in <b>PPTX format</b> with the proper placeholders (download a previous example
+                        to see them). You can make one in Google Slides and then download as PPTX. Some important notes:
+
                         <ul>
-                            <li>Be sure to test your template with the example cards!</li>
+                            <li>If you are varying your template based on card attachments, upload a multi-slide PPTX with
+                                your no-attachment default template as the first slide.  The remaining attachment-specific slides must be in the same order that the attachments appear in the Attachment Options section below!</li>
+                            <li>Set the <a href="https://support.google.com/docs/answer/10364036?hl=en">AutoFit settings
+                                    for the textbox to <b>Shrink text on overflow</b></a>.</li>
+                            <li>Test your template with the example cards</li>
 
                         </ul>
                     </li>
@@ -103,11 +106,11 @@
                             <tr>
                                 <td>{{message_group_long_name}}</td>
                                 <td>
-                                    <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-hidden-cards/{{message_group_short_name}}">
+                                    <form class="{{'admin-read-only' if admin_write_required}}" method="post"
+                                        action="/update-hidden-cards/{{message_group_short_name}}">
                                         <input class="form-check-input" type="checkbox" name="hidden-cards"
                                             value="{{message_group_short_name}}" id="{{message_group_short_name}}"
-                                            onchange="this.form.submit();" {{ "disabled" if message_group_short_name not
-                                            in pptx_templates_files }} {{ "checked" if message_group_short_name in
+                                            onchange="this.form.submit();" {{ "checked" if message_group_short_name in
                                             lifted_config.hidden_cards }}>
                                     </form>
                                 </td>
@@ -123,16 +126,17 @@
                                         href="/get-card-pdf/16193?override-template={{message_group_short_name}}"
                                         target="_blank">Test PDF (long card)</a>
                                     {% endif %}
-                                    <form class="{{'admin-read-only' if admin_write_required}}" method="post" enctype="multipart/form-data"
+                                    <form class="{{'admin-read-only' if admin_write_required}}" method="post"
+                                        enctype="multipart/form-data"
                                         action="/upload-pptx-template/{{message_group_short_name}}">
                                         <input class="form-control form-control-sm" type="file" name="file"
                                             id="pptx_template_upload" onchange="this.form.submit();"
                                             accept="application/vnd.openxmlformats-officedocument.presentationml.presentation">
-
                                     </form>
                                 </td>
                                 <td>{{message_group_short_name}}</td>
-                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/remove-message-group/{{message_group_short_name}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}"
+                                        href="/remove-message-group/{{message_group_short_name}}">🗑️</a></td>
 
                             </tr>
                             {% endfor %}
@@ -149,7 +153,8 @@
                     end the physical form.</p>
                 <p>Set this to <b>None</b> to close the form entirely.</p>
 
-                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-form-message-group">
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post"
+                    action="/update-form-message-group">
                     {{ components.message_group_radio(id="form-message-group",
                     onclick_fn="this.form.submit()",
                     checked_expr=lifted_config.form_message_group,
@@ -158,24 +163,30 @@
 
                 <h5>Attachment Options</h5>
                 <p>Add, remove, and edit attachments for the following message group</p>
-                
-                <p><b>Current Message Group:</b> Set this to the message group that people will pick an attachment for.  Set this to <b>None</b> to not allow any choosing attachments.</p>
-                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-attachment-message-group">
+
+                <p><b>Current Message Group:</b> Set this to the message group that people will pick an attachment for.
+                    Set this to <b>None</b> to not allow any choosing attachments.</p>
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post"
+                    action="/update-attachment-message-group">
                     {{ components.message_group_radio(id="attachment-message-group",
                     onclick_fn="this.form.submit()",
                     checked_expr=lifted_config.attachment_message_group,
                     show_none=True) }}
                 </form>
 
-                <p class="mb-1"><b>Add Attachments and Counts:</b> This will add for the message group selected above.</p>
-                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/add-attachment/{{lifted_config.attachment_message_group}}">
+                <p class="mb-1"><b>Add Attachments and Counts:</b> This will add for the message group selected above.
+                </p>
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post"
+                    action="/add-attachment/{{lifted_config.attachment_message_group}}">
                     <div class="d-inline-flex border border-2 rounded mb-2 p-2">
                         <div class="d-flex align-items-center ms-4">
                             <label for="attachment-name-input" class="form-label m-2">Name</label>
-                            <input type="text" class="form-control" id="attachment-name" name="attachment-name" required />
+                            <input type="text" class="form-control" id="attachment-name" name="attachment-name"
+                                required />
 
                             <label for="attachment-count-input" class="form-label m-2">Count</label>
-                            <input type="number" class="form-control" id="attachment-count" name="attachment-count" min="0" required />
+                            <input type="number" class="form-control" id="attachment-count" name="attachment-count"
+                                min="0" required />
                             <button type="submit" class="btn btn-primary ms-4 mx-2" onclick="">Add</button>
                         </div>
 
@@ -190,7 +201,7 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">Message Group</th>
                                 <th scope="col">Attachment</th>
-                                <th scope="col">Count</th>
+                                <th scope="col">Count Remaining</th>
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
@@ -201,7 +212,8 @@
                                 <td>{{ record["message_group"] }}</td>
                                 <td>{{ record["attachment"] }}</td>
                                 <td>{{ record["count"] }}</td>
-                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/delete-attachment/{{record['id']}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}"
+                                        href="/delete-attachment/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -218,7 +230,8 @@
                 <p>Set to <b>None</b> to disable. <b>Be sure to turn this off right before you export the cards as
                         PDFs!</b></p>
 
-                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/update-swapping-config">
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post"
+                    action="/update-swapping-config">
                     <div class="d-flex">
                         <div class="me-2">
                             <p><b>Swap From</b></p>
@@ -274,7 +287,8 @@
                         {{ components.tab_bar("rich-text-type-tab-bar", lifted_config.rich_text_types.keys(),
                         lifted_config.rich_text_types.values()) }}
 
-                        <div class="tab-content pt-2 {{'admin-read-only' if admin_write_required}}" id="rich-text-type-tab-content">
+                        <div class="tab-content pt-2 {{'admin-read-only' if admin_write_required}}"
+                            id="rich-text-type-tab-content">
                             {% for type_short_name, type_long_name in lifted_config.rich_text_types.items() %}
 
                             <div class="tab-pane fade{% if loop.index0 == 0 %} show active{% endif %} mt-2"
@@ -348,9 +362,10 @@
                 </div>
 
                 {{ components.confirm_modal("delete-card-modal", "Delete Message",
-                "Are you sure you want to delete this message?  This cannot be undone!  Also, consider if you want to notify the recipient that they are no longer Lifted if this is their only card.",
+                "Are you sure you want to delete this message? This cannot be undone! Also, consider if you want to
+                notify the recipient that they are no longer Lifted if this is their only card.",
                 "Delete", "anchor") }}
-                
+
                 {{ components.card_modal("card-modal", "Lifted Message", False) }}
 
                 <h5>Download All Cards as CSV, PPTX, and PDF</h5>
@@ -385,7 +400,8 @@
 
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" value="" id="pptx-pdf-checkbox">
-                    <label class="form-check-label {{'admin-read-only' if admin_write_required}}" for="pptx-pdf-checkbox">
+                    <label class="form-check-label {{'admin-read-only' if admin_write_required}}"
+                        for="pptx-pdf-checkbox">
                         Download PPTX and PDF in addition to CSV (check this to enable PPTX/PDF downloads, but uncheck
                         this if you only want a CSV)
                     </label>
@@ -495,7 +511,8 @@
                             <tr>
                                 <td>{{ admin["id"] }}</td>
                                 <td>{{ admin["write"] }}</td>
-                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/remove-admin/{{admin['id']}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}"
+                                        href="/remove-admin/{{admin['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -525,7 +542,8 @@
                                 <td>{{ record["recipient_email"] }}</td>
                                 <td>{{ record["message_group_from"] }}</td>
                                 <td>{{ record["message_group_to"] }}</td>
-                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/delete-swap-pref/{{record['id']}}">🗑️</a></td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}"
+                                        href="/delete-swap-pref/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -534,7 +552,7 @@
 
                 <h5>Attachment Prefs Table</h5>
                 <p>The attachment_prefs table. Num entries: {{ attachment_prefs | length }}</p>
-                <p>Deleting will remove the pref.</p>
+                <p>Deleting will remove the pref and automatically increase the count of the attachment.</p>
                 <div class="table-responsive mb-4">
                     <table id="attachment-prefs-table" class="table table-striped"
                         style="display: block; max-height: 300px; overflow: auto">
@@ -544,6 +562,7 @@
                                 <th scope="col">Recipient Email</th>
                                 <th scope="col">Message Group</th>
                                 <th scope="col">Attachment ID</th>
+                                <th scope="col">Attachment Name</th>
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
@@ -554,7 +573,9 @@
                                 <td>{{ record["recipient_email"] }}</td>
                                 <td>{{ record["message_group"] }}</td>
                                 <td>{{ record["attachment_id"] }}</td>
-                                <td><a class="{{'admin-read-only' if admin_write_required}}" href="/delete-attachment-pref/{{record['id']}}">🗑️</a></td>
+                                <td>{{ record["attachment"] }}</td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}"
+                                        href="/delete-attachment-pref/{{record['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
