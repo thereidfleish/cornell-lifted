@@ -64,7 +64,7 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_templa
                 
         # NEED with window to be true for text resizing to work!!!!
         input_pptx = f"pptx_templates/{message_group}.pptx"
-        presentation = powerpoint.Presentations.Open(os.path.abspath(input_pptx), WithWindow=True)
+        presentation = powerpoint.Presentations.Open(os.path.abspath(input_pptx), WithWindow=True, ReadOnly=False)
         
         for i, card in enumerate(cards):
             if num_cards > 1 and not override_template:
