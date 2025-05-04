@@ -26,7 +26,10 @@ async function getCardJson(cardId, currentUserEmail, currentMessageGroup, hidden
   
       if (!hiddenCards.includes(card["message_group"])) {
         document.getElementById('card-print-options').classList.remove('d-none');
-        document.getElementById('card-pdf-button').setAttribute("href", `/get-card-pdf/${card['id']}`)
+        const cardPDFForm = document.getElementById('card-pdf-form')
+        cardPDFForm.setAttribute("action", `/get-card-pdf/${card['id']}`)
+        cardPDFForm.querySelector("#card-pdf-button").textContent = "Download PDF"
+        cardPDFForm.querySelector("#card-pdf-button").disabled = false
       } else {
         document.getElementById('card-print-options').classList.add('d-none');
       }

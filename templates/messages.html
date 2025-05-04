@@ -215,8 +215,10 @@
                                                                     Quad before 7 PM</b> on the last day of classes
                                                                 <b>(Tuesday, May 6th)!</b>
                                                             </p>
-                                                            <p class="locked-note">Check your "You've been Lifted!"
-                                                                email for details</p>
+                                                            {% if message_group_short_name in attachment_prefs_dict %}
+                                                            <p>You'll also receive a <b>{{attachment_prefs_dict[message_group_short_name]["attachment"]}}</b> alongside your cards!</p>
+                                                            {% endif %}
+                                                            <p class="locked-note">Keep an eye on your email for details!</p>
 
                                                             {% if lifted_config.attachment_message_group ==
                                                             message_group_short_name %}
@@ -231,15 +233,15 @@
                                                                         received_message_count|pluralize() }}, leave this blank.  Hard deadline to select an attachment is <b>Sunday 4/27/25 at 11:59 PM!</b></p>
                                                                 <form method="post" action="/set-attachment-pref">
                                                                     {% for attachment in attachments %}
+                                                                    {% set checked = message_group_short_name in attachment_prefs_dict and attachment['id']==attachment_prefs_dict[message_group_short_name]['attachment_id'] %}
                                                                     <div
-                                                                        class="attachment-option {% if attachment['id']==attachment_pref['attachment_id'] %}checked{% endif %} {% if attachment['count'] < 1 %}disabled{% endif %}">
+                                                                        class="attachment-option {% if checked %}checked{% endif %} {% if attachment['count'] < 1 %}disabled{% endif %}">
                                                                         <div class="attachment-radio">
                                                                             <input class="form-check-input" type="radio"
                                                                                 name="id" value="{{ attachment['id'] }}"
                                                                                 id="attachment_{{ attachment['id'] }}"
                                                                                 onchange="this.form.submit();" required
-                                                                                {{ "checked" if
-                                                                                attachment["id"]==attachment_pref["attachment_id"]
+                                                                                {{ "checked" if checked
                                                                                 }} {{ "disabled" if attachment["count"]
                                                                                 < 1 }}>
                                                                             <span class="radio-custom"></span>
@@ -255,8 +257,8 @@
                                                                         </label>
                                                                     </div>
                                                                     {% endfor %}
-                                                                    {% if attachment_pref %}
-                                                                    <p class="mb-0 mt-3 text-start"><a href="/delete-attachment-pref/{{attachment_pref['id']}}">Clear Selection</a></p>
+                                                                    {% if message_group_short_name in attachment_prefs_dict %}
+                                                                    <p class="mb-0 mt-3 text-start"><a href="/delete-attachment-pref/{{attachment_prefs_dict[message_group_short_name]['id']}}">Clear Selection</a></p>
                                                                     {% endif %}
                                                                 </form>
                                                             </div>

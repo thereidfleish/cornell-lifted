@@ -136,7 +136,7 @@
         </div>
 
         <div class="footer-bottom text-center">
-            <p>Version 3.2 (4/27/25) | <a href="https://reidserver.statuspage.io" target="_blank">System Status</a> | <a href="/about-this-website">About this Website</a></p>
+            <p>Version 3.2.1 (5/3/25) | <a href="https://reidserver.statuspage.io" target="_blank">System Status</a> | <a href="/about-this-website">About this Website</a></p>
             <p>© 2025 Lifted at Cornell</p>
             <p class="mt-1">This organization is a registered student organization of Cornell University.</p>
             <p class="mb-0">Made with 💌 by <a style="text-decoration: none;" href="/circle">🐏</a></p>
@@ -267,7 +267,10 @@
                 <p>If you'd like to print your card, we suggest either printing with 100% size on normal
                     paper and
                     cutting it out, or inserting a properly sized card into your printer!</p>
-                <a id="card-pdf-button" class="btn btn-primary mb-3" target="_blank">Download PDF</a>
+                    <form id="card-pdf-form">
+                        <button id="card-pdf-button" class="btn btn-primary mb-3" onclick="this.form.submit(); this.innerText='Generating PDF...'; this.disabled=true;"></button>
+                    </form>
+                
 
                 <div class="card mt-3">
                     <div class="card-body">

@@ -12,3 +12,4 @@ db/init_db.ipynb
 /pptx_templates
 .env
 db/logs.db
+/single_card_output

@@ -44,7 +44,7 @@ def faqs():
 
 @core.get("/about-this-website")
 def about_this_website():
-    helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed About This Website")
+    # helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed About This Website")
     return render_template("about-this-website.html")
 
 @core.get("/messages")
@@ -71,8 +71,10 @@ def messages():
         current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
         attachments = conn.execute("select * from attachments where message_group=? order by id desc", (current_attachment_message_group,)).fetchall()
-        attachment_pref = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
-                                       (current_user.email, current_attachment_message_group)).fetchone()
+        attachment_prefs = conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id where recipient_email=?",
+                                       (current_user.email,)).fetchall()
+        
+        attachment_prefs_dict = helpers.process_attachment_prefs_to_dict(attachment_prefs)
 
         conn.close()
 
@@ -83,7 +85,7 @@ def messages():
             cards_dict=cards_dict,
             ranks_dict=ranks_dict,
             attachments=attachments,
-            attachment_pref=attachment_pref,
+            attachment_prefs_dict=attachment_prefs_dict,
             message_confirmation=request.args.get("message_confirmation"),
             recipient_email=request.args.get("recipient_email")
             )
@@ -197,14 +199,23 @@ def get_card_pdf(id):
             abort(401, "Hidden Card")
 
     override_template = request.args.get("override-template", False)
+    message_group = override_template if override_template else card['message_group']
+
+    filepath = os.path.join("single_card_output", message_group, id)
+    download_name=f"Lifted Message #{id} From {card["sender_email"]}"
+
+    # Get a cached version if it exists, otherwise get a fresh copy via pptx
+    if os.path.isfile(filepath + ".pdf") and not override_template:
+        return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
+
     helpers.cards_to_pptx_and_pdf(cards=[card],
-                                  message_group=override_template if override_template else card['message_group'],
-                                  output_filepath=f"tmp_output/{id}",
+                                  message_group=message_group,
+                                  output_filepath=filepath,
                                   override_template=True if override_template else False)
 
     # helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
 
-    return send_file(f"tmp_output/{id}.pdf", download_name=f"Lifted Message #{id}", mimetype='application/pdf')
+    return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
 
 def check_if_can_edit_or_delete(card):
     if is_admin(write_required=True) == False:
@@ -455,7 +466,7 @@ def swap_messages():
 
     # Delete attachment pref if there is one
     attachment_pref = conn.execute("select * from attachment_prefs where recipient_email=? and message_group=?",
-                                       (current_user.email, current_app.config["lifted_config"]["attachment_message_group"])).fetchone()
+                                       (current_user.email, current_app.config["lifted_config"]["swap_from"])).fetchone()
     if attachment_pref:
         conn.execute("update attachments set count=count+1 where id=?", (attachment_pref["attachment_id"],))
         conn.execute('delete from attachment_prefs where id = ?', (attachment_pref["id"],))

@@ -33,6 +33,14 @@ def process_ranks_to_dict(ranks):
 
     return dict
 
+def process_attachment_prefs_to_dict(attachment_prefs):
+    dict = {}
+
+    for attachment_pref in attachment_prefs:
+        dict[attachment_pref["message_group"]] = attachment_pref
+
+    return dict
+
 def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_template=False):
     if current_app.config["is_windows"]:
         # print("Beginning replacing placeholders")
@@ -60,6 +68,7 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_templa
             if override_template:
                 new_card = cards[0].copy()
                 new_card["attachment_id"] = attachment['id']
+                new_card["attachment"] = attachment['attachment']
                 cards.append(new_card)
                 
         # NEED with window to be true for text resizing to work!!!!
@@ -75,13 +84,16 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_templa
                     print(f"{progress}% converting cards to pptx")
 
             card_attachment_id = card["attachment_id"] if card["attachment_id"] else "default"
+            card_attachment_name = card["attachment"] if card["attachment_id"] else "default"
+            message_content = "This template is for: " + card_attachment_name + "\n\n" + card["message_content"] if override_template else card["message_content"]
+
             presentation.Slides(attachment_id_to_slide_num_dict[card_attachment_id]).Duplicate().MoveTo(presentation.Slides.Count)
 
             replacements_dict = {
                             "{{NET_ID}}": card["recipient_email"].split("@")[0],
                             "{{RECIPIENT_NAME}}": card["recipient_name"],
                             "{{SENDER_NAME}}": card["sender_name"],
-                            "{{MESSAGE}}": card["message_content"]
+                            "{{MESSAGE}}": message_content
                         }
             # Iterate through shapes
             for shape in presentation.Slides(presentation.Slides.Count).Shapes:
@@ -101,6 +113,9 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_templa
         for i in range(len(attachments)+1):
             presentation.Slides(1).Delete()
         
+        if not os.path.exists(os.path.dirname(output_filepath)):
+            os.makedirs(os.path.dirname(output_filepath))
+        
         if num_cards > 1 and not override_template:
             print("Saving PPTX...")
             presentation.SaveAs(os.path.abspath(f"{output_filepath}.pptx"))
@@ -109,23 +124,9 @@ def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_templa
         presentation.Close()
         # print("Done!")
         # powerpoint.Quit()
-        # CoUninitialize()
+        CoUninitialize()
     else:
-        """
-        Mac-compatible version - just logs actions without actually generating files
-        For development/testing purposes only
-        """
-        print("Mac-compatible version: Would generate PPTX and PDF here")
-        print(f"Would process {len(cards)} cards for message group '{message_group}'")
-        print(f"Would save to {output_filepath}.pptx and {output_filepath}.pdf")
-        
-        # Create a dummy text file to simulate progress tracking
-        with open(f"{output_filepath}.txt", "a") as file:
-            file.write(f"\n100%")
-        
-        # Create empty PDF file for testing purposes
-        with open(f"{output_filepath}.pdf", "w") as file:
-            file.write("This is a placeholder PDF file for Mac testing")
+        print("Mac - no functionality")
 
 def create_csv(cards, output_path):
     with open(output_path + ".csv", 'w', newline="", encoding="utf-8") as csvfile:
