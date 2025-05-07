@@ -1,5 +1,5 @@
 // Load card content by fetching the card JSON
-async function getCardJson(cardId, currentUserEmail, currentMessageGroup, hiddenCards) {
+async function getCardJson(cardId, currentUserEmail, currentMessageGroup, hiddenCards, hiddenMessageOverrides) {
     const response = await fetch(`/get-card-json/${cardId}`);
       if (!response.ok) {
           document.getElementById('card-message-content').textContent = 'Error loading message. Try refreshing the page or try again later.  Please report this to lifted@cornell.edu!!';
@@ -24,7 +24,7 @@ async function getCardJson(cardId, currentUserEmail, currentMessageGroup, hidden
         document.getElementById('card-edit-delete-options').classList.add('d-none');
       }
   
-      if (!hiddenCards.includes(card["message_group"])) {
+      if (!hiddenCards.includes(card["message_group"]) || hiddenMessageOverrides.includes(card["message_group"])) {
         document.getElementById('card-print-options').classList.remove('d-none');
         const cardPDFForm = document.getElementById('card-pdf-form')
         cardPDFForm.setAttribute("action", `/get-card-pdf/${card['id']}`)

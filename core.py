@@ -76,6 +76,11 @@ def messages():
         
         attachment_prefs_dict = helpers.process_attachment_prefs_to_dict(attachment_prefs)
 
+        hidden_card_overrides = conn.execute("select message_group from hidden_card_overrides where recipient_email=?",
+                                       (current_user.email,)).fetchall()
+        
+        hidden_card_overrides = [i["message_group"] for i in hidden_card_overrides]
+
         conn.close()
 
         # helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed Messages Page")
@@ -86,8 +91,9 @@ def messages():
             ranks_dict=ranks_dict,
             attachments=attachments,
             attachment_prefs_dict=attachment_prefs_dict,
+            hidden_card_overrides=hidden_card_overrides,
             message_confirmation=request.args.get("message_confirmation"),
-            recipient_email=request.args.get("recipient_email")
+            recipient_email=request.args.get("recipient_email"),
             )
     else:
         return render_template('messages.html')
@@ -147,17 +153,26 @@ def get_card(id):
              left join attachments on attachment_prefs.attachment_id = attachments.id
              where messages.id=?"""
     card = conn.execute(sql, (id,)).fetchone()
+
+    hidden_card_overrides = conn.execute("select message_group from hidden_card_overrides where recipient_email=?",
+                                       (current_user.email,)).fetchall()
+        
+    hidden_card_overrides = [i["message_group"] for i in hidden_card_overrides]
+
     conn.close()
 
     if card is None:
         abort(404, "Card DNE")
     
-    return card
+
+
+    
+    return card, hidden_card_overrides
 
 @core.route("/get-card-json/<id>")
 @login_required
 def get_card_json(id):
-    card = get_card(id)
+    card, hidden_card_overrides = get_card(id)
 
     # First check if the user is an admin.  If so, they can bypass all the remaining checks
     if is_admin(write_required=False) == False:
@@ -165,7 +180,7 @@ def get_card_json(id):
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
             abort(401, "Not your card")
         # So now we know the user is affiliated with the message in some way.  However, if the cards are hidden and the user was not a sender of the card, abort
-        elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"] and card["sender_email"] != current_user.email:
+        elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"] and card["message_group"] not in hidden_card_overrides and card["sender_email"] != current_user.email:
             abort(401, "Hidden Card")
     
     card_json = {
@@ -187,7 +202,7 @@ def get_card_json(id):
 @core.route("/get-card-pdf/<id>")
 @login_required
 def get_card_pdf(id):
-    card = get_card(id)
+    card, hidden_card_overrides = get_card(id)
     
     # note: THE LOGIC HERE IS SLIGHTLY DIFFERENT THAN FOR HTML, since we don't want anyone downloading a PDF before its unhidden
     if is_admin(write_required=False) == False:
@@ -195,7 +210,7 @@ def get_card_pdf(id):
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
             abort(401, "Not your card")
         # So now we know the user is affiliated with the message in some way.  However, if the cards are hidden, abort
-        elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"]:
+        elif card["message_group"] in current_app.config["lifted_config"]["hidden_cards"] and card["message_group"] not in hidden_card_overrides:
             abort(401, "Hidden Card")
 
     override_template = request.args.get("override-template", False)

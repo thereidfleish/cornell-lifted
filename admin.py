@@ -68,23 +68,21 @@ def admin_page():
             if "~" not in stem and ext in all_cards_files_dict[stem]["to_process"]:
                 all_cards_files_dict[stem]["done"] += ext + ", "
     
-    # Admins Table
     conn = get_db_connection()
+
+    # Admins Table
     admins = conn.execute("select * from admins").fetchall()
-    conn.close()
+
+    # Hidden Message Overrides Table
+    hidden_card_overrides = conn.execute("select * from hidden_card_overrides").fetchall()
     
     # Swap Prefs Table
-    conn = get_db_connection()
     swap_prefs = conn.execute("select * from swap_prefs").fetchall()
-    conn.close()
 
     # Attachments Table
-    conn = get_db_connection()
     attachments = conn.execute("select * from attachments order by id desc").fetchall()
-    conn.close()
 
     # Attachment Prefs Table
-    conn = get_db_connection()
     attachment_prefs = conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id").fetchall()
     conn.close()
 
@@ -92,6 +90,7 @@ def admin_page():
                            all_cards_files_dict=all_cards_files_dict,
                            pptx_templates_files=pptx_templates_files,
                            admins=admins,
+                           hidden_card_overrides=hidden_card_overrides,
                            swap_prefs=swap_prefs,
                            attachments=attachments,
                            attachment_prefs=attachment_prefs)
@@ -412,6 +411,31 @@ def add_admin():
 def remove_admin(id):
     conn = get_db_connection()
     conn.execute('delete from admins where id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin.admin_page'))
+
+@admin.post("/add-hidden-card-override")
+@login_required
+@admin_required(write_required=True)
+def add_hidden_card_override():
+    message_group = request.form["hidden-card-message-group-input"]
+    recipient_email = request.form["hidden-card-email-input"]
+
+    conn = get_db_connection()
+    conn.execute("insert into hidden_card_overrides (recipient_email, message_group) values (?, ?)",
+                 (recipient_email, message_group))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('admin.admin_page'))
+
+@admin.route("/remove-hidden-card-override/<id>")
+@login_required
+@admin_required(write_required=True)
+def remove_hidden_card_override(id):
+    conn = get_db_connection()
+    conn.execute('delete from hidden_card_overrides where id = ?', (id,))
     conn.commit()
     conn.close()
     return redirect(url_for('admin.admin_page'))

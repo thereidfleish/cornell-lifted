@@ -197,7 +197,7 @@
                                                         </div>
                                                         {% endif %}
 
-                                                        {% if message_group_short_name in lifted_config.hidden_cards %}
+                                                        {% if message_group_short_name in lifted_config.hidden_cards and message_group_short_name not in hidden_card_overrides %}
                                                         <!-- WARNING: This loop condition only holds true if the latest sem contains both a physical AND eLifted.  For the future, make this work regardless -->
                                                         {% if loop.index > 2 %}
                                                         <div class="locked-message">
@@ -287,7 +287,7 @@
                                                             %}
                                                             <button type="button" class="message-thumbnail"
                                                                 data-bs-toggle="modal" data-bs-target="#card-modal"
-                                                                onclick="getCardJson('{{ card.id }}', '{{ current_user.email }}', '{{lifted_config.form_message_group}}', {{lifted_config.hidden_cards}})">
+                                                                onclick="getCardJson('{{ card.id }}', '{{ current_user.email }}', '{{lifted_config.form_message_group}}', {{lifted_config.hidden_cards}}, {{hidden_card_overrides}})">
                                                                 <div class="thumbnail-content">
                                                                     <div class="message-icon-img" id="{{ card['id'] }}">
                                                                         💌
@@ -332,7 +332,7 @@
                                                         {% for card in cards_dict['sent'][message_group_short_name] %}
                                                         <button type="button" class="message-thumbnail"
                                                             data-bs-toggle="modal" data-bs-target="#card-modal"
-                                                            onclick="getCardJson('{{ card.id }}', '{{ current_user.email }}', '{{lifted_config.form_message_group}}', {{lifted_config.hidden_cards}})">
+                                                            onclick="getCardJson('{{ card.id }}', '{{ current_user.email }}', '{{lifted_config.form_message_group}}', {{lifted_config.hidden_cards}}, {{hidden_card_overrides}})">
                                                             <div class="thumbnail-content">
                                                                 <div class="message-icon-img" id="{{ card['id'] }}">💌
                                                                 </div>

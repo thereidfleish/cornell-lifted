@@ -38,6 +38,14 @@
 --     attachment_id INTEGER NOT NULL
 -- );
 
+-- DROP TABLE IF EXISTS hidden_card_overrides;
+
+-- CREATE TABLE hidden_card_overrides (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     recipient_email TEXT NOT NULL,
+--     message_group TEXT NOT NULL
+-- );
+
 -- DROP TABLE IF EXISTS admins;
 
 -- CREATE TABLE admins (

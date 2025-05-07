@@ -479,19 +479,25 @@
                     </div>
                 </form>
 
-                <h5>Admins</h5>
-                <p>Add and remove admins by NetID. Admins have access to the Admin Dashboard, and can view, edit, and
-                    delete any and all Lifted messages. In other words, you have a lot of power - admins should only be
-                    (trusted) CP members!</p>
-                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/add-admin">
+                <h5>Hidden Card Overrides</h5>
+                <p>Use this tool to override hidden cards for specific message groups (add msg grp select functionality next).  </p>
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/add-hidden-card-override">
                     <div class="d-inline-flex border border-2 rounded mb-2 p-2">
-                        <div class="d-flex align-items-center ms-4">
-                            <label for="admin-netid-input" class="form-label m-2">NetID</label>
-                            <input type="text" class="form-control" id="admin_netid" name="admin_netid" required />
+                        <div class="d-flex align-items-center">
+                            {{ components.message_group_dropdown(dropdown_id="hidden-card-message-group-dropdown",
+                            keys=lifted_config.message_group_list_map.keys(),
+                            values=lifted_config.message_group_list_map.values(),
+                            default_key=lifted_config.message_group_list_map.keys()|first,
+                            default_value=lifted_config.message_group_list_map.values()|first,
+                            onclick_fn="document.getElementById('hidden-card-message-group-input').value = document.getElementById('hidden-card-message-group-dropdown').dataset.short_name",
+                            show_all_time=False) }}
 
-                            <label for="admin-write-checkbox" class="form-label m-2">Write Perm</label>
-                            <input type="checkbox" id="admin_write_perm" name="admin_write_perm">
-                            <button type="submit" class="btn btn-primary ms-4 mx-2">Add Admin</button>
+                            <input type="hidden" id="hidden-card-message-group-input" name="hidden-card-message-group-input" value="{{lifted_config.message_group_list_map.keys()|first}}">
+
+                            <label for="hidden-card-email-input" class="form-label m-2">Email</label>
+                            <input type="text" class="form-control" id="hidden-card-email-input" name="hidden-card-email-input" required />
+
+                            <button type="submit" class="btn btn-primary ms-4 mx-2">Add Override</button>
                         </div>
 
                     </div>
@@ -501,18 +507,20 @@
                         style="display: block; max-height: 300px; overflow: auto">
                         <thead>
                             <tr style="position: sticky; top: 0;">
-                                <th scope="col">NetID</th>
-                                <th scope="col">Write Perm</th>
+                                <th scope="col">ID</th>
+                                <th scope="col">Message Group</th>
+                                <th scope="col">Recipient Email</th>
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for admin in admins %}
+                            {% for hidden_card_override in hidden_card_overrides %}
                             <tr>
-                                <td>{{ admin["id"] }}</td>
-                                <td>{{ admin["write"] }}</td>
+                                <td>{{ hidden_card_override["id"] }}</td>
+                                <td>{{ hidden_card_override["message_group"] }}</td>
+                                <td>{{ hidden_card_override["recipient_email"] }}</td>
                                 <td><a class="{{'admin-read-only' if admin_write_required}}"
-                                        href="/remove-admin/{{admin['id']}}">🗑️</a></td>
+                                        href="/remove-hidden-card-override/{{hidden_card_override['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -576,6 +584,46 @@
                                 <td>{{ record["attachment"] }}</td>
                                 <td><a class="{{'admin-read-only' if admin_write_required}}"
                                         href="/delete-attachment-pref/{{record['id']}}">🗑️</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h5>Admins</h5>
+                <p>Add and remove admins by NetID. Admins have access to the Admin Dashboard, and can view, edit, and
+                    delete any and all Lifted messages. In other words, you have a lot of power - admins should only be
+                    (trusted) CP members!</p>
+                <form class="{{'admin-read-only' if admin_write_required}}" method="post" action="/add-admin">
+                    <div class="d-inline-flex border border-2 rounded mb-2 p-2">
+                        <div class="d-flex align-items-center ms-4">
+                            <label for="admin-netid-input" class="form-label m-2">NetID</label>
+                            <input type="text" class="form-control" id="admin_netid" name="admin_netid" required />
+
+                            <label for="admin-write-checkbox" class="form-label m-2">Write Perm</label>
+                            <input type="checkbox" id="admin_write_perm" name="admin_write_perm">
+                            <button type="submit" class="btn btn-primary ms-4 mx-2">Add Admin</button>
+                        </div>
+
+                    </div>
+                </form>
+                <div class="table-responsive mb-4">
+                    <table id="admins-table" class="table table-striped"
+                        style="display: block; max-height: 300px; overflow: auto">
+                        <thead>
+                            <tr style="position: sticky; top: 0;">
+                                <th scope="col">NetID</th>
+                                <th scope="col">Write Perm</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin in admins %}
+                            <tr>
+                                <td>{{ admin["id"] }}</td>
+                                <td>{{ admin["write"] }}</td>
+                                <td><a class="{{'admin-read-only' if admin_write_required}}"
+                                        href="/remove-admin/{{admin['id']}}">🗑️</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
