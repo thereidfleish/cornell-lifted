@@ -41,6 +41,7 @@
             <div class="d-none d-lg-flex align-items-center">
                 <div class="nav-links me-4">
                     <a href="/faqs" class="btn btn-link">FAQs</a>
+                    <a href="/popped" class="btn btn-link">Popped</a>
                     {% if current_user.is_authenticated and is_admin(write_required=False) %}
                     <a href="/admin" class="btn btn-link">Admin</a>
                     {% endif %}
@@ -59,6 +60,7 @@
         <div class="container py-3">
             <div class="nav-links mb-3">
                 <a href="/faqs" class="btn btn-link d-block text-start py-2">FAQs</a>
+                <a href="/popped" class="btn btn-link d-block text-start py-2">Popped</a>
                 {% if current_user.is_authenticated and is_admin(write_required=False) %}
                 <a href="/admin" class="btn btn-link d-block text-start py-2">Admin</a>
                 {% endif %}
@@ -136,7 +138,8 @@
         </div>
 
         <div class="footer-bottom text-center">
-            <p>Version 3.2.2 (5/7/25) | <a href="https://reidserver.statuspage.io" target="_blank">System Status</a> | <a href="/about-this-website">About this Website</a></p>
+            <p>Version 3.2.3 (6/4/25) | <a href="https://reidserver.statuspage.io" target="_blank">System Status</a> |
+                <a href="/about-this-website">About this Website</a></p>
             <p>© 2025 Lifted at Cornell</p>
             <p class="mt-1">This organization is a registered student organization of Cornell University.</p>
             <p class="mb-0">Made with 💌 by <a style="text-decoration: none;" href="/circle">🐏</a></p>
@@ -145,7 +148,7 @@
 </footer>
 {%- endmacro %}
 
-{% macro img_carousel(id, img_count, folder_path) %}
+{% macro img_carousel(id, img_count, folder_path, format) %}
 <div id="{{id}}" class="carousel slide">
     <div class="carousel-indicators">
         {% for i in range(1, img_count + 1) %}
@@ -157,11 +160,23 @@
     <div class="carousel-inner">
         {% for i in range(1, img_count + 1) %}
         <div class="{{'carousel-item active' if loop.index0 == 0 else 'carousel-item'}}">
-            <img src="{{folder_path}}/{{i}}.jpg" class="d-block w-100" alt="...">
+            <img src="{{folder_path}}/{{i}}.{{format}}" class="d-block w-100" alt="...">
         </div>
         {% endfor %}
     </div>
 </div>
+{% if img_count > 1 %}
+<button class="carousel-control-prev custom-carousel-control" type="button" data-bs-target="#{{id}}"
+    data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+</button>
+<button class="carousel-control-next custom-carousel-control" type="button" data-bs-target="#{{id}}"
+    data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+</button>
+{% endif %}
 {%- endmacro %}
 
 {% macro accordion(id, content) %}
@@ -267,10 +282,11 @@
                 <p>If you'd like to print your card, we suggest either printing with 100% size on normal
                     paper and
                     cutting it out, or inserting a properly sized card into your printer!</p>
-                    <form id="card-pdf-form">
-                        <button id="card-pdf-button" class="btn btn-primary mb-3" onclick="this.form.submit(); this.innerText='Generating PDF...'; this.disabled=true;"></button>
-                    </form>
-                
+                <form id="card-pdf-form">
+                    <button id="card-pdf-button" class="btn btn-primary mb-3"
+                        onclick="this.form.submit(); this.innerText='Generating PDF...'; this.disabled=true;"></button>
+                </form>
+
 
                 <div class="card mt-3">
                     <div class="card-body">

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% import 'components.html' as components with context %}
+
+<head>
+    {{ components.header("Cornell Lifted - Popped") }}
+</head>
+
+<body class="faq-page">
+    <!-- Sticky Navigation Bar -->
+    {{ components.sticky_navbar() }}
+
+    <section class="section-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="text-center mb-5">
+                        <img class="mx-auto d-block" src="/static/images/logo.png" width="300"
+                            alt="Cornell Lifted Logo" />
+                    </div>
+
+                    <h2 class="section-title">Lifted Popped</h2>
+                    <p class="section-subtitle">Stats and fun facts from each semester's Lifted</p>
+
+                    <div class="form-container">
+                        <p class="text-center mb-0 mt-2">Use the arrows to scroll through the pages of stats and fun facts!</p>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2025</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_25", carousel["sp_25"], "static/popped/sp_25", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2025.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Fall 2024</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("fa_24", carousel["fa_24"], "static/popped/fa_24", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Fall_2024.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2024</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_24", carousel["sp_24"], "static/popped/sp_24", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2024.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <p class="text-center mb-0 mt-2">We present limited stats for Spring 2023 and earlier</p>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2023</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_23", carousel["sp_23"], "static/popped/sp_23", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2023.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+                        
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2022</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_22", carousel["sp_22"], "static/popped/sp_22", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2022.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2021</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_21", carousel["sp_21"], "static/popped/sp_21", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2021.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2020</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_20", carousel["sp_20"], "static/popped/sp_20", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2020.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2019</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_19", carousel["sp_19"], "static/popped/sp_19", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2019.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <div class="col-md-8 carousel-container mx-auto p-3">
+                            <h3 class="blue-text mb-3">Spring 2018</h3>
+                            <div class="position-relative">
+                                {{ components.img_carousel("sp_18", carousel["sp_18"], "static/popped/sp_18", "png") }}
+                            </div>
+                            <a href="/static/popped/Lifted_Popped_Spring_2018.pdf" class="mt-2 btn btn-secondary btn-sm" target="_blank">View as PDF</a>
+                        </div>
+
+                        <p class="text-center mb-0 mt-2">Fun Fact: The first two Lifted iterations, Spring 2016 and Spring 2017, involved students writing hand-written cards to others!  We are currently trying to locate copies of these, but till then, you won't see any stats from those years.</p>
+                        
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    {{ components.footer() }}
+
+    <script src="/static/scripts/scripts.js"></script>
+    <script src="/static/scripts/themes.js"></script>
+    <script src="/static/scripts/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

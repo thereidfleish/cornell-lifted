@@ -27,8 +27,8 @@
                     {% if lifted_config["form_message_group"] == "none" %}
                     <div class="hero-cta">
                         <a class="btn btn-primary btn-lg disabled" href="/send-message">Send a Lifted Message</a>
-                        <p class="mt-3">The Lifted submission form is now closed. Keep an eye out in April 2025 for
-                            this semester's Lifted event!</p>
+                        <p class="mt-3">The Lifted submission form is now closed. Keep an eye out for the next semester's Lifted
+                event!</p>
                     </div>
                     {% else %}
                     <div class="hero-cta">
@@ -65,16 +65,16 @@
                         <h3 class="text-center mb-4">Our Impact Since 2016</h3>
                         <div class="row">
                             <div class="col-md-4 stat-item">
+                                <div class="stat-number">{{ "{:,}".format(stats["total_received"]) }}+</div>
+                                <div class="stat-label">Cards Written</div>
+                            </div>
+                            <div class="col-md-4 stat-item">
                                 <div class="stat-number">{{ "{:,}".format(stats["unique_sent"]) }}+</div>
                                 <div class="stat-label">Unique Senders</div>
                             </div>
                             <div class="col-md-4 stat-item">
                                 <div class="stat-number">{{ "{:,}".format(stats["unique_received"]) }}+</div>
                                 <div class="stat-label">Unique Recipients</div>
-                            </div>
-                            <div class="col-md-4 stat-item">
-                                <div class="stat-number">{{ "{:,}".format(stats["total_received"]) }}+</div>
-                                <div class="stat-label">Cards Written</div>
                             </div>
                         </div>
                     </div>
@@ -128,34 +128,14 @@
                 <div class="col-md-6 carousel-container">
                     <h5 class="text-center">Fall Edition</h5>
                     <div class="position-relative">
-                        {{ components.img_carousel("fall_carousel", carousel["fall"], "static/images/home_fall") }}
-                        <button class="carousel-control-prev custom-carousel-control" type="button"
-                            data-bs-target="#fall_carousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next custom-carousel-control" type="button"
-                            data-bs-target="#fall_carousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
+                        {{ components.img_carousel("fall_carousel", carousel["fall"], "static/images/home_fall", "jpg") }}
+                        
                     </div>
                 </div>
                 <div class="col-md-6 carousel-container">
                     <h5 class="text-center pink-text">Spring Edition</h5>
                     <div class="position-relative">
-                        {{ components.img_carousel("spring_carousel", carousel["spring"], "static/images/home_spring")
-                        }}
-                        <button class="carousel-control-prev custom-carousel-control" type="button"
-                            data-bs-target="#spring_carousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next custom-carousel-control" type="button"
-                            data-bs-target="#spring_carousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
+                        {{ components.img_carousel("spring_carousel", carousel["spring"], "static/images/home_spring", "jpg") }}
                     </div>
                 </div>
             </div>
@@ -195,7 +175,7 @@
             <a href="/send-message" class="btn cta-btn">Send a Lifted Message Now</a>
             {% else %}
             <p>
-                The Lifted submission form is now closed. Keep an eye out in April 2025 for this semester's Lifted
+                The Lifted submission form is now closed. Keep an eye out for the next semester's Lifted
                 event!
             </p>
             {% endif %}

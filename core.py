@@ -38,6 +38,14 @@ def home():
 
     return render_template('index.html', stats=stats, helpers=helpers, carousel=carousel)
 
+@core.get("/popped")
+def popped():
+    root = 'static/popped/'
+    folders = next(os.walk(root))[1]
+    carousel = { folder: len([f for f in os.listdir(root + folder) if not f.startswith('.')]) for folder in folders }
+
+    return render_template('popped.html', carousel=carousel)
+
 @core.get("/faqs")
 def faqs():
     return render_template("faqs.html", helpers=helpers)
@@ -164,8 +172,6 @@ def get_card(id):
     if card is None:
         abort(404, "Card DNE")
     
-
-
     
     return card, hidden_card_overrides
 
@@ -244,7 +250,7 @@ def check_if_can_edit_or_delete(card):
 @core.route("/edit-message/<id>", methods=["GET", "POST"])
 @login_required
 def edit_message(id):
-    card = get_card(id)
+    card, hidden_card_overrides = get_card(id)
 
     check_if_can_edit_or_delete(card)
 
