@@ -19,7 +19,7 @@ def create_app():
     app = Flask(__name__)
 
     ### COMMENT OUT BEFORE DEPLOYING!!!!! ###
-    app.debug = True
+    # app.debug = True
 
     ### Put T/F for if windows or mac!!!!! ###
     is_windows = True

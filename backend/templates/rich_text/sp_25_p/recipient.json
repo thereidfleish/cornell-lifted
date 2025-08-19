@@ -1,0 +1,138 @@
+{
+    "ops": [
+        {
+            "insert": "{{LOGO}}\n\n"
+        },
+        {
+            "attributes": {
+                "bold": true
+            },
+            "insert": "Someone at Cornell wrote you a Lifted message! \ud83d\udc8c"
+        },
+        {
+            "insert": "\n\nWe can't tell you who it is yet (it's a secret), but we can tell you that you're appreciated!\n\nYour message will be posted on a notecard (for you to keep!) on the "
+        },
+        {
+            "attributes": {
+                "underline": true
+            },
+            "insert": "Arts Quad"
+        },
+        {
+            "insert": " on the last day of classes ("
+        },
+        {
+            "attributes": {
+                "bold": true
+            },
+            "insert": "Tuesday, May 6th"
+        },
+        {
+            "insert": "), along with a balloon, flower, pinwheel, or more to celebrate the end of the semester.\n\n"
+        },
+        {
+            "attributes": {
+                "bold": true
+            },
+            "insert": "Can't make it to the Arts Quad by 7 PM on the last day of classes?  Not in Ithaca?"
+        },
+        {
+            "insert": "\n"
+        },
+        {
+            "attributes": {
+                "link": "https://cornelllifted.com/messages"
+            },
+            "insert": "Get your physical cards delivered virtually on the last day of classes instead"
+        },
+        {
+            "insert": ".  Hard deadline to request this is "
+        },
+        {
+            "attributes": {
+                "bold": true
+            },
+            "insert": "Sunday, April 27th at 11:59 PM."
+        },
+        {
+            "insert": "  If you don't do this, you won't be able to view them virtually.\n\nSpread the love by writing your own eLifted message to a friend, staff, or faculty member who has made your year better.  "
+        },
+        {
+            "attributes": {
+                "bold": true
+            },
+            "insert": "The form closes on Monday, May 5th at 11:59 PM!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
+                "link": "https://cornelllifted.com/send-message",
+                "underline": true,
+                "bold": true
+            },
+            "insert": "Send an eLifted Message"
+        },
+        {
+            "attributes": {
+                "align": "center"
+            },
+            "insert": "\n"
+        },
+        {
+            "insert": "\nLooking to send a physical Lifted message? Unfortunately, the physical Lifted message form closed on April 25th, but you are encouraged to send as many eLifted messages as you'd like!\n\nSee you then,\nCornell Lifted \ud83c\udf88\n\nP.S. New this year, you'll get a chance to pick whether you receive a balloon, flower, pinwheel, and more!  You'll be able to "
+        },
+        {
+            "attributes": {
+                "link": "https://cornelllifted.com/messages"
+            },
+            "insert": "choose"
+        },
+        {
+            "insert": " starting "
+        },
+        {
+            "attributes": {
+                "bold": true
+            },
+            "insert": "April 26th at 12:00 AM"
+        },
+        {
+            "insert": " right after the form closes \u2014 first come, first serve!\n\nCheck us out at our Instagram "
+        },
+        {
+            "attributes": {
+                "link": "https://www.instagram.com/cornelllifted"
+            },
+            "insert": "@cornelllifted"
+        },
+        {
+            "insert": " and on our website "
+        },
+        {
+            "attributes": {
+                "link": "https://cornelllifted.com/"
+            },
+            "insert": "cornelllifted.com"
+        },
+        {
+            "insert": "\nRead more about Lifted here: "
+        },
+        {
+            "attributes": {
+                "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+            },
+            "insert": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
+        },
+        {
+            "insert": "\n\nMade with \ud83d\udc8c by the Lifted Team"
+        },
+        {
+            "attributes": {
+                "align": "center"
+            },
+            "insert": "\n"
+        }
+    ]
+}

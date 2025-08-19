@@ -2,7 +2,7 @@
     "ops": [
         {
             "attributes": {
-                "font": "Schoolbell",
+                "font": "Tenor Sans",
                 "size": "16px",
                 "bold": true
             },
@@ -83,6 +83,16 @@
         },
         {
             "attributes": {
+                "font": "Tenor Sans",
+                "size": "16px"
+            },
+            "insert": "Looking to send a physical Lifted message? Unfortunately, the physical Lifted message form closed on April 25th, but you are encouraged to send as many eLifted messages as you'd like!"
+        },
+        {
+            "insert": "\n\n"
+        },
+        {
+            "attributes": {
                 "size": "16px",
                 "font": "Tenor Sans"
             },
@@ -98,24 +108,18 @@
         },
         {
             "attributes": {
-                "size": "16px"
+                "size": "16px",
+                "font": "Tenor Sans"
             },
             "insert": " and "
         },
         {
             "attributes": {
                 "size": "16px",
-                "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
-            },
-            "insert": "read"
-        },
-        {
-            "attributes": {
                 "font": "Tenor Sans",
-                "size": "16px",
                 "link": "https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals"
             },
-            "insert": " more about Lifted"
+            "insert": "read more about Lifted"
         },
         {
             "insert": "\n\n"
