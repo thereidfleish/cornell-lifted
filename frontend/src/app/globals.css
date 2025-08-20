@@ -2,6 +2,8 @@
 @import url(https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap);
 @import "tailwindcss";
 
+
+
 /* Variables */
 :root {
     --cornell-blue: #0076BD;
@@ -22,6 +24,7 @@
     --winter-background: #e3eeff;
     --winter-background-alt: #d7e7ff;
 }
+
 
 /* Base Styles */
 body {
@@ -46,6 +49,7 @@ h3, h4, h5, p, .btn {
 .pink-text {
     color: var(--cornell-red);
 }
+
 
 /* Utility classes for text color */
 .text-cornell-blue {
@@ -78,4 +82,22 @@ h3, h4, h5, p, .btn {
 }
 .animate-fade-in-down {
   animation: fade-in-down 0.3s ease-out;
+}
+
+/* Floating animation for hero image */
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+        transform: translateY(-25px) rotate(1deg);
+    }
+    100% {
+        transform: translateY(0) rotate(-2deg);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+    position: relative;
 }

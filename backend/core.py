@@ -26,8 +26,8 @@ def auth_status():
         })
     return jsonify({"authenticated": False}), 401
 
-@core.get("/")
-def home():
+@core.get("/api/stats/lifted")
+def stats_lifted():
     conn = get_db_connection()
     
     total_received = conn.execute("select count(*) from messages").fetchone()[0]
@@ -35,22 +35,36 @@ def home():
     unique_sent = conn.execute("select count(distinct sender_email) from messages").fetchone()[0]
 
     conn.close()
-    
-    stats = {
-        "total_received": total_received,
-        "unique_received": unique_received,
-        "unique_sent": unique_sent
-    }
 
-    fall_pics = len(os.listdir("static/images/home_fall"))
-    spring_pics = len(os.listdir("static/images/home_spring"))
+    return jsonify({
+        "stats": {
+            "total_received": total_received,
+            "unique_received": unique_received,
+            "unique_sent": unique_sent
+        }
+    })
 
-    carousel = {
-        "fall": fall_pics,
-        "spring": spring_pics
-    }
+@core.get("/api/list-images")
+def list_images():
+    directory = request.args.get("dir", "")
+    if not directory:
+        return jsonify({"error": "Directory not specified"}), 400
 
-    return render_template('index.html', stats=stats, helpers=helpers, carousel=carousel)
+    # List all images in the specified directory
+    image_dir = Path("../frontend/public") / directory
+    print(image_dir)
+    if not image_dir.exists() or not image_dir.is_dir():
+        return jsonify({"error": "Directory not found"}), 404
+
+    images = []
+    for ext in ["jpg", "jpeg", "png", "gif"]:
+        images.extend([f.name for f in image_dir.glob(f"*.{ext}")])
+
+    return jsonify({"images": images})
+
+@core.get("/faqs")
+def faqs():
+    return render_template("faqs.html", helpers=helpers)
 
 @core.get("/popped")
 def popped():
@@ -60,9 +74,7 @@ def popped():
 
     return render_template('popped.html', carousel=carousel)
 
-@core.get("/faqs")
-def faqs():
-    return render_template("faqs.html", helpers=helpers)
+
 
 @core.get("/about-this-website")
 def about_this_website():
