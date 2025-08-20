@@ -58,23 +58,9 @@ def list_images():
 
     images = []
     for ext in ["jpg", "jpeg", "png", "gif"]:
-        images.extend([f.name for f in image_dir.glob(f"*.{ext}")])
+        images.extend([f.name for f in image_dir.glob(f"*.{ext}") if not f.name.startswith(".")])
 
     return jsonify({"images": images})
-
-@core.get("/faqs")
-def faqs():
-    return render_template("faqs.html", helpers=helpers)
-
-@core.get("/popped")
-def popped():
-    root = 'static/popped/'
-    folders = next(os.walk(root))[1]
-    carousel = { folder: len([f for f in os.listdir(root + folder) if not f.startswith('.')]) for folder in folders }
-
-    return render_template('popped.html', carousel=carousel)
-
-
 
 @core.get("/about-this-website")
 def about_this_website():

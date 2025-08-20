@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 
 interface CarouselProps {
@@ -44,19 +43,23 @@ const Carousel: React.FC<CarouselProps> = ({ directory, alt = "Carousel image", 
                     alt={alt}
                     className="rounded-lg shadow"
                 />
-                <button
-                    className="absolute -left-8 top-1/2 -translate-y-1/2 bg-[#B31B1B]/75 rounded-full w-15 h-15 flex items-center justify-center shadow-lg text-white text-4xl transition hover:bg-[#B31B1B]/100 hover:scale-105"
+                <button className="absolute -left-6 top-1/2 -translate-y-1/2 bg-[#B31B1B]/50 rounded-full w-14 h-14 flex items-center justify-center shadow-lg text-white transition hover:bg-[#B31B1B]/100 hover:scale-105"
                     onClick={goPrev}
                     aria-label="Previous"
+                    style={{ zIndex: 2 }}
                 >
-                    <span className="inline-block align-middle" style={{ fontWeight: 500, fontSize: "3rem" }}>&#x2039;</span>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8">
+                        <path d="M15 6L9 12L15 18" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                 </button>
-                <button
-                    className="absolute -right-8 top-1/2 -translate-y-1/2 bg-[#B31B1B]/75 rounded-full w-15 h-15 flex items-center justify-center shadow-lg text-white text-4xl transition hover:bg-[#B31B1B]/100 hover:scale-105"
+                <button className="absolute -right-6 top-1/2 -translate-y-1/2 bg-[#B31B1B]/50 rounded-full w-14 h-14 flex items-center justify-center shadow-lg text-white transition hover:bg-[#B31B1B]/100 hover:scale-105"
                     onClick={goNext}
                     aria-label="Next"
+                    style={{ zIndex: 2 }}
                 >
-                    <span className="inline-block align-middle" style={{ fontWeight: 500, fontSize: "3rem" }}>&#x203A;</span>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8">
+                        <path d="M9 6L15 12L9 18" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                 </button>
 
             </div>
