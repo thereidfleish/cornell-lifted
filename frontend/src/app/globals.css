@@ -1,26 +1,81 @@
+@import url(https://fonts.googleapis.com/css?family=Schoolbell&v1);
+@import url(https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap);
 @import "tailwindcss";
 
+/* Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --cornell-blue: #0076BD;
+    --cornell-red: #B31B1B;
+    --light-gray: #f8f9fa;
+    --border-color: #e0e0e0;
+    --text-color: #212529;
+    --balloon-red: #ff5252;
+    --balloon-blue: #4facfe;
+    --balloon-yellow: #ffe259;
+    --balloon-green: #4CAF50;
+    --balloon-purple: #9C27B0;
+    --note-yellow: #fff9c4;
+    --winter-blue-light: #d9eaff;
+    --winter-blue-medium: #a8d8ff;
+    --winter-blue-dark: #7bb5eb;
+    --winter-accent: #9C27B0;
+    --winter-background: #e3eeff;
+    --winter-background-alt: #d7e7ff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base Styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Tenor Sans', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #fffefa;
+}
+
+h1, h2 {
+    font-family: Schoolbell, arial, serif;
+}
+
+h3, h4, h5, p, .btn {
+    font-family: 'Tenor Sans', sans-serif;
+}
+
+.blue-text {
+    color: var(--cornell-blue);
+}
+
+.pink-text {
+    color: var(--cornell-red);
+}
+
+/* Utility classes for text color */
+.text-cornell-blue {
+    color: var(--cornell-blue);
+}
+.text-cornell-red {
+    color: var(--cornell-red);
+}
+
+/* Utility classes for background color */
+.bg-cornell-blue {
+    background-color: var(--cornell-blue);
+}
+.bg-cornell-red {
+    background-color: var(--cornell-red);
+}
+
+/* Utility classes for font family */
+.font-schoolbell {
+    font-family: Schoolbell, arial, serif;
+}
+.font-tenor {
+    font-family: 'Tenor Sans', sans-serif;
+}
+
+/* Fade-in-down animation for mobile nav bar */
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-down {
+  animation: fade-in-down 0.3s ease-out;
 }

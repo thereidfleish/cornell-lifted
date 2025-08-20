@@ -12,6 +12,20 @@ from app import is_admin, get_db_connection, get_logs_connection
 
 core = Blueprint('core', __name__, template_folder='templates', static_folder='static')
 
+@core.get("/api/auth/status")
+def auth_status():
+    print(current_user.is_authenticated)
+    if current_user.is_authenticated:
+        return jsonify({
+            "authenticated": True,
+            "user": {"id": current_user.id,
+                     "email": current_user.email,
+                     "name": current_user.name,
+                     "is_admin": is_admin(write_required=False),
+                     "admin_write_perm": is_admin(write_required=True)}
+        })
+    return jsonify({"authenticated": False}), 401
+
 @core.get("/")
 def home():
     conn = get_db_connection()

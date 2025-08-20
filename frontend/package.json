@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev-cert": "next dev -p 3000 --experimental-https --experimental-https-key ../127.0.0.1+1-key.pem --experimental-https-cert ../127.0.0.1+1.pem"
   },
   "dependencies": {
     "react": "19.1.0",

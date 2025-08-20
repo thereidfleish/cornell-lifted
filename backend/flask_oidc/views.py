@@ -50,6 +50,7 @@ def login_view():
         redirect_uri=redirect_uri,
         next=session["next"],
     )
+    print(redirect_uri)
     return g._oidc_auth.authorize_redirect(redirect_uri)
 
 
@@ -57,6 +58,7 @@ def login_view():
 def authorize_view():
     before_authorize.send(g._oidc_auth)
     try:
+        # print(g._oidc_auth.authorize_access_token())
         token = g._oidc_auth.authorize_access_token()
     except OAuthError as e:
         logger.exception("Could not get the access token")
@@ -71,6 +73,8 @@ def authorize_view():
         del session["next"]
     except KeyError:
         return_to = request.url_root
+    return_to = "https://cornelllifted.com" + return_to
+    print("Returning to:", return_to)
     after_authorize.send(g._oidc_auth, token=token, return_to=return_to)
     return redirect(return_to)
 
