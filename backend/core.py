@@ -248,7 +248,7 @@ def get_card_json(id):
 
     return jsonify(card_json)
 
-@core.route("/get-card-pdf/<id>")
+@core.route("/api/get-card-pdf/<id>")
 @login_required
 def get_card_pdf(id):
     card, hidden_card_overrides = get_card(id)

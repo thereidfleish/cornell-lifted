@@ -30,8 +30,21 @@ export type LiftedConfig = {
   };
 } | null;
 
+export type CardData = {
+    id: number;
+    created_timestamp: string;
+    message_group: string;
+    sender_email: string;
+    sender_name: string;
+    recipient_email: string;
+    recipient_name: string;
+    message_content: string;
+    attachment: string | null;
+}
+
 export type LiftedHomepageStats = {
   total_received: number;
   unique_sent: number;
   unique_received: number;
 };
+

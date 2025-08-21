@@ -1,24 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loading from "@/components/Loading";
 import { useGlobal } from "@/utils/GlobalContext";
+import { CardData } from "@/types/User";
 
 export interface MessageModalProps {
     cardId: number | string | null;
     open: boolean;
     onClose: () => void;
     overrideHiddenMessage: boolean;
-}
-
-interface CardData {
-    id: number;
-    created_timestamp: string;
-    message_group: string;
-    sender_email: string;
-    sender_name: string;
-    recipient_email: string;
-    recipient_name: string;
-    message_content: string;
-    attachment: string;
 }
 
 export default function MessageModal({
@@ -137,9 +126,16 @@ export default function MessageModal({
                         )}
                         {/* Print options */}
                         {(!config?.hidden_cards.includes(card.message_group) || overrideHiddenMessage) && (
+                            
                             <div className="mt-4 text-center">
+                                <div className="mb-2 text-cornell-blue font-semibold text-base">
+                                    Want to print your card?
+                                </div>
+                                <div className="mb-4 text-gray-700 text-sm">
+                                    Either print with 100% size on normal paper and cut it out, or insert a properly sized card into your printer (contact us for card sizes)!
+                                </div>
                                 <a
-                                    href={`/get-card-pdf/${card.id}`}
+                                    href={`/api/get-card-pdf/${card.id}`}
                                     className="btn bg-cornell-blue text-white rounded px-4 py-2 font-semibold hover:bg-cornell-red transition"
                                     target="_blank"
                                     rel="noopener noreferrer"
