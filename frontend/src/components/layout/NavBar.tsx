@@ -1,16 +1,17 @@
 "use client"
 import React, { use, useState } from "react";
 import Link from "next/link";
-import useAuth from "@/utils/useAuth";
-import { Auth } from "@/types/User";
+import { useGlobal } from "@/utils/GlobalContext";
 
-function NavLinks({ className = "", auth }: { className?: string; auth: Auth | null }) {
+function NavLinks({ className = "" }: { className?: string }) {
+    const { user, config } = useGlobal();
+
     const navLinkClass = `text-gray-700 transition-all duration-300 ease-in-out hover:text-[var(--cornell-red)] hover:-translate-y-[2px] ${className}`;
     return (
         <>
             <Link href="/faqs" className={navLinkClass}>FAQs</Link>
             <Link href="/popped" className={navLinkClass}>Popped</Link>
-            { auth?.authenticated && (
+            { user?.authenticated && (
                 <Link href="/admin" className={navLinkClass}>Admin</Link>
             )}
         </>
@@ -39,7 +40,6 @@ function ActionLinks({ vertical = false }) {
 }
 
 export default function NavBar({ impersonating = false }) {
-    const auth = useAuth();
     const [mobileOpen, setMobileOpen] = useState(false);
     const toggleMobileMenu = () => setMobileOpen((open) => !open);
 
@@ -74,7 +74,7 @@ export default function NavBar({ impersonating = false }) {
                     {/* Navigation items (visible on desktop) */}
                     <div className="hidden lg:flex items-center">
                         <div className="flex space-x-6 mr-6">
-                            <NavLinks auth={auth} />
+                            <NavLinks />
                         </div>
                         <div className="flex space-x-2">
                             <ActionLinks />
@@ -88,7 +88,7 @@ export default function NavBar({ impersonating = false }) {
                 <div className="lg:hidden bg-white border-t border-gray-200 shadow-md animate-fade-in-down">
                     <div className="max-w-7xl mx-auto px-4 py-4">
                         <div className="flex flex-col mb-4">
-                            <NavLinks className="py-2 d-block" auth={auth} />
+                            <NavLinks className="py-2 d-block" />
                             <div className="border-t border-gray-200 my-2" />
                         </div>
                         <div className="flex flex-col space-y-2">

@@ -26,6 +26,10 @@ def auth_status():
         })
     return jsonify({"authenticated": False}), 401
 
+@core.get("/api/config")
+def config():
+    return current_app.config["lifted_config"]
+
 @core.get("/api/stats/lifted")
 def stats_lifted():
     conn = get_db_connection()
@@ -66,6 +70,88 @@ def list_images():
 def about_this_website():
     # helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed About This Website")
     return render_template("about-this-website.html")
+
+def rows_to_dicts(rows):
+    """
+    Convert a list of sqlite3.Row objects to a list of dicts.
+    """
+    return [dict(row) for row in rows]
+
+@core.get("/api/messages")
+def get_messages():
+    if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"    
+        conn = get_db_connection()
+
+        received_cards = rows_to_dicts(conn.execute("select id, message_group from messages where recipient_email=?", (current_user.email,)).fetchall())
+        sent_cards = rows_to_dicts(conn.execute("select id, message_group from messages where sender_email=?", (current_user.email,)).fetchall())
+
+        received_ranks = rows_to_dicts(conn.execute("select message_group, rank from (select message_group, recipient_email, rank() over (partition by message_group order by count(*) desc) as rank from messages group by message_group, recipient_email) where recipient_email=?", (current_user.email,)).fetchall())
+        sent_ranks = rows_to_dicts(conn.execute("select message_group, rank from (select message_group, sender_email, rank() over (partition by message_group order by count(*) desc) as rank from messages group by message_group, sender_email) where sender_email=?", (current_user.email,)).fetchall())
+
+        hidden_card_overrides = [row["message_group"] for row in conn.execute("select message_group from hidden_card_overrides where recipient_email=?",
+                                       (current_user.email,)).fetchall()]
+        
+        current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
+        # current_attachment_message_group = "sp_25_p"
+
+        attachments = rows_to_dicts(conn.execute("select * from attachments where message_group=? order by id desc", (current_attachment_message_group,)).fetchall())
+        attachment_prefs = rows_to_dicts(conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id where recipient_email=?",
+                                       (current_user.email,)).fetchall())
+        
+        conn.close()
+
+        events = set(["_".join(message_group.split("_")[0:2]) for message_group in current_app.config["lifted_config"]["message_group_list_map"].keys()])
+        # Order events: year descending, then fa before sp for same year
+        def event_sort_key(event):
+            season, year = event.split("_")
+            # For sorting: year descending, fa before sp
+            season_order = {"fa": 0, "sp": 1}
+            return (-int(year), season_order.get(season, 2))
+        events = sorted(events, key=event_sort_key)
+
+        output = []
+        for event in events:
+            build = {}
+
+            build["year"] = int(event.split("_")[1])
+            build["year_name"] = int(str(20) + str(build["year"]))
+            build["season"] = event.split("_")[0]
+            build["season_name"] = "Fall" if build["season"] == "fa" else "Spring"
+
+            build["types"] = []
+            for message_group in current_app.config["lifted_config"]["message_group_list_map"].keys():
+                if event in message_group:
+                    received_cards_in_current_message_group = [card for card in received_cards if card["message_group"] == message_group]
+                    sent_cards_in_current_message_group = [card for card in sent_cards if card["message_group"] == message_group]
+
+                    attachments_in_current_message_group = [{"id": attachment["id"],
+                                                             "attachment_name": attachment["attachment"],
+                                                             "attachment_count": int(attachment["count"])}
+                                                             for attachment in attachments if attachment["message_group"] == message_group]
+
+                    build["types"].append({
+                    "type":  message_group.split("_")[2],
+                    "type_name": "eLifted" if "e" in message_group else "Physical Lifted",
+                    "hide_cards": False if message_group not in current_app.config["lifted_config"]["hidden_cards"] or message_group in hidden_card_overrides else True,
+                    "received_count": len(received_cards_in_current_message_group),
+                    "sent_count": len(sent_cards_in_current_message_group),
+                    "received_card_ids": [card["id"] for card in received_cards_in_current_message_group],
+                    "sent_card_ids": [card["id"] for card in sent_cards_in_current_message_group],
+                    "received_rank": next((item["rank"] for item in received_ranks if item["message_group"] == message_group), None),
+                    "sent_rank": next((item["rank"] for item in sent_ranks if item["message_group"] == message_group), None),
+                    "available_attachments": attachments_in_current_message_group,
+                    "chosen_attachment": next(({"id": pref["attachment_id"], "attachment_name": pref["attachment"]} for pref in attachment_prefs if pref["message_group"] == message_group), None)
+                })
+
+            output.append(build)
+
+        # print(output)
+        # print(attachments)
+        # print(attachment_prefs)
+
+        return jsonify(output)
+    else:
+        return {"error": "User not authenticated"}, 401
 
 @core.get("/messages")
 def messages():

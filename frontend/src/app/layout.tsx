@@ -3,16 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/layout/NavBar";
 import Footer from "@/components/layout/Footer";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import getUser from "@/utils/getUser";
+import { GlobalProvider } from "@/utils/GlobalContext";
 
 export const metadata: Metadata = {
   title: "Cornell Lifted",
@@ -25,13 +17,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className="antialiased">
+    <GlobalProvider>
+      <html lang="en">
+        <body
+          className="antialiased">
           <NavBar />
-        <main>{children}</main>
-        <Footer />
-      </body>
-    </html>
+          <main>{children}</main>
+          <Footer />
+        </body>
+      </html>
+    </GlobalProvider>
   );
 }

@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image";
 import React from "react";
 // Stub Carousel component (replace with your actual Carousel)
 import Carousel from "@/components/Carousel";
@@ -56,7 +55,7 @@ const semesters = [
 
 export default function PoppedPage() {
   return (
-    <main className="bg-[#f4fbf3] min-h-screen font-tenor">
+    <main className="bg-[#f4fbf3] font-tenor">
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="flex flex-col items-center mb-8">
             <img
