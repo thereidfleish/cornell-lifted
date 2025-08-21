@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/layout/NavBar";
 import Footer from "@/components/layout/Footer";
-import getUser from "@/utils/getUser";
 import { GlobalProvider } from "@/utils/GlobalContext";
 
 export const metadata: Metadata = {

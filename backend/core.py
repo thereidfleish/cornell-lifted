@@ -9,6 +9,7 @@ import os
 import helpers
 
 from app import is_admin, get_db_connection, get_logs_connection
+import json
 
 core = Blueprint('core', __name__, template_folder='templates', static_folder='static')
 
@@ -28,7 +29,11 @@ def auth_status():
 
 @core.get("/api/config")
 def config():
-    return current_app.config["lifted_config"]
+    # Return config in the exact order it appears
+    return current_app.response_class(
+        json.dumps(current_app.config["lifted_config"], ensure_ascii=False),
+        mimetype='application/json'
+    )
 
 @core.get("/api/stats/lifted")
 def stats_lifted():
@@ -78,6 +83,7 @@ def rows_to_dicts(rows):
     return [dict(row) for row in rows]
 
 @core.get("/api/messages")
+@login_required
 def get_messages():
     if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"    
         conn = get_db_connection()
@@ -379,49 +385,40 @@ def delete_message(id):
         return redirect(url_for("admin.admin_page"))
     return redirect(url_for("core.messages"))
 
-class RegistrationForm(Form):
-    sender_name = StringField("Your Name", [validators.DataRequired(message="Please enter your name (or at the very least, 'Anonymous').")])
-    recipient_name = StringField("Recipient's Name", [validators.DataRequired(message="Please enter the recipient's name.")])
-    people_search = StringField("Select Recipient")
-    recipient_netid = HiddenField("Select Recipient", [validators.DataRequired(message="Please search for a recipient and then select them in the table below.  Otherwise, we won't know who to send the message to!")])
-    message_content = TextAreaField("Your Thank You Message", [validators.DataRequired(message="Please enter a message.  It wouldn't be a Lifted message without a message!")])
 
-    # These ones are only used when we're allowed to edit the sender and recipient email (Admins only)
-    message_group = HiddenField("Select Message Group")
-    sender_email = StringField("Your Email")
-    recipient_email = StringField("Recipient's Email")
-    send_ybl_email = BooleanField("Send You've Been Lifted! Email")
+def validate_form(form):
+    return form["sender_name"] and form["recipient_name"] and form["recipient_netid"] and form["message_content"]
 
-@core.route("/send-message", methods=["GET", "POST"])
+@core.route("/api/send-message", methods=["POST"])
 def send_message():
-    form = RegistrationForm(request.form)
+    # form = RegistrationForm(request.data)
+    form = json.loads(request.data)
 
     show_admin_overrides = False
     if current_user.is_authenticated and is_admin(write_required=True) and request.args.get("show_admin_overrides") == "true":
         show_admin_overrides = True
 
-                                                # (Disable validation for admin overrides)
-    if request.method == 'POST' and (form.validate() or show_admin_overrides):
-        # return form.data
- 
+                        # (Disable validation for admin overrides)
+    if show_admin_overrides or validate_form(form):
+        # return form.data 
         sender_email = current_user.email
-        sender_name = form.sender_name.data.strip()
-        recipient_name = form.recipient_name.data.strip()
-        message_content = form.message_content.data.strip()
+        sender_name = form["sender_name"].strip()
+        recipient_name = form["recipient_name"].strip()
+        message_content = form["message_content"].strip()
 
         if show_admin_overrides:
-            message_group = form.message_group.data.strip()
+            message_group = form["message_group"].strip()
             # return message_group
             if message_group == "None" or message_group == "":
                 return "message group cannot be empty!"
-            sender_email = form.sender_email.data.strip()
-            recipient_email = form.recipient_email.data.strip()
+            sender_email = form["sender_email"].strip()
+            recipient_email = form["recipient_email"].strip()
         else:
             message_group = current_app.config["lifted_config"]["form_message_group"]
             if message_group == "none":
                 abort(401, "Form is closed")
-            
-            recipient_netID = form.recipient_netid.data.strip()
+
+            recipient_netID = form["recipient_netid"].strip()
             if "@" in recipient_netID:
                 abort(400, "Haha nice try...it must be a valid NetID.  If you want to send something to a non-NetID, email us at lifted@cornell.edu :)")
             recipient_email = recipient_netID + "@cornell.edu"
@@ -446,18 +443,19 @@ def send_message():
 
         helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
 
-        return redirect(url_for('core.messages', message_confirmation=True, recipient_email=recipient_email))
+        return jsonify({"message_confirmation": True, "recipient_email": recipient_email})
 
+@core.route("/api/get-form-description")
+def get_form_description():
     dir_path = f'templates/rich_text/{current_app.config["lifted_config"]["form_message_group"]}/form.html'
     if Path(dir_path).exists():
         with open(dir_path, 'r', encoding='utf-8') as file:
             form_description = file.read()
-        return render_template("send-message.html", form=form, is_edit=False, show_admin_overrides=show_admin_overrides, form_description=form_description)
-    
-    return render_template("send-message.html", form=form, is_edit=False, show_admin_overrides=show_admin_overrides,
-                           form_description="<p>A Lifted admin needs to set a form description!  Sign into the admin dashboard to do this.</p>",)
+    else:
+        form_description = "<p>Admin needs to set form description in Admin Dashboard!</p>"
+    return jsonify({"form_description": form_description})
 
-@core.route("/people-search")
+@core.route("/api/people-search")
 @login_required
 def get_person_info():
     # Sanitize input to prevent LDAP injection
@@ -505,7 +503,7 @@ def get_person_info():
     
     return jsonify({"results": sorted(master_dict, key=lambda x: x["NetID"])})
 
-@core.route("/easter-egg/<netID>")
+@core.route("/api/easter-egg/<netID>")
 @login_required
 def easter_egg(netID):
     result = ""

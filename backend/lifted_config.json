@@ -25,7 +25,7 @@
         "sp_25_p",
         "fa_24_p"
     ],
-    "form_message_group": "none",
+    "form_message_group": "sp_25_p",
     "attachment_message_group": "none",
     "swap_from": "none",
     "swap_to": "sp_25_e",

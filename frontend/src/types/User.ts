@@ -5,6 +5,7 @@ export type User = {
     email: string;
     name: string;
     is_admin: boolean;
+    admin_write_perm: boolean;
   };
 } | null;
 
