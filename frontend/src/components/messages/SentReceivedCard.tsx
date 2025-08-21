@@ -1,4 +1,5 @@
 import { LiftedEventTypeDetails } from "@/app/messages/page";
+import MessageModal from "@/components/messages/MessageModal";
 import React, { useState } from "react";
 
 type SentReceivedCardProps = {
@@ -10,8 +11,23 @@ type SentReceivedCardProps = {
 
 export default function SentReceivedCard({ details, year_name, season_name, latest_physical_event }: SentReceivedCardProps) {
     const [activeTab, setActiveTab] = useState<'received' | 'sent'>('received');
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedCardId, setSelectedCardId] = useState<number | string | null>(null);
+    const [overrideHiddenMessage, setOverrideHiddenMessage] = useState(false);
+
     const isELifted = details.type === "e";
     const isPhysical = details.type === "p";
+
+    const handleCardClick = (cardId: number | string, overrideHiddenMessage: boolean) => {
+        setSelectedCardId(cardId);
+        setOverrideHiddenMessage(overrideHiddenMessage);
+        setModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setSelectedCardId(null);
+        setOverrideHiddenMessage(false);
+    };
 
     return (
         <div className="bg-white rounded-xl shadow-lg mb-4 overflow-hidden">
@@ -99,7 +115,12 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                         ) : (
                                             <div className="grid grid-cols-4 gap-8 p-2">
                                                 {details.received_card_ids.map((id: number, idx: number) => (
-                                                    <button key={id} type="button" className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer" /* onClick={...} */>
+                                                    <button
+                                                        key={id}
+                                                        type="button"
+                                                        className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer"
+                                                        onClick={() => handleCardClick(id, !details.hide_cards)}
+                                                    >
                                                         <div className="flex flex-col items-center">
                                                             <div className="text-3xl mb-2">💌</div>
                                                             <span className="relative">
@@ -142,7 +163,12 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                         )}
                                         <div className="grid grid-cols-4 gap-8 p-2">
                                             {details.sent_card_ids.map((id: number, idx: number) => (
-                                                <button key={id} type="button" className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer" /* onClick={...} */>
+                                                <button
+                                                    key={id}
+                                                    type="button"
+                                                    className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer"
+                                                    onClick={() => handleCardClick(id, !details.hide_cards)}
+                                                >
                                                     <div className="flex flex-col items-center">
                                                         <div className="text-3xl mb-2">💌</div>
                                                         <span className="relative">
@@ -162,6 +188,13 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                             </div>
                         )}
                     </div>
+                    {/* Message Modal */}
+                    <MessageModal
+                        cardId={selectedCardId}
+                        open={modalOpen}
+                        onClose={handleCloseModal}
+                        overrideHiddenMessage={overrideHiddenMessage}
+                    />
                 </div>
             </div>
         </div>

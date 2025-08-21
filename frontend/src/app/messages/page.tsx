@@ -65,7 +65,7 @@ export default function MessagesPage() {
     }, []);
 
     return (
-        <main className="bg-[#f4fbf3] font-tenor">
+        <main className="bg-[#f4fbf3] font-tenor px-4">
             {/* Hero Section */}
             <section className="relative pt-16 flex flex-col items-center">
                 <div className="flex flex-col items-center">
@@ -96,14 +96,14 @@ export default function MessagesPage() {
                         <div className="text-4xl mb-4">🔑</div>
                         <h4 className="text-2xl font-bold text-cornell-blue mb-2">Sign In to View Your Messages</h4>
                         <p className="mb-4">Sign in with your Cornell NetID to view and manage Lifted messages you've sent and received!</p>
-                        <a href="https://www.cornelllifted.com/login?next=/messages" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block">Sign In with Cornell NetID</a>
+                        <a href="https://api.cornelllifted.com/login?next=/messages" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block">Sign In with Cornell NetID</a>
                     </div>
                 </section>
             ) : messagesLoading ? (
                 <Loading />
             ) : (
                 <section id="messages-dashboard" className="py-8">
-                    <div className="max-w-6xl mx-auto px-4">
+                    <div className="max-w-6xl mx-auto">
                         {/* User greeting */}
                         <div className="bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between mb-6 p-6">
                             <div>

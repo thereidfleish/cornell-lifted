@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://www.cornelllifted.com/api/:path*", // Flask prod server
+        destination: "https://api.cornelllifted.com/api/:path*", // Flask prod server
       },
     ];
   },

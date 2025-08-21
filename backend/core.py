@@ -145,64 +145,9 @@ def get_messages():
 
             output.append(build)
 
-        # print(output)
-        # print(attachments)
-        # print(attachment_prefs)
-
         return jsonify(output)
     else:
         return {"error": "User not authenticated"}, 401
-
-@core.get("/messages")
-def messages():
-    if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"    
-        conn = get_db_connection()
-                
-        received_cards = conn.execute("select * from messages where recipient_email=?", (current_user.email,)).fetchall()
-        sent_cards = conn.execute("select * from messages where sender_email=?", (current_user.email,)).fetchall()
-
-        cards_dict = {
-            "received": helpers.process_cards_to_dict(received_cards),
-            "sent": helpers.process_cards_to_dict(sent_cards)
-        }
-
-        received_ranks = conn.execute("select * from (select message_group, recipient_email, rank() over (partition by message_group order by count(*) desc) as rank from messages group by message_group, recipient_email) where recipient_email=?", (current_user.email,)).fetchall()
-        sent_ranks = conn.execute("select * from (select message_group, sender_email, rank() over (partition by message_group order by count(*) desc) as rank from messages group by message_group, sender_email) where sender_email=?", (current_user.email,)).fetchall()
-
-        ranks_dict = {
-            "received": helpers.process_ranks_to_dict(received_ranks),
-            "sent": helpers.process_ranks_to_dict(sent_ranks)
-        }
-
-        current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
-
-        attachments = conn.execute("select * from attachments where message_group=? order by id desc", (current_attachment_message_group,)).fetchall()
-        attachment_prefs = conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id where recipient_email=?",
-                                       (current_user.email,)).fetchall()
-        
-        attachment_prefs_dict = helpers.process_attachment_prefs_to_dict(attachment_prefs)
-
-        hidden_card_overrides = conn.execute("select message_group from hidden_card_overrides where recipient_email=?",
-                                       (current_user.email,)).fetchall()
-        
-        hidden_card_overrides = [i["message_group"] for i in hidden_card_overrides]
-
-        conn.close()
-
-        # helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed Messages Page")
-
-        return render_template(
-            'messages.html',
-            cards_dict=cards_dict,
-            ranks_dict=ranks_dict,
-            attachments=attachments,
-            attachment_prefs_dict=attachment_prefs_dict,
-            hidden_card_overrides=hidden_card_overrides,
-            message_confirmation=request.args.get("message_confirmation"),
-            recipient_email=request.args.get("recipient_email"),
-            )
-    else:
-        return render_template('messages.html')
     
 @core.post("/set-attachment-pref")
 @login_required
@@ -273,7 +218,7 @@ def get_card(id):
     
     return card, hidden_card_overrides
 
-@core.route("/get-card-json/<id>")
+@core.route("/api/get-card-json/<id>")
 @login_required
 def get_card_json(id):
     card, hidden_card_overrides = get_card(id)
@@ -291,7 +236,7 @@ def get_card_json(id):
         "id": card["id"],
         "created_timestamp": card["created_timestamp"],
         "message_group": card["message_group"],
-        "sender_email": card["sender_email"],
+        "sender_email": card["sender_email"] if current_user.email == card["sender_email"] else "nice try :)",
         "sender_name": card["sender_name"],
         "recipient_email": card["recipient_email"],
         "recipient_name": card["recipient_name"],
