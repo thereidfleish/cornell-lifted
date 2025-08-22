@@ -58,11 +58,11 @@ export default function AdminLogsPage() {
         <>
           <h2 className="text-xl font-semibold mb-2">Logs</h2>
           <p className="mb-2 text-gray-700">The logs table. Num entries: {logs.length}</p>
-          <Table headers={logHeaders} data={logs} className="mb-8" style={{ maxHeight: 600 }} />
+          <Table headers={logHeaders} data={logs} className="mb-8" maxHeight={400} />
 
           <h2 className="text-xl font-semibold mb-2">Recently Deleted Messages</h2>
           <p className="mb-2 text-gray-700">The recently deleted messages table. Num entries: {recentlyDeleted.length}</p>
-          <Table headers={deletedHeaders} data={recentlyDeleted} style={{ maxHeight: 600 }} />
+          <Table headers={deletedHeaders} data={recentlyDeleted} maxHeight={400} />
         </>
       )}
     </main>

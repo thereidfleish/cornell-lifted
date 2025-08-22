@@ -151,6 +151,8 @@ export default function MessageModal({
                             onConfirm={() => { setShowConfirm(false); handleDelete(); }}
                             onCancel={() => setShowConfirm(false)}
                             deleting={deleting}
+                            title="Are you sure you want to delete this message?"
+                            description="This action cannot be undone."
                         />
                         {/* Print options */}
                         {(!config?.hidden_cards.includes(card.message_group) || overrideHiddenMessage) && (

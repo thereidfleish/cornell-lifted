@@ -63,12 +63,6 @@ def admin_page():
                 all_cards_files_dict[stem]["done"] += ext + ", "
     
     conn = get_db_connection()
-
-    # Admins Table
-    admins = conn.execute("select * from admins").fetchall()
-
-    # Hidden Message Overrides Table
-    hidden_card_overrides = conn.execute("select * from hidden_card_overrides").fetchall()
     
     # Swap Prefs Table
     swap_prefs = conn.execute("select * from swap_prefs").fetchall()
@@ -83,8 +77,6 @@ def admin_page():
     return render_template("admin.html",
                            all_cards_files_dict=all_cards_files_dict,
                            pptx_templates_files=pptx_templates_files,
-                           admins=admins,
-                           hidden_card_overrides=hidden_card_overrides,
                            swap_prefs=swap_prefs,
                            attachments=attachments,
                            attachment_prefs=attachment_prefs)
@@ -298,10 +290,12 @@ def upload_pptx_template(message_group):
     file.save(f"pptx_templates/{message_group}.pptx")
     return redirect(url_for('admin.admin_page'))
 
-@admin.route("/query-messages")
+### Browse Messages
+
+@admin.route("/api/admin/browse-messages")
 @login_required
 @admin_required(write_required=False)
-def query_messages():
+def browse_messages():
     query = request.args.get("q")
     message_group = request.args.get("mg")
 
@@ -334,7 +328,7 @@ def query_messages():
     if len(results) == 0:
         return jsonify({"results": "none"})
     
-    return jsonify({"results": [{attr: result[attr] for attr in result.keys()} for result in results]})
+    return jsonify({"results": rows_to_dicts(results)})
 
 @admin.route("/process-all-cards/<message_group>")
 @login_required
@@ -384,22 +378,36 @@ def end_impersonate():
     session["impersonating"] = False
     return redirect(url_for("core.messages"))
 
-@admin.post("/add-admin")
+### Admins
+
+def fetch_admins_from_db():
+    conn = get_db_connection()
+    admins = rows_to_dicts(reversed(conn.execute("select * from admins").fetchall()))
+    conn.close()
+    return admins
+
+@admin.route("/api/admin/get-admins")
+@login_required
+@admin_required(write_required=False)
+def get_admins():
+    admins = fetch_admins_from_db()
+    return jsonify({"admins": admins})
+
+@admin.post("/api/admin/add-admin")
 @login_required
 @admin_required(write_required=True)
 def add_admin():
     netID = request.form["admin_netid"]
     write_perm = True if request.form.get("admin_write_perm") else False
-
     conn = get_db_connection()
     conn.execute("insert into admins (id, write) values (?, ?)",
                  (netID, write_perm))
     conn.commit()
     conn.close()
+    admins = fetch_admins_from_db()
+    return jsonify({"admins": admins})
 
-    return redirect(url_for('admin.admin_page'))
-
-@admin.route("/remove-admin/<id>")
+@admin.post("/api/admin/remove-admin/<id>")
 @login_required
 @admin_required(write_required=True)
 def remove_admin(id):
@@ -407,24 +415,39 @@ def remove_admin(id):
     conn.execute('delete from admins where id = ?', (id,))
     conn.commit()
     conn.close()
-    return redirect(url_for('admin.admin_page'))
+    admins = fetch_admins_from_db()
+    return jsonify({"admins": admins})
 
-@admin.post("/add-hidden-card-override")
+### Hidden Card Overrides
+
+def fetch_hidden_card_overrides_from_db():
+    conn = get_db_connection()
+    hidden_card_overrides = rows_to_dicts(conn.execute("select * from hidden_card_overrides order by id desc").fetchall())
+    conn.close()
+    return hidden_card_overrides
+
+@admin.route("/api/admin/get-hidden-card-overrides")
+@login_required
+@admin_required(write_required=False)
+def get_hidden_card_overrides():
+    hidden_card_overrides = fetch_hidden_card_overrides_from_db()
+    return jsonify({"hidden_card_overrides": hidden_card_overrides})
+
+@admin.post("/api/admin/add-hidden-card-override")
 @login_required
 @admin_required(write_required=True)
 def add_hidden_card_override():
     message_group = request.form["hidden-card-message-group-input"]
     recipient_email = request.form["hidden-card-email-input"]
-
     conn = get_db_connection()
     conn.execute("insert into hidden_card_overrides (recipient_email, message_group) values (?, ?)",
                  (recipient_email, message_group))
     conn.commit()
     conn.close()
+    hidden_card_overrides = fetch_hidden_card_overrides_from_db()
+    return jsonify({"hidden_card_overrides": hidden_card_overrides})
 
-    return redirect(url_for('admin.admin_page'))
-
-@admin.route("/remove-hidden-card-override/<id>")
+@admin.post("/api/admin/remove-hidden-card-override/<id>")
 @login_required
 @admin_required(write_required=True)
 def remove_hidden_card_override(id):
@@ -432,4 +455,5 @@ def remove_hidden_card_override(id):
     conn.execute('delete from hidden_card_overrides where id = ?', (id,))
     conn.commit()
     conn.close()
-    return redirect(url_for('admin.admin_page'))
+    hidden_card_overrides = fetch_hidden_card_overrides_from_db()
+    return jsonify({"hidden_card_overrides": hidden_card_overrides})

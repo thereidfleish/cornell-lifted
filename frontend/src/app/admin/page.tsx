@@ -1,6 +1,9 @@
 "use client"
 import React, { useState } from "react";
-import AdminLogsPage from "./logs";
+import AdminLogsPage from "./Logs";
+import AdminsSection from "./Admins";
+import HiddenCardOverridesSection from "./HiddenCardOverrides";
+import BrowseMessagesSection from "./BrowseMessages";
 
 const sidebarSections = [
   {
@@ -23,6 +26,15 @@ export default function AdminDashboardPage() {
   function renderTabContent() {
     if (activeTab === "Logs") {
       return <AdminLogsPage />;
+    }
+    if (activeTab === "Admins") {
+      return <AdminsSection />;
+    }
+    if (activeTab === "Hidden Card Overrides") {
+      return <HiddenCardOverridesSection />;
+    }
+    if (activeTab === "Browse") {
+      return <BrowseMessagesSection />;
     }
     return (
       <div className="bg-white rounded-xl shadow p-6">
