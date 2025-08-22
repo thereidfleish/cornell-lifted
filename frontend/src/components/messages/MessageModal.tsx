@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Loading from "@/components/Loading";
 import { useGlobal } from "@/utils/GlobalContext";
 import { CardData } from "@/types/User";
+import DeleteConfirmation from "@/components/DeleteConfirmation";
 
 export interface MessageModalProps {
     cardId: number | string | null;
@@ -23,6 +24,8 @@ export default function MessageModal({
     const modalRef = useRef<HTMLDivElement>(null);
     const [show, setShow] = useState(false);
     const [animating, setAnimating] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     useEffect(() => {
         if (!open || !cardId) return;
@@ -79,6 +82,21 @@ export default function MessageModal({
     // Modal logic
     if (!show) return null;
 
+    async function handleDelete() {
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/delete-message/${card?.id}`, { method: "POST" });
+            const data = await res.json();
+            if (data.deleted === true) {
+                window.location.reload();
+            } else {
+                setDeleting(false);
+            }
+        } catch {
+            setDeleting(false);
+        }
+    }
+
     return (
         <div
             className={`fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${animating ? "opacity-100" : "opacity-0"}`}
@@ -118,12 +136,22 @@ export default function MessageModal({
                                     href={`/edit-message/${card.id}`}
                                     className="btn bg-cornell-blue text-white rounded px-4 py-2 font-semibold hover:bg-cornell-red transition"
                                 >Edit</a>
-                                <a
-                                    href={`/delete-message/${card.id}`}
-                                    className="btn bg-cornell-red text-white rounded px-4 py-2 font-semibold hover:bg-cornell-blue transition"
-                                >Delete</a>
+                                <button
+                                    type="button"
+                                    className="btn bg-cornell-red text-white rounded px-4 py-2 font-semibold hover:bg-cornell-blue transition disabled:opacity-50"
+                                    disabled={deleting}
+                                    onClick={() => setShowConfirm(true)}
+                                >
+                                    {deleting ? "Deleting..." : "Delete"}
+                                </button>
                             </div>
                         )}
+                        <DeleteConfirmation
+                            open={showConfirm}
+                            onConfirm={() => { setShowConfirm(false); handleDelete(); }}
+                            onCancel={() => setShowConfirm(false)}
+                            deleting={deleting}
+                        />
                         {/* Print options */}
                         {(!config?.hidden_cards.includes(card.message_group) || overrideHiddenMessage) && (
                             

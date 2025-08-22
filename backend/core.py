@@ -221,7 +221,6 @@ def get_card(id):
     if card is None:
         abort(404, "Card DNE")
     
-    
     return card, hidden_card_overrides
 
 @core.route("/api/get-card-json/<id>")
@@ -242,7 +241,7 @@ def get_card_json(id):
         "id": card["id"],
         "created_timestamp": card["created_timestamp"],
         "message_group": card["message_group"],
-        "sender_email": card["sender_email"] if current_user.email == card["sender_email"] else "nice try :)",
+        "sender_email": card["sender_email"] if current_user.email == card["sender_email"] or is_admin(write_required=False) else "nice try :)",
         "sender_name": card["sender_name"],
         "recipient_email": card["recipient_email"],
         "recipient_name": card["recipient_name"],
@@ -296,75 +295,60 @@ def check_if_can_edit_or_delete(card):
         elif card["message_group"] != current_app.config["lifted_config"]["form_message_group"]:
             abort(401, "Form is closed")
 
-@core.route("/edit-message/<id>", methods=["GET", "POST"])
+@core.route("/api/edit-message/<id>", methods=["POST"])
 @login_required
 def edit_message(id):
     card, hidden_card_overrides = get_card(id)
-
     check_if_can_edit_or_delete(card)
+
+    form = json.loads(request.data)
 
     show_admin_overrides = False
     if current_user.is_authenticated and is_admin(write_required=True) and request.args.get("show_admin_overrides") == "true":
         show_admin_overrides = True
 
-    form = RegistrationForm(request.form)
-
-    if request.method == 'GET':
-        form.message_group.data = card["message_group"]
-        form.sender_name.data = card["sender_name"]
-        form.recipient_name.data = card["recipient_name"]
-        form.recipient_netid.data = card["recipient_email"].split("@")[0]
-        form.message_content.data = card["message_content"]
-        
-        # These ones are only used when we're allowed to edit the sender and recipient email (Admins only)
-        form.sender_email.data = card["sender_email"]
-        form.recipient_email.data = card["recipient_email"]
-
     # (Disable validation for editing...due to complications with NetID validation, and also, if someone is savvy enough to bypass server-side validation, well, they can have their way)
-    if request.method == 'POST':
-        sender_name = form.sender_name.data.strip()
-        recipient_name = form.recipient_name.data.strip()
-        message_content = form.message_content.data.strip()
+    sender_name = form["sender_name"].strip()
+    recipient_name = form["recipient_name"].strip()
+    message_content = form["message_content"].strip()
 
-        conn = get_db_connection()
+    conn = get_db_connection()
 
-        if show_admin_overrides:
-            message_group = form.message_group.data.strip()
-            if message_group == "None" or message_group == "":
-                return "message group cannot be empty!"
-            sender_email = form.sender_email.data.strip()
-            recipient_email = form.recipient_email.data.strip()
-            send_ybl_email = form.send_ybl_email.data
+    recipient_email = card["recipient_email"]
 
-            id = conn.execute('update messages set message_group=?, sender_email=?, sender_name=?, recipient_email=?, recipient_name=?, message_content=?  where id=? returning id',
-                         (message_group, sender_email, sender_name, recipient_email, recipient_name, message_content, card["id"])).fetchone()
-            
-            if send_ybl_email:
-                helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
-        else:
-            message_group = current_app.config["lifted_config"]["form_message_group"]
-            if message_group == "none":
-                return "Sorry - the form is closed!"
-            
-            conn.execute('update messages set sender_name=?, recipient_name=?, message_content=?  where id=? returning id',
-                         (sender_name, recipient_name, message_content, card["id"]))
+    if show_admin_overrides:
+        message_group = form["message_group"].strip()
+        if message_group == "none" or message_group == "":
+            return "message group cannot be empty!"
+        sender_email = form["sender_email"].strip()
+        recipient_email = form["recipient_email"].strip()
+        send_ybl_email = form["send_ybl_email"]
+
+        id = conn.execute('update messages set message_group=?, sender_email=?, sender_name=?, recipient_email=?, recipient_name=?, message_content=?  where id=? returning id',
+                        (message_group, sender_email, sender_name, recipient_email, recipient_name, message_content, card["id"])).fetchone()
         
-        conn.commit()
-        conn.close()
-
-        helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Edited Card ID {id}") 
-
-        return redirect(url_for('core.messages'))
+        if send_ybl_email:
+            helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
+    else:
+        message_group = current_app.config["lifted_config"]["form_message_group"]
+        if message_group == "none":
+            return "Sorry - the form is closed!"
+        
+        conn.execute('update messages set sender_name=?, recipient_name=?, message_content=?  where id=? returning id',
+                        (sender_name, recipient_name, message_content, card["id"]))
     
-    return render_template("send-message.html", form=form, is_edit=True, show_admin_overrides=show_admin_overrides,
-                           form_description="<p>Edit your Lifted message.  If you need to change the recipient email, please email us at <a href=mailto:lifted@cornell.edu>lifted@cornell.edu</a></p>",)
+    conn.commit()
+    conn.close()
 
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Edited Card ID {id}") 
 
-@core.route("/delete-message/<id>")
+    return jsonify({"message_confirmation": True, "recipient_email": recipient_email})
+
+@core.post("/api/delete-message/<id>")
 @login_required
 def delete_message(id):
-    card = get_card(id)
-    
+    card, hidden_card_overrides = get_card(id)
+
     check_if_can_edit_or_delete(card)
 
     conn = get_db_connection()
@@ -381,9 +365,7 @@ def delete_message(id):
 
     helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Deleted Card ID {id}")
 
-    if request.args.get("go_to_admin") == "true":
-        return redirect(url_for("admin.admin_page"))
-    return redirect(url_for("core.messages"))
+    return jsonify({"deleted": True})
 
 
 def validate_form(form):
@@ -391,7 +373,6 @@ def validate_form(form):
 
 @core.route("/api/send-message", methods=["POST"])
 def send_message():
-    # form = RegistrationForm(request.data)
     form = json.loads(request.data)
 
     show_admin_overrides = False
@@ -409,7 +390,7 @@ def send_message():
         if show_admin_overrides:
             message_group = form["message_group"].strip()
             # return message_group
-            if message_group == "None" or message_group == "":
+            if message_group == "none" or message_group == "":
                 return "message group cannot be empty!"
             sender_email = form["sender_email"].strip()
             recipient_email = form["recipient_email"].strip()

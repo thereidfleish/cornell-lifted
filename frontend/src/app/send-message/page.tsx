@@ -5,13 +5,14 @@ import Loading from "@/components/Loading";
 import PeopleSearch, { Person } from "@/components/PeopleSearch";
 import MessageGroupSelector from "@/components/MessageGroupSelector";
 import { useGlobal } from "@/utils/GlobalContext";
+import { CardData } from "@/types/User";
 
-export default function SendMessagePage() {
+export default function SendMessagePage({ editMode = false, cardData }: { editMode?: boolean; cardData?: CardData }) {
     // Form state
-    const [senderName, setSenderName] = useState("");
-    const [recipientName, setRecipientName] = useState("");
-    const [recipientNetID, setRecipientNetID] = useState("");
-    const [messageContent, setMessageContent] = useState("");
+    const [senderName, setSenderName] = useState(cardData?.sender_name || "");
+    const [recipientName, setRecipientName] = useState(cardData?.recipient_name || "");
+    const [recipientNetID, setRecipientNetID] = useState(cardData?.recipient_email ? cardData.recipient_email.split("@")[0] : "");
+    const [messageContent, setMessageContent] = useState(cardData?.message_content || "");
     const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
     const [formErrors, setFormErrors] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
@@ -19,9 +20,10 @@ export default function SendMessagePage() {
     const { user, config } = useGlobal();
     const [dialog, setDialog] = useState<{ type: "success" | "error"; message: string; recipientEmail?: string } | null>(null);
     const [adminOverride, setAdminOverride] = useState(false);
-    const [adminMessageGroup, setAdminMessageGroup] = useState<string>("");
-    const [adminSenderEmail, setAdminSenderEmail] = useState("");
-    const [adminRecipientEmail, setAdminRecipientEmail] = useState("");
+    const [adminMessageGroup, setAdminMessageGroup] = useState(cardData?.message_group || "");
+    const [adminSenderEmail, setAdminSenderEmail] = useState(cardData?.sender_email || "");
+    const [adminRecipientEmail, setAdminRecipientEmail] = useState(cardData?.recipient_email || "");
+    const [sendYblEmail, setSendYblEmail] = useState(false);
 
     // Select person logic
     function handleSelectPerson(person: Person) {
@@ -74,14 +76,23 @@ export default function SendMessagePage() {
                 recipient_name: recipientName,
                 message_content: messageContent
             };
-            if (adminOverride) {
+            if (adminOverride || (editMode && user?.user?.admin_write_perm)) {
                 payload.message_group = adminMessageGroup;
                 payload.sender_email = adminSenderEmail;
                 payload.recipient_email = adminRecipientEmail;
+                if (editMode && adminOverride) {
+                    payload.send_ybl_email = sendYblEmail;
+                }
+            } else if (editMode) {
+                payload.recipient_netid = recipientNetID;
             } else {
                 payload.recipient_netid = recipientNetID;
             }
-            const res = await fetch(`/api/send-message${adminOverride ? '?show_admin_overrides=true' : ''}`, {
+            let apiUrl = "/api/send-message";
+            if (editMode) {
+                apiUrl = `/api/edit-message/${cardData?.id}`;
+            }
+            const res = await fetch(`${apiUrl}${(adminOverride) ? '?show_admin_overrides=true' : ''}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -93,20 +104,20 @@ export default function SendMessagePage() {
             if (res.ok && data.message_confirmation) {
                 setDialog({
                     type: "success",
-                    message: "Message successfully sent!",
+                    message: editMode ? "Message successfully updated!" : "Message successfully sent!",
                     recipientEmail: data.recipient_email
                 });
             } else {
                 setDialog({
                     type: "error",
-                    message: data?.error || "Failed to send message. Please try again later.  Please send an email to lifted@cornell.edu to report this!!"
+                    message: data?.error || `Failed to ${editMode ? "update" : "send"} message. Please try again later.  Please send an email to lifted@cornell.edu to report this!!`
                 });
             }
         } catch (err) {
             setSubmitting(false);
             setDialog({
                 type: "error",
-                message: "Failed to send message. Please try again later.  Please send an email to lifted@cornell.edu to report this!!"
+                message: `Failed to ${editMode ? "update" : "send"} message. Please try again later.  Please send an email to lifted@cornell.edu to report this!!`
             });
         }
     }
@@ -166,23 +177,25 @@ export default function SendMessagePage() {
                 {dialog && dialog.type === "success" && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300">
                         <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-                            <h3 className="text-2xl font-bold text-cornell-blue mb-4">Message Sent!</h3>
-                            <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog.recipientEmail}</span> was submitted successfully!  You can view it
-                                in your sent messages below.
-                            </p>
-                            <p className="mb-2 text-gray-700">Your recipient was just notified that they've been Lifted, but
-                                they won't get to see your message until the last day of classes!
-                            </p>
-                            <p className="mb-2 text-gray-700">To stay up-to-date with any last-minute reminders or changes, and to help Lift us,
-                                follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.
-                            </p>
+                            <h3 className="text-2xl font-bold text-cornell-blue mb-4">{editMode ? "Message Edited!" : "Message Sent!"}</h3>
+                            {editMode ? (
+                                <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog?.recipientEmail}</span> was edited successfully.</p>
+                            ) : (
+                                <>
+                                    <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog.recipientEmail}</span> was submitted successfully!  You can view it in your sent messages below.</p>
+                                    <p className="mb-2 text-gray-700">Your recipient was just notified that they've been Lifted, but they won't get to see your message until the last day of classes!</p>
+                                    <p className="mb-2 text-gray-700">To stay up-to-date with any last-minute reminders or changes, and to help Lift us, follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
+                                </>
+                            )}
                             <div className="mt-6 flex flex-col gap-3">
-                                <button
-                                    className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition"
-                                    onClick={() => window.location.reload()}
-                                >
-                                    Send Another Message
-                                </button>
+                                {!editMode && (
+                                    <button
+                                        className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition"
+                                        onClick={() => window.location.reload()}
+                                    >
+                                        Send Another Message
+                                    </button>
+                                )}
                                 <a
                                     href="/messages"
                                     className="bg-gray-100 text-cornell-blue rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-blue hover:text-white transition text-center"
@@ -211,7 +224,7 @@ export default function SendMessagePage() {
                 )}
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
-                    {/* Admin Override Fields: Message Group Selector */}
+                    {/* Admin Override Fields: Message Group Selector (only show if adminOverride is enabled) */}
                     {adminOverride && (
                         <div>
                             <label className="block font-bold text-cornell-blue mb-1">Select Message Group</label>
@@ -226,7 +239,7 @@ export default function SendMessagePage() {
                     )}
                     {/* Sender Info */}
                     <div>
-                        <label className="block font-bold text-cornell-blue mb-1">👤 {adminOverride ? "Sender's Name" : "Your Name"}</label>
+                        <label className="block font-bold text-cornell-blue mb-1">👤 {(adminOverride || (editMode && user?.user?.admin_write_perm)) ? "Sender's Name" : "Your Name"}</label>
                         <input
                             type="text"
                             className="w-full rounded-lg border border-gray-300 p-3 mb-2"
@@ -249,7 +262,7 @@ export default function SendMessagePage() {
                         <p className="text-sm text-gray-500">This is the recipient's name that will appear on the card.</p>
                     </div>
 
-                    {/* Admin Override Fields */}
+                    {/* Admin Override Fields (only show if adminOverride is enabled) */}
                     {adminOverride && (
                         <>
                             <div>
@@ -274,11 +287,36 @@ export default function SendMessagePage() {
                                 />
                                 <p className="text-sm text-gray-500">(Admin Only) Enter the recipient's FULL email (preferably Cornell so they can log in), such as rf377@cornell.edu. DO NOT enter a NetID!</p>
                             </div>
+                            {editMode && (
+                                <div className="flex items-center mt-4 mb-1">
+                                    <input
+                                        type="checkbox"
+                                        id="sendYblEmail"
+                                        checked={sendYblEmail}
+                                        onChange={e => setSendYblEmail(e.target.checked)}
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="sendYblEmail" className="font-bold text-cornell-blue">Send You've Been Lifted Email?</label>
+                                </div>
+                            )}
+                            {editMode && (
+                                <p className="text-sm text-gray-500">(Admin Only) Send "You've been Lifted!" email (only check this if you edited the recipient email on an existing message)</p>
+                            )}
                         </>
                     )}
-                    {/* Recipient Search (reusable component) */}
-                    {!adminOverride && (
-                        <PeopleSearch onSelect={handleSelectPerson} selectedPerson={selectedPerson} />
+                    {/* In edit mode, do not show PeopleSearch at all, regardless of admin status */}
+                    {editMode ? (
+                        !adminOverride && (
+                            <div>
+                                <label className="block font-bold text-cornell-blue mb-1">Recipient's Email</label>
+                                <div className="w-full rounded-lg border border-gray-300 p-3 mb-2 bg-gray-100 text-gray-700">
+                                    {cardData?.recipient_email}
+                                </div>
+                                <p className="text-sm text-gray-500">To change the recipient email, please email <a href="mailto:lifted@cornell.edu" className="underline text-cornell-blue">lifted@cornell.edu</a>.</p>
+                            </div>
+                        )
+                    ) : (
+                        !adminOverride && <PeopleSearch onSelect={handleSelectPerson} selectedPerson={selectedPerson} />
                     )}
                     {/* Message Content */}
                     <div>
@@ -311,7 +349,7 @@ export default function SendMessagePage() {
                                 type="submit"
                                 disabled={submitting}
                             >
-                                Submit Message
+                                {editMode ? "Edit Message" : "Submit Message"}
                             </button>
                         )}
                         <p className="mt-3 text-gray-500">Please ensure you get a confirmation message after submitting.</p>
