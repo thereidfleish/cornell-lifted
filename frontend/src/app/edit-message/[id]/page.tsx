@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Loading from "@/components/Loading";
-import SendMessagePage from "../../send-message/page";
 import { CardData } from "../../../types/User";
+import SendMessageForm from "@/app/send-message/SendMessageForm";
 
-export default function EditMessagePage({ params }: { params: { id: string } }) {
+export default function EditMessagePage() {
+	const params = useParams();
+	const id = params?.id as string;
 	const [cardData, setCardData] = useState<CardData | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -15,7 +18,7 @@ export default function EditMessagePage({ params }: { params: { id: string } }) 
 			setLoading(true);
 			setError(null);
 			try {
-				const res = await fetch(`/api/get-card-json/${params.id}`);
+				const res = await fetch(`/api/get-card-json/${id}`);
 				if (!res.ok) {
 					throw new Error("Failed to fetch card data");
 				}
@@ -26,8 +29,8 @@ export default function EditMessagePage({ params }: { params: { id: string } }) 
 			}
 			setLoading(false);
 		}
-		fetchCard();
-	}, [params.id]);
+		if (id) fetchCard();
+	}, [id]);
 
 	if (loading) {
 		return <div className="flex justify-center items-center h-96"><Loading /></div>;
@@ -36,5 +39,5 @@ export default function EditMessagePage({ params }: { params: { id: string } }) 
 		return <div className="flex justify-center items-center h-96 text-red-700">{error || "Card not found."}</div>;
 	}
 
-	return <SendMessagePage editMode={true} cardData={cardData} />;
+	return <SendMessageForm editMode={true} cardData={cardData} />;
 }

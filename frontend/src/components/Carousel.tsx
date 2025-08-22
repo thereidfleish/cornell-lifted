@@ -19,7 +19,7 @@ const Carousel: React.FC<CarouselProps> = ({ directory, alt = "Carousel image", 
                 if (Array.isArray(data.images)) {
                     // Sort by filename
                     const sorted = data.images.slice().sort();
-                    setImages(sorted.map((filename) => `${directory}/${filename}`));
+                    setImages(sorted.map((filename: any) => `${directory}/${filename}`));
                 } else {
                     setImages([]);
                 }

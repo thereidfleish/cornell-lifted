@@ -9,29 +9,23 @@ import mimetypes
 import helpers
 
 from app import admin_required, update_lifted_config, get_db_connection, get_logs_connection, load_user
+from core import rows_to_dicts
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
 
-@admin.route("/admin/logs", methods=['GET', 'POST'])
+@admin.route("/api/admin/logs")
 @login_required
 @admin_required(write_required=False)
 def logs_page():
-    if request.method == "POST":
-        return redirect(url_for('admin.logs_page')) # prevents form resubmission
-    
-    # Logs Table
     conn = get_logs_connection()
-    logs = conn.execute("select * from logs order by id desc").fetchall()
-    conn.close()
-    
-    # Recently Deleted Table
-    conn = get_logs_connection()
-    recently_deleted_messages = conn.execute("select * from recently_deleted_messages order by id desc").fetchall()
+    logs = rows_to_dicts(conn.execute("select * from logs order by id desc").fetchall())
+    recently_deleted_messages = rows_to_dicts(conn.execute("select * from recently_deleted_messages order by id desc").fetchall())
     conn.close()
 
-    return render_template("logs.html",
-                           logs=logs,
-                           recently_deleted_messages=recently_deleted_messages)
+    return jsonify({
+        "logs": logs,
+        "recently_deleted_messages": recently_deleted_messages
+    })
 
 @admin.route("/admin", methods=['GET', 'POST'])
 @login_required

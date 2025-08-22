@@ -13,6 +13,12 @@ import json
 
 core = Blueprint('core', __name__, template_folder='templates', static_folder='static')
 
+def rows_to_dicts(rows):
+    """
+    Convert a list of sqlite3.Row objects to a list of dicts.
+    """
+    return [dict(row) for row in rows]
+
 @core.get("/api/auth/status")
 def auth_status():
     print(current_user.is_authenticated)
@@ -75,12 +81,6 @@ def list_images():
 def about_this_website():
     # helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed About This Website")
     return render_template("about-this-website.html")
-
-def rows_to_dicts(rows):
-    """
-    Convert a list of sqlite3.Row objects to a list of dicts.
-    """
-    return [dict(row) for row in rows]
 
 @core.get("/api/messages")
 @login_required
