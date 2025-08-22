@@ -4,6 +4,7 @@ import AdminLogsPage from "./Logs";
 import AdminsSection from "./Admins";
 import HiddenCardOverridesSection from "./HiddenCardOverrides";
 import BrowseMessagesSection from "./BrowseMessages";
+import ProcessCards from "./ProcessCards";
 
 const sidebarSections = [
   {
@@ -35,6 +36,9 @@ export default function AdminDashboardPage() {
     }
     if (activeTab === "Browse") {
       return <BrowseMessagesSection />;
+    }
+    if (activeTab === "Process") {
+      return <ProcessCards />;
     }
     return (
       <div className="bg-white rounded-xl shadow p-6">

@@ -36,32 +36,6 @@ def admin_page():
     
     pptx_templates_files = [os.path.splitext(file)[0] for file in os.listdir("pptx_templates")]
     
-    all_cards_files = sorted(os.listdir("all_cards_output"), key=lambda x: os.path.getctime(os.path.join("all_cards_output", x)), reverse=True)
-    all_cards_files_dict = {}
-
-    for file in all_cards_files:
-        stem = os.path.splitext(file)[0]
-        ext = os.path.splitext(file)[1]
-
-        if ext == ".txt":
-            with open(f"all_cards_output/{stem}.txt", "r") as file:
-                first_line = file.readline()
-                for line in file:
-                    pass
-                last_line = line
-                all_cards_files_dict[stem] = {"to_process": first_line,
-                                   "done": "",
-                                   "pptx_progress": last_line
-                                   }
-    
-    for file in all_cards_files:
-        stem = os.path.splitext(file)[0]
-        ext = os.path.splitext(file)[1]
-
-        if stem in all_cards_files_dict: # Don't include tmp files or other stuff
-            if "~" not in stem and ext in all_cards_files_dict[stem]["to_process"]:
-                all_cards_files_dict[stem]["done"] += ext + ", "
-    
     conn = get_db_connection()
     
     # Swap Prefs Table
@@ -75,7 +49,6 @@ def admin_page():
     conn.close()
 
     return render_template("admin.html",
-                           all_cards_files_dict=all_cards_files_dict,
                            pptx_templates_files=pptx_templates_files,
                            swap_prefs=swap_prefs,
                            attachments=attachments,
@@ -268,11 +241,6 @@ def get_rich_text(message_group, type):
     else:
         return jsonify({'status': 'no files found'}) 
 
-@admin.route("/get-all-cards/<filename>")
-@login_required
-@admin_required(write_required=False)
-def get_all_cards(filename):
-    return send_file(f"all_cards_output/{filename}", mimetype=mimetypes.guess_type(filename)[0])
 
 @admin.route("/get-pptx-template/<message_group>")
 @login_required
@@ -330,9 +298,67 @@ def browse_messages():
     
     return jsonify({"results": rows_to_dicts(results)})
 
-@admin.route("/process-all-cards/<message_group>")
+### Process Cards
+
+@admin.route("/api/admin/get-all-cards/<filename>")
 @login_required
 @admin_required(write_required=False)
+def get_all_cards(filename):
+    return send_file(f"all_cards_output/{filename}", mimetype=mimetypes.guess_type(filename)[0])
+
+@admin.route("/api/admin/get-process-status")
+@login_required
+@admin_required(write_required=True)
+def get_process_status():
+    all_cards_files = sorted(
+        os.listdir("all_cards_output"),
+        key=lambda x: os.path.getctime(os.path.join("all_cards_output", x)),
+        reverse=True
+    )
+    result = []
+
+    for file in all_cards_files:
+        stem, ext = os.path.splitext(file)
+        if ext == ".txt":
+            txt_path = os.path.join("all_cards_output", file)
+            with open(txt_path, "r") as f:
+                first_line = f.readline().strip()
+                last_line = ""
+                for line in f:
+                    last_line = line.strip()
+            # Extract message_group and timestamp
+            if " " in stem:
+                message_group, timestamp_raw = stem.split(" ", 1)
+            else:
+                message_group, timestamp_raw = stem, ""
+            # Format timestamp to ISO 8601 if possible
+            try:
+                dt = datetime.strptime(timestamp_raw, "%m-%d-%Y at %H-%M-%S")
+                timestamp = dt.strftime("%Y-%m-%dT%H:%M:%S")
+            except Exception:
+                timestamp = timestamp_raw
+            # Find done extensions
+            done = ""
+            for ext_file in all_cards_files:
+                ext_stem, ext_ext = os.path.splitext(ext_file)
+                if ext_stem == stem and "~" not in ext_stem and ext_ext in first_line:
+                    done += ext_ext + ", "
+            result.append({
+                "filename": stem,
+                "timestamp": timestamp,
+                "message_group": message_group,
+                "to_process": first_line,
+                "done": done,
+                "pptx_progress": last_line
+            })
+
+    # Sort result by timestamp
+    result_sorted = sorted(result, key=lambda x: x["timestamp"], reverse=True)
+    return jsonify(result_sorted)
+
+@admin.route("/api/admin/process-all-cards/<message_group>")
+@login_required
+@admin_required(write_required=True)
 def process_all_cards(message_group):
     print("Starting task")
     
@@ -360,7 +386,9 @@ def process_all_cards(message_group):
     if should_process_pptx_pdf:
         helpers.cards_to_pptx_and_pdf(cards, message_group, output_filepath)
     
-    return "Done!"
+    return jsonify({"status": "Processing started!"})
+
+### Impersonation
 
 @admin.post("/impersonate")
 @login_required

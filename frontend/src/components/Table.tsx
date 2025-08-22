@@ -38,7 +38,7 @@ const Table: React.FC<TableProps> = ({ headers, data, maxHeight, className = "",
         </thead>
         <tbody>
           {data.map((row, idx) => (
-            <tr key={idx} className="border-b border-gray-200">
+            <tr key={idx} className={`border-b border-gray-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
               {headers.map((header) => {
                 const cell = row[header.key];
                 const maxWidth = typeof cell === "string" && cell.length < 100 ? 100 : 300;
