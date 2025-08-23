@@ -155,9 +155,7 @@ export default function HiddenCardOverridesSection() {
         <div className="text-gray-500">Loading overrides...</div>
       ) : (
         <>
-          <div style={{ maxHeight: 300, overflowY: 'auto' }}>
             <Table headers={headers} data={tableData} maxHeight={400} />
-          </div>
           <DeleteConfirmation
             open={confirmOpen}
             onConfirm={handleRemoveOverrideConfirmed}

@@ -34,7 +34,6 @@ def admin_page():
     if request.method == "POST":
         return redirect(url_for('admin.admin_page')) # prevents form resubmission
     
-    pptx_templates_files = [os.path.splitext(file)[0] for file in os.listdir("pptx_templates")]
     
     conn = get_db_connection()
     
@@ -54,20 +53,31 @@ def admin_page():
                            attachments=attachments,
                            attachment_prefs=attachment_prefs)
 
-@admin.post("/add-message-group")
+### Message Groups
+
+@admin.route("/api/admin/get-pptx-templates-files")
+@login_required
+@admin_required(write_required=False)
+def get_pptx_templates_files():
+    pptx_templates_files = [os.path.splitext(file)[0] for file in os.listdir("pptx_templates")]
+    return jsonify({"pptx_templates_files": pptx_templates_files})
+
+@admin.post("/api/admin/add-message-group")
 @login_required
 @admin_required(write_required=True)
 def add_message_group():
     old_dict = current_app.config["lifted_config"]["message_group_list_map"]
     new_dict = {}
 
+    request_data = json.loads(request.data)
+
     for type in ["p", "e"]:
-        short_name = request.form["sem"] + "_" + request.form["year"].split("20")[1] + "_" + type
-        long_name = ("Fall " if request.form["sem"] == "fa" else "Spring ") + request.form["year"] + (" Physical Lifted" if type == "p" else " eLifted")
-        
+        short_name = request_data["semester"] + "_" + str(request_data["year"]).split("20")[1] + "_" + type
+        long_name = ("Fall " if request_data["semester"] == "fa" else "Spring ") + str(request_data["year"]) + (" Physical Lifted" if type == "p" else " eLifted")
+
         if short_name in old_dict:
-            return "Error: This message group has already been added!"
-        
+            return jsonify({"status": "Message group already exists!"}), 400
+
         new_dict.update({short_name: long_name})
         current_app.config["lifted_config"]["hidden_cards"].append(short_name)
     
@@ -78,23 +88,24 @@ def add_message_group():
     current_app.config["lifted_config"]["message_group_list_map"] = new_dict
     update_lifted_config(current_app.config["lifted_config"])
 
-    return redirect(url_for('admin.admin_page'))
+    return jsonify({"status": "Message group added successfully!"})
 
-@admin.post("/update-hidden-cards/<message_group>")
+@admin.post("/api/admin/update-hidden-cards/<message_group>")
 @login_required
 @admin_required(write_required=True)
 def update_hidden_cards(message_group):
-    if request.form.get('hidden-cards') != None: # meaning a checkbox was ticked "on"
+    print(json.loads(request.data))
+    if json.loads(request.data).get('hidden-cards'): # meaning a checkbox was ticked "on"
         current_app.config["lifted_config"]["hidden_cards"].append(message_group)
     else: # meaning a checkbox was ticked "off"
         current_app.config["lifted_config"]["hidden_cards"].remove(message_group)
 
     update_lifted_config(current_app.config["lifted_config"])
-    
-    return redirect(url_for('admin.admin_page'))
+
+    return jsonify({"status": "Hidden cards updated successfully!"})
 
 # NEED TO IMPLEMENT MESSAGE DELETING!!!!
-@admin.route("/remove-message-group/<message_group>")
+@admin.route("/api/admin/remove-message-group/<message_group>")
 @login_required
 @admin_required(write_required=True)
 def remove_message_group(message_group):
@@ -105,15 +116,98 @@ def remove_message_group(message_group):
     if current_app.config["lifted_config"]["form_message_group"] == message_group:
         current_app.config["lifted_config"]["form_message_group"] = "none"
     update_lifted_config(current_app.config["lifted_config"])
-    return redirect(url_for('admin.admin_page'))
+    return jsonify({"status": "Message group removed successfully!"})
 
-@admin.post("/update-form-message-group")
+@admin.route("/api/admin/get-pptx-template/<message_group>")
+@login_required
+@admin_required(write_required=False)
+def get_pptx_template(message_group):
+    return send_file(f"pptx_templates/{message_group}.pptx", mimetype=mimetypes.guess_type(message_group)[0])
+
+@admin.post("/api/admin/upload-pptx-template/<message_group>")
+@login_required
+@admin_required(write_required=True)
+def upload_pptx_template(message_group):
+    file = request.files['file']
+    if os.path.splitext(file.filename)[1] != ".pptx":
+        return "You need to upload a PPTX file!!"
+    file.save(f"pptx_templates/{message_group}.pptx")
+    return jsonify({"status": "PPTX template uploaded successfully!"})
+
+### Form and Email
+
+@admin.post("/api/admin/update-form-message-group")
 @login_required
 @admin_required(write_required=True)
 def update_form_message_group():
     current_app.config["lifted_config"]["form_message_group"] = request.form.get("form-message-group")
     update_lifted_config(current_app.config["lifted_config"])
-    return redirect(url_for('admin.admin_page'))
+    return jsonify({"status": "Form message group updated successfully!"})
+
+@admin.post("/api/admin/save-rich-text/<message_group>/<type>")
+@login_required
+@admin_required(write_required=True)
+def save_rich_text(message_group, type):
+    data = request.get_json()
+    html_content = data["html"]
+    # delta = data["delta"]
+    subject = data["subject"]
+
+    if type == "form":
+        html_content = html_content.replace("<p>", "<p style='margin: 0px'>")
+    else:
+        html_content = html_content.replace("<p>", "<p style='margin: 0px; line-height: 1.5'>")
+
+    if type != "form":
+        # html_content = html_content.replace("<p><br></p>", "")
+        
+        html_content = "<div style='background-color: white; padding: 15px; max-width: 1000px; margin-left: auto; margin-right: auto; border-radius: 5px'>" + html_content + "</div>"
+
+        html_content = "<div style='background-color: #cfecf7; padding: 15px; margin-bottom: 50px;'>" + html_content + "</div>"
+    
+    dir_path = f"templates/rich_text/{message_group}"
+    os.makedirs(dir_path, exist_ok=True)
+
+    # Save the HTML to a file
+    with open(f'{dir_path}/{type}.html', 'w', encoding='utf-8') as file:
+        file.write(html_content)
+    
+    # Save the Quill delta to a file
+    # with open(f'{dir_path}/{type}.json', 'w') as file:
+    #     json.dump(delta, file, indent=4)
+
+    with open(f'{dir_path}/{type}.txt', 'w', encoding='utf-8') as file:
+        file.write(subject)
+    
+    if request.args.get("send_email") == "true":
+        helpers.send_email(message_group, type, to=[current_user.email])
+
+    return jsonify({'status': 'Rich text saved successfully!'})
+
+@admin.route("/api/admin/get-rich-text/<message_group>/<type>")
+@login_required
+@admin_required(write_required=False)
+def get_rich_text(message_group, type):
+    # dir_path_delta = f"templates/rich_text/{message_group}/{type}.json"
+    dir_path_html = f"templates/rich_text/{message_group}/{type}.html"
+    dir_path_subject = f"templates/rich_text/{message_group}/{type}.txt"
+
+    if Path(dir_path_html).exists() and Path(dir_path_subject).exists():
+        # with open(dir_path_delta, 'r') as file:
+        #     delta = file.read()
+        with open(dir_path_html, 'r', encoding='utf-8') as file:
+            html = file.read()
+        with open(dir_path_subject, 'r', encoding='utf-8') as file:
+            subject = file.read()
+
+        return jsonify({'status': 'found',
+                        # 'delta': delta,
+                        'html': html,
+                        'subject': subject})
+    else:
+        return jsonify({'status': 'no files found'}) 
+
+### Attachments
 
 @admin.post("/update-attachment-message-group")
 @login_required
@@ -176,87 +270,6 @@ def delete_swap_pref(id):
     conn.close()
 
     return redirect(url_for("admin.admin_page"))
-
-@admin.post("/save-rich-text/<message_group>/<type>")
-@login_required
-@admin_required(write_required=True)
-def save_rich_text(message_group, type):
-    data = request.get_json()
-    html_content = data["html"]
-    delta = data["delta"]
-    subject = data["subject"]
-
-    if type == "form":
-        html_content = html_content.replace("<p>", "<p style='margin: 0px'>")
-    else:
-        html_content = html_content.replace("<p>", "<p style='margin: 0px; line-height: 1.5'>")
-
-    if type != "form":
-        # html_content = html_content.replace("<p><br></p>", "")
-
-        html_content = html_content.replace("{{LOGO}}", """<img src='https://cornelllifted.com/static/images/logo.png'
-                                            style='display: block; max-width: 200px; margin-left: auto; margin-right: auto;'>
-                                            """)
-                
-        html_content = "<div style='background-color: white; padding: 15px; max-width: 1000px; margin-left: auto; margin-right: auto; border-radius: 5px'>" + html_content + "</div>"
-
-        html_content = "<div style='background-color: #cfecf7; padding: 15px; margin-bottom: 50px;'>" + html_content + "</div>"
-    
-    
-    dir_path = f"templates/rich_text/{message_group}"
-    os.makedirs(dir_path, exist_ok=True)
-
-    # Save the HTML to a file
-    with open(f'{dir_path}/{type}.html', 'w', encoding='utf-8') as file:
-        file.write(html_content)
-    
-    # Save the Quill delta to a file
-    with open(f'{dir_path}/{type}.json', 'w') as file:
-        json.dump(delta, file, indent=4)
-
-    with open(f'{dir_path}/{type}.txt', 'w', encoding='utf-8') as file:
-        file.write(subject)
-    
-    if request.args.get("send_email") == "true":
-        helpers.send_email(message_group, type, to=[current_user.email])
-
-    return jsonify({'status': 'Rich text saved successfully!'})
-
-@admin.route("/get-rich-text/<message_group>/<type>")
-@login_required
-@admin_required(write_required=False)
-def get_rich_text(message_group, type):
-    dir_path_delta = f"templates/rich_text/{message_group}/{type}.json"
-    dir_path_subject = f"templates/rich_text/{message_group}/{type}.txt"
-
-    if Path(dir_path_delta).exists() and Path(dir_path_subject).exists():
-        with open(dir_path_delta, 'r') as file:
-            delta = file.read()
-        with open(dir_path_subject, 'r', encoding='utf-8') as file:
-            subject = file.read()
-
-        return jsonify({'status': 'found',
-                        'delta': delta,
-                        'subject': subject})
-    else:
-        return jsonify({'status': 'no files found'}) 
-
-
-@admin.route("/get-pptx-template/<message_group>")
-@login_required
-@admin_required(write_required=False)
-def get_pptx_template(message_group):
-    return send_file(f"pptx_templates/{message_group}", mimetype=mimetypes.guess_type(message_group)[0])
-
-@admin.post("/upload-pptx-template/<message_group>")
-@login_required
-@admin_required(write_required=True)
-def upload_pptx_template(message_group):
-    file = request.files['file']
-    if os.path.splitext(file.filename)[1] != ".pptx":
-        return "You need to upload a PPTX file!!"
-    file.save(f"pptx_templates/{message_group}.pptx")
-    return redirect(url_for('admin.admin_page'))
 
 ### Browse Messages
 

@@ -5,11 +5,13 @@ import AdminsSection from "./Admins";
 import HiddenCardOverridesSection from "./HiddenCardOverrides";
 import BrowseMessagesSection from "./BrowseMessages";
 import ProcessCards from "./ProcessCards";
+import EssentialsSection from "./MessageGroups";
+import FormAndEmailSection from "./FormAndEmail";
 
 const sidebarSections = [
   {
     title: "Lifted Config",
-    items: ["Essentials", "Attachments", "Swapping", "Hidden Card Overrides"],
+    items: ["Message Groups", "Form and Email", "Attachments", "Swapping", "Hidden Card Overrides"],
   },
   {
     title: "Messages",
@@ -22,9 +24,15 @@ const sidebarSections = [
 ];
 
 export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState("Essentials");
+  const [activeTab, setActiveTab] = useState("Message Groups");
 
   function renderTabContent() {
+    if (activeTab === "Message Groups") {
+      return <EssentialsSection />;
+    }
+    if (activeTab === "Form and Email") {
+      return <FormAndEmailSection />;
+    }
     if (activeTab === "Logs") {
       return <AdminLogsPage />;
     }

@@ -2,8 +2,6 @@
 @import url(https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap);
 @import "tailwindcss";
 
-
-
 /* Variables */
 :root {
     --cornell-blue: #0076BD;
@@ -101,3 +99,44 @@ h3, h4, h5, p, .btn {
     animation: float 6s ease-in-out infinite;
     position: relative;
 }
+
+/* Editor rendering for class-based fonts */
+.ql-font-georgia { font-family: Georgia, serif; }
+.ql-font-arial { font-family: Arial, Helvetica, sans-serif; }
+.ql-font-verdana { font-family: Verdana, Geneva, sans-serif; }
+.ql-font-schoolbell { font-family: "Schoolbell", cursive; }
+.ql-font-tenor-sans { font-family: "Tenor Sans", sans-serif; }
+
+/* Label text for the Snow pickers (force override with !important) */
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="georgia"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="georgia"]::before { content: "Georgia" !important; }
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="arial"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="arial"]::before { content: "Arial" !important; }
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="verdana"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="verdana"]::before { content: "Verdana" !important; }
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="schoolbell"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="schoolbell"]::before {
+  content: "Schoolbell" !important;
+  font-family: "Schoolbell", cursive;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="tenor-sans"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="tenor-sans"]::before {
+  content: "Tenor Sans" !important;
+  font-family: "Tenor Sans", sans-serif;
+}
+
+/* Sizes (you’re using style/px attributor) */
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="10px"]::before { content: "10px" !important; }
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="11px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="11px"]::before { content: "11px" !important; }
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before { content: "12px" !important; }
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before { content: "14px" !important; }
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before { content: "16px" !important; }
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before { content: "18px" !important; }
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before { content: "20px" !important; }

@@ -163,7 +163,12 @@ def send_email(message_group, type, to, cc=None, bcc=None):
             Msg.Subject = file.read()
 
         with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
-            Msg.HTMLBody = file.read()
+            html_content = file.read()
+            html_content = html_content.replace("{{LOGO}}", """<img src='https://cornelllifted.com/images/logo.png'
+                                            style='display: block; max-width: 200px; margin-left: auto; margin-right: auto;'>
+                                            """)
+
+            Msg.HTMLBody = html_content
 
         Msg.Send()
     else:

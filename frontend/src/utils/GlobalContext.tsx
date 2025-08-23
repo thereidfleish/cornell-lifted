@@ -6,7 +6,7 @@ type GlobalState = {
     user: User;
     config: LiftedConfig;
     loading: boolean;
-    refresh: () => Promise<void>;
+    refreshConfig: () => Promise<void>;
 };
 
 const GlobalContext = createContext<GlobalState | undefined>(undefined);
@@ -31,7 +31,8 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
     };
 
-    const refresh = async () => {
+    const refreshConfig = async () => {
+        console.log("Refreshing global config");
         setLoading(true);
         await fetchGlobalData();
     };
@@ -41,7 +42,7 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }, []);
 
     return (
-        <GlobalContext.Provider value={{ user, config, loading, refresh }}>
+        <GlobalContext.Provider value={{ user, config, loading, refreshConfig }}>
             {children}
         </GlobalContext.Provider>
     );
