@@ -26,6 +26,8 @@ export default function MessageModal({
     const [animating, setAnimating] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [loadingPdf, setLoadingPdf] = useState(false);
+    const [pdfError, setPdfError] = useState("");
 
     useEffect(() => {
         if (!open || !cardId) return;
@@ -156,7 +158,6 @@ export default function MessageModal({
                         />
                         {/* Print options */}
                         {(!config?.hidden_cards.includes(card.message_group) || overrideHiddenMessage) && (
-                            
                             <div className="mt-4 text-center">
                                 <div className="mb-2 text-cornell-blue font-semibold text-base">
                                     Want to print your card?
@@ -164,12 +165,33 @@ export default function MessageModal({
                                 <div className="mb-4 text-gray-700 text-sm">
                                     Either print with 100% size on normal paper and cut it out, or insert a properly sized card into your printer (contact us for card sizes)!
                                 </div>
-                                <a
-                                    href={`/api/get-card-pdf/${card.id}`}
-                                    className="btn bg-cornell-blue text-white rounded px-4 py-2 font-semibold hover:bg-cornell-red transition"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >Download PDF</a>
+                                <button
+                                    className="btn bg-cornell-blue text-white rounded px-4 py-2 font-semibold hover:bg-cornell-red transition disabled:opacity-50"
+                                    disabled={deleting || loadingPdf}
+                                    onClick={async () => {
+                                        setLoadingPdf(true);
+                                        setPdfError("");
+                                        try {
+                                            const res = await fetch(`/api/get-card-pdf/${card.id}`);
+                                            if (res.ok) {
+                                                const blob = await res.blob();
+                                                const url = window.URL.createObjectURL(blob);
+                                                window.open(url, "_blank");
+                                            } else {
+                                                setPdfError("Error generating PDF. Please try again later or contact lifted@cornell.edu.");
+                                            }
+                                        } catch {
+                                            setPdfError("Error generating PDF. Please try again later or contact lifted@cornell.edu.");
+                                        } finally {
+                                            setLoadingPdf(false);
+                                        }
+                                    }}
+                                >
+                                    {loadingPdf ? "Converting PDF..." : "Download PDF"}
+                                </button>
+                                {pdfError && (
+                                    <div className="text-red-600 text-sm mt-2">{pdfError}</div>
+                                )}
                             </div>
                         )}
                     </div>

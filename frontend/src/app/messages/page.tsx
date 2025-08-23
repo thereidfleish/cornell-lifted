@@ -5,12 +5,6 @@ import { useGlobal } from "@/utils/GlobalContext";
 import Loading from "@/components/Loading";
 import SentReceivedCard from "@/components/messages/SentReceivedCard";
 
-// Mock authentication and message data for demo
-const isAuthenticated = true; // Replace with real auth logic
-const user = { name: "Jane Doe", email: "jd123@cornell.edu" };
-const messageConfirmation = false;
-const recipientEmail = "alex@cornell.edu";
-
 export type Attachment = {
     id: number;
     attachment_name: string;
@@ -19,6 +13,7 @@ export type Attachment = {
 
 // Lifted event type and its details.  Either "physical" or "eLifted"
 export type LiftedEventTypeDetails = {
+    message_group: string;
     type: string;
     type_name: string;
     hide_cards: boolean;
@@ -42,7 +37,7 @@ export type LiftedEvent = {
 };
 
 export default function MessagesPage() {
-    const { user, config, loading, refresh } = useGlobal();
+    const { user, config, loading } = useGlobal();
     const [showOlder, setShowOlder] = useState(false);
     const [messagesData, setMessagesData] = useState<LiftedEvent[]>([]);
     const [messagesLoading, setMessagesLoading] = useState(true);
@@ -78,15 +73,6 @@ export default function MessagesPage() {
                     <h2 className="text-cornell-red font-schoolbell text-4xl mb-2 font-bold text-center">Your Lifted Journey</h2>
                     <p className="text-lg text-center text-gray-700 mb-6">Explore the gratitude you've shared and received throughout your Cornell experience</p>
                 </div>
-
-                {messageConfirmation && (
-                    <div className="mt-6 bg-green-100 border border-green-300 rounded-lg p-4 max-w-xl mx-auto text-center shadow">
-                        <h4 className="text-xl font-bold text-green-700 mb-2">Message Submitted Successfully!</h4>
-                        <p>Your Lifted message to <b>{recipientEmail}</b> was submitted successfully! You can view it in your sent messages below.</p>
-                        <p>Your recipient was just notified that they've been Lifted, but they won't get to see your message until the last day of classes!</p>
-                        <p className="mb-0">To stay up-to-date with any last-minute reminders or changes, and to help Lift us, follow <a href="https://www.instagram.com/cornelllifted" className="text-cornell-red underline">@cornelllifted</a> on Instagram.</p>
-                    </div>
-                )}
             </section>
 
             {/* Auth Section */}

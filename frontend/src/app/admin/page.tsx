@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from "react";
+import { useGlobal } from "@/utils/GlobalContext";
 import AdminLogsPage from "./Logs";
 import AdminsSection from "./Admins";
 import HiddenCardOverridesSection from "./HiddenCardOverrides";
@@ -10,6 +11,7 @@ import EssentialsSection from "./MessageGroups";
 import FormAndEmailSection from "./FormAndEmail";
 import AttachmentOptions from "./AttachmentOptions";
 import SwappingOptions from "./SwappingOptions";
+import Impersonate from "./Impersonate";
 
 const sidebarSections = [
   {
@@ -28,6 +30,10 @@ const sidebarSections = [
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState("Message Groups");
+  const { user } = useGlobal() as any;
+
+  // Check admin status (user?.user?.is_admin is typical)
+  const isAdmin = user?.user?.is_admin;
 
   function renderTabContent() {
     if (activeTab === "Message Groups") {
@@ -57,11 +63,25 @@ export default function AdminDashboardPage() {
     if (activeTab === "Process") {
       return <ProcessCards />;
     }
+    if (activeTab === "Impersonation") {
+      return <Impersonate />;
+    }
     return (
       <div className="bg-white rounded-xl shadow p-6">
         <h2 className="text-xl font-semibold mb-4">{activeTab}</h2>
         <div className="text-gray-700">Content for {activeTab} goes here.</div>
       </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <main className="flex-1 p-8">
+        <h1 className="text-4xl font-bold mb-4">Admin Dashboard</h1>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          You do not have admin access to this page.
+        </div>
+      </main>
     );
   }
 

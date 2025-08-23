@@ -37,7 +37,7 @@ export default function AttachmentOptions() {
     useEffect(() => {
         async function fetchAttachments() {
             setLoading(true);
-            const res = await fetch(`/api/admin/get-attachments/${attachmentsFilterGroup}`);
+            const res = await fetch(`/api/get-attachments/${attachmentsFilterGroup}`);
             const data = await res.json();
             setAttachments(data.attachments || []);
             setLoading(false);

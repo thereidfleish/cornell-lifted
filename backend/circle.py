@@ -9,59 +9,72 @@ import os
 import helpers
 
 from app import is_admin, get_db_connection, get_logs_connection, admin_required
+from core import rows_to_dicts
 
 circle = Blueprint('circle', __name__, template_folder='templates', static_folder='static')
 
-@circle.route("/circle", methods=["GET", "POST"])
-def circle_home():
-    if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"
+def validate_user_is_tapped_or_admin():
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Tried to access the Tap Page!")
 
-        helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Tried to access the Tap Page!")
+    # Taps Table
+    conn = get_db_connection()
+    user = conn.execute("select * from cp_taps where netid=?", (current_user.id,)).fetchone()
+    conn.close()
 
-        # Taps Table
-        conn = get_db_connection()
-        taps = conn.execute("select * from cp_taps").fetchall()
-        conn.close()
+    # If the user was not tapped, abort
+    if not user and not is_admin(write_required=False):
+        abort(401, "No Circle!")
+        # return "We're sorry, but you do not have access to this page."
+    return user
 
-        # If the user was not tapped, abort
-        if current_user.id not in [tap["netid"] for tap in taps] and not is_admin(write_required=False):
-            abort(403, "No Circle!")
-            # return "We're sorry, but you do not have access to this page."
+@circle.route("/api/circle/get-user")
+@login_required
+def get_user():
+    user = validate_user_is_tapped_or_admin()
+    if user:
+        return jsonify(dict(user))
+    return jsonify("user not tapped")
 
-        form = TapResponseForm(request.form)
+@circle.route("/api/circle/get-taps")
+@login_required
+@admin_required(write_required=False)
+def get_taps():
+    validate_user_is_tapped_or_admin()
+    conn = get_db_connection()
+    taps = rows_to_dicts(conn.execute("select * from cp_taps").fetchall())
+    conn.close()
+    return jsonify(taps)
 
-        if request.method == 'POST' and form.validate():    
-            netid = current_user.id
-            accept_tap = True if form.accept_tap.data == "accept" else False
-            clear_schedule = form.clear_schedule.data
-            wear_clothing = form.wear_clothing.data
-            monitor_inbox = form.monitor_inbox.data
-            phonetic_spelling = form.phonetic_spelling.data
-            allergens = form.allergens.data
-            pronouns = form.pronouns.data
-            notes = form.notes.data
+@circle.post("/api/circle/update-tap-response")
+@login_required
+def update_tap_response():
+    validate_user_is_tapped_or_admin()
+    
+    form = request.form
+    print(form)
 
-            timestamp = datetime.now().replace(microsecond=0)
+    netid = current_user.id
+    accept_tap = True if form["accept_tap"] == "accept" else False
+    clear_schedule = form["clear_schedule"]
+    wear_clothing = form["wear_clothing"]
+    monitor_inbox = form["monitor_inbox"]
+    phonetic_spelling = form["phonetic_spelling"]
+    allergens = form["allergens"]
+    pronouns = form["pronouns"]
+    notes = form["notes"]
 
-            conn = get_db_connection()
-            conn.execute('update cp_taps set responded_timestamp=?, accept_tap=?, clear_schedule=?, wear_clothing=?, monitor_inbox=?, pronouns=?, phonetic_spelling=?, allergens=?, notes=?  where netid=?',
-                         (timestamp, accept_tap, clear_schedule, wear_clothing, monitor_inbox, pronouns, phonetic_spelling, allergens, notes, netid))
-            # conn.execute('insert into cp_taps (netid, tap_name, created_timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                            # (netid, current_user.name, timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes))
-            conn.commit()
-            conn.close()
+    timestamp = datetime.now().replace(microsecond=0)
 
-            return redirect(url_for('circle.circle_home'))
+    conn = get_db_connection()
+    conn.execute('update cp_taps set responded_timestamp=?, accept_tap=?, clear_schedule=?, wear_clothing=?, monitor_inbox=?, pronouns=?, phonetic_spelling=?, allergens=?, notes=?  where netid=?',
+                    (timestamp, accept_tap, clear_schedule, wear_clothing, monitor_inbox, pronouns, phonetic_spelling, allergens, notes, netid))
+    # conn.execute('insert into cp_taps (netid, tap_name, created_timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    # (netid, current_user.name, timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes))
+    conn.commit()
+    conn.close()
 
-        conn = get_db_connection()
+    return jsonify({"success": True})
 
-        user = conn.execute("select * from cp_taps where netid=?", (current_user.id,)).fetchone()
-
-        conn.close()
-
-        return render_template('circle.html', user=user, taps=taps, form=form)
-    else:
-        return render_template('circle.html')
 
 class TapResponseForm(Form):
     accept_tap = RadioField("Accept or Reject the Tap",
@@ -75,7 +88,7 @@ class TapResponseForm(Form):
     phonetic_spelling = StringField("Phonetic pronunciation of my name:")
     allergens = StringField("Any Allergens:")
 
-@circle.post("/add-tap")
+@circle.post("/api/circle/add-tap")
 @login_required
 @admin_required(write_required=True)
 def add_tap():
@@ -88,9 +101,9 @@ def add_tap():
     conn.commit()
     conn.close()
 
-    return redirect(url_for('circle.circle_home'))
+    return jsonify({"success": True})
 
-@circle.get("/delete-tap/<netID>")
+@circle.get("/api/admin/delete-tap/<netID>")
 @login_required
 @admin_required(write_required=True)
 def delete_tap(netID):
@@ -99,4 +112,4 @@ def delete_tap(netID):
     conn.commit()
     conn.close()
 
-    return redirect(url_for('circle.circle_home'))
+    return jsonify({"success": True})

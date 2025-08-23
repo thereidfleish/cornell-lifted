@@ -1,5 +1,3 @@
-
-
 import Link from "next/link";
 
 const footerLinkClass = "underline text-gray-300 hover:no-underline hover:text-white transition-all duration-200";

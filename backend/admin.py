@@ -183,15 +183,6 @@ def get_rich_text(message_group, type):
 
 ### Attachments
 
-@admin.route("/api/admin/get-attachments/<message_group>")
-@login_required
-@admin_required(write_required=False)
-def get_attachments(message_group):
-    conn = get_db_connection()
-    attachments = rows_to_dicts(conn.execute("select * from attachments where message_group = ? order by id desc", (message_group,)).fetchall())
-    conn.close()
-    return jsonify({"attachments": attachments})
-
 @admin.route("/api/admin/get-attachment-prefs/<message_group>")
 @login_required
 @admin_required(write_required=False)
@@ -401,21 +392,21 @@ def process_all_cards(message_group):
 
 ### Impersonation
 
-@admin.post("/impersonate")
+@admin.post("/api/admin/impersonate")
 @login_required
-@admin_required(write_required=False)
+@admin_required(write_required=True)
 def impersonate():
     netID = request.form.get("impersonate_netid")
     user = load_user(netID)
     login_user(user)
     session["impersonating"] = True
-    return redirect(url_for("core.messages"))
+    return jsonify({"status": f"Now impersonating {netID}!"})
 
-@admin.route("/end-impersonate")
+@admin.route("/api/admin/end-impersonate")
 def end_impersonate():
     logout_user()
     session["impersonating"] = False
-    return redirect(url_for("core.messages"))
+    return jsonify({"status": "No longer impersonating."})
 
 ### Admins
 

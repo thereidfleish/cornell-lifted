@@ -1,5 +1,6 @@
 export type User = {
   authenticated: boolean;
+  impersonating: boolean;
   user?: {
     id: string;
     email: string;

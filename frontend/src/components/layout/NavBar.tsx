@@ -1,17 +1,17 @@
 "use client"
 import React, { use, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useGlobal } from "@/utils/GlobalContext";
+import {User} from "@/types/User";
 
-function NavLinks({ className = "" }: { className?: string }) {
-    const { user, config } = useGlobal();
-
+function NavLinks({ user, className = "" }: { user: User; className?: string }) {
     const navLinkClass = `text-gray-700 transition-all duration-300 ease-in-out hover:text-[var(--cornell-red)] hover:-translate-y-[2px] ${className}`;
     return (
         <>
             <Link href="/faqs" className={navLinkClass}>FAQs</Link>
             <Link href="/popped" className={navLinkClass}>Popped</Link>
-            { user?.authenticated && (
+            { user?.user?.is_admin && (
                 <Link href="/admin" className={navLinkClass}>Admin</Link>
             )}
         </>
@@ -39,9 +39,21 @@ function ActionLinks({ vertical = false }) {
     );
 }
 
-export default function NavBar({ impersonating = false }) {
+export default function NavBar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const toggleMobileMenu = () => setMobileOpen((open) => !open);
+    const { user, config, refreshConfig } = useGlobal();
+
+    const router = useRouter();
+
+    const handleEndImpersonate = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        const res = await fetch("/api/admin/end-impersonate");
+        if (res.ok) {
+            refreshConfig();
+            router.push("/messages");
+        }
+    };
 
     return (
         <nav className="sticky top-0 z-50 bg-white shadow">
@@ -74,7 +86,7 @@ export default function NavBar({ impersonating = false }) {
                     {/* Navigation items (visible on desktop) */}
                     <div className="hidden lg:flex items-center">
                         <div className="flex space-x-6 mr-6">
-                            <NavLinks />
+                            <NavLinks user={user} />
                         </div>
                         <div className="flex space-x-2">
                             <ActionLinks />
@@ -88,7 +100,7 @@ export default function NavBar({ impersonating = false }) {
                 <div className="lg:hidden bg-white border-t border-gray-200 shadow-md animate-fade-in-down">
                     <div className="max-w-7xl mx-auto px-4 py-4">
                         <div className="flex flex-col mb-4">
-                            <NavLinks className="py-2 d-block" />
+                            <NavLinks user={user} className="py-2 d-block" />
                             <div className="border-t border-gray-200 my-2" />
                         </div>
                         <div className="flex flex-col space-y-2">
@@ -98,12 +110,18 @@ export default function NavBar({ impersonating = false }) {
                 </div>
             )}
 
-            {impersonating && (
-                <div className="alert alert-warning mt-2" role="alert">
-                    <h5 className="alert-heading">
-                        You are impersonating as hi
-                    </h5>
-                    <a href="/end-impersonate" className="mb-0 download">End Impersonation</a>
+            {user?.impersonating && (
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded flex items-center justify-between mb-2">
+                    <span>
+                        <strong>Impersonating:</strong> {user.user?.email}
+                    </span>
+                    <a
+                        href="/api/admin/end-impersonate"
+                        className="ml-4 px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold shadow hover:bg-yellow-500 transition"
+                        onClick={handleEndImpersonate}
+                    >
+                        End Impersonation
+                    </a>
                 </div>
             )}
         </nav>

@@ -1,9 +1,8 @@
-from flask import redirect, send_file, render_template, abort, jsonify, request, url_for, Blueprint, current_app
+from flask import redirect, send_file, render_template, abort, jsonify, request, url_for, Blueprint, current_app, session
 from flask_login import login_required, current_user
 import ldap3
 from datetime import datetime
 from pathlib import Path
-from wtforms import Form, BooleanField, StringField, HiddenField, TextAreaField, validators
 
 import os
 import helpers
@@ -23,8 +22,14 @@ def rows_to_dicts(rows):
 def auth_status():
     print(current_user.is_authenticated)
     if current_user.is_authenticated:
+        try:
+            session["impersonating"]
+        except KeyError:
+            session["impersonating"] = False
+        
         return jsonify({
             "authenticated": True,
+            "impersonating": session["impersonating"],
             "user": {"id": current_user.id,
                      "email": current_user.email,
                      "name": current_user.name,
@@ -136,6 +141,7 @@ def get_messages():
                                                              for attachment in attachments if attachment["message_group"] == message_group]
 
                     build["types"].append({
+                    "message_group": message_group,
                     "type":  message_group.split("_")[2],
                     "type_name": "eLifted" if "e" in message_group else "Physical Lifted",
                     "hide_cards": False if message_group not in current_app.config["lifted_config"]["hidden_cards"] or message_group in hidden_card_overrides else True,
@@ -145,7 +151,9 @@ def get_messages():
                     "sent_card_ids": [card["id"] for card in sent_cards_in_current_message_group],
                     "received_rank": next((item["rank"] for item in received_ranks if item["message_group"] == message_group), None),
                     "sent_rank": next((item["rank"] for item in sent_ranks if item["message_group"] == message_group), None),
-                    "available_attachments": attachments_in_current_message_group,
+                    # "allow_choosing_attachments": True if current_attachment_message_group == message_group else False,
+                    # "allow_swapping"
+                    # "available_attachments": attachments_in_current_message_group,
                     "chosen_attachment": next(({"id": pref["attachment_id"], "attachment_name": pref["attachment"]} for pref in attachment_prefs if pref["message_group"] == message_group), None)
                 })
 
@@ -154,8 +162,27 @@ def get_messages():
         return jsonify(output)
     else:
         return {"error": "User not authenticated"}, 401
-    
-@core.post("/set-attachment-pref")
+
+@core.route("/api/get-attachment-pref/<message_group>")
+@login_required
+def get_attachment_pref(message_group):
+    conn = get_db_connection()
+    attachment_pref = conn.execute("select * from attachment_prefs where message_group = ? and recipient_email = ?",
+                                    (message_group, current_user.email)).fetchone()
+    conn.close()
+    if attachment_pref is None:
+        return jsonify({"attachment_pref": None})
+    return jsonify({"attachment_pref": dict(attachment_pref)})
+
+@core.route("/api/get-attachments/<message_group>")
+@login_required
+def get_attachments(message_group):
+    conn = get_db_connection()
+    attachments = rows_to_dicts(conn.execute("select * from attachments where message_group = ? order by id desc", (message_group,)).fetchall())
+    conn.close()
+    return jsonify({"attachments": attachments})
+
+@core.post("/api/set-attachment-pref")
 @login_required
 def set_attachment():
     attachment_id = request.form["id"]
@@ -182,8 +209,8 @@ def set_attachment():
     # conn.execute("insert or replace into attachment_prefs (recipient_email, attachment) values (?, ?)", (current_user.email, attachment))
     conn.commit()
     conn.close()
-    
-    return redirect(url_for("core.messages"))
+
+    return jsonify({"status": "success"})
 
 @core.route("/api/delete-attachment-pref/<id>")
 @login_required
@@ -496,7 +523,7 @@ def easter_egg(netID):
 
     return jsonify({"result": result})
 
-@core.route("/swap-messages")
+@core.post("/api/swap-messages")
 @login_required
 def swap_messages():
     swap_from = current_app.config["lifted_config"]["swap_from"]
@@ -523,4 +550,4 @@ def swap_messages():
 
     helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Swapped Cards to eLifted")
     
-    return redirect(url_for("core.messages"))
+    return jsonify({"swapped": True})

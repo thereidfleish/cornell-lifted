@@ -1,6 +1,9 @@
 import { LiftedEventTypeDetails } from "@/app/messages/page";
 import MessageModal from "@/components/messages/MessageModal";
 import React, { useState } from "react";
+import { useGlobal } from "@/utils/GlobalContext";
+import ChooseAttachment from "./ChooseAttachment";
+import SwapCards from "./SwapCards";
 
 type SentReceivedCardProps = {
     details: LiftedEventTypeDetails;
@@ -14,6 +17,7 @@ export default function SentReceivedCard({ details, year_name, season_name, late
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCardId, setSelectedCardId] = useState<number | string | null>(null);
     const [overrideHiddenMessage, setOverrideHiddenMessage] = useState(false);
+    const { config } = useGlobal();
 
     const isELifted = details.type === "e";
     const isPhysical = details.type === "p";
@@ -89,7 +93,6 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                             <div className="text-center p-2">
                                                 {isPhysical ? (
                                                     latest_physical_event ? (
-
                                                         <div className="shadow-lg rounded-lg p-4 transition-all duration-500 ease-in-out scale-100 hover:scale-102">
                                                             <h2 className="text-3xl text-cornell-red font-schoolbell mb-4">🎈 Coming Soon!</h2>
                                                             <p className="text-sm text-gray-800 mb-4">Pick up your {details.received_count} physical card{details.received_count !== 1 ? 's' : ''} on the <b>Arts Quad before 7 PM</b> on the last day of classes <b>(Tuesday, May 6th)!</b></p>
@@ -109,6 +112,16 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                                     <div className="shadow-lg rounded-lg p-4 transition-all duration-500 ease-in-out scale-100 hover:scale-102">
                                                         <h2 className="text-3xl text-cornell-red font-schoolbell mb-4">💌 Coming Soon!</h2>
                                                         <p className="text-sm text-gray-800 mb-4">Your {details.received_count} eLifted message{details.received_count !== 1 ? 's' : ''} will be available here on the last day of classes!</p>
+                                                    </div>
+                                                )}
+                                                {details.message_group === config?.attachment_message_group && (
+                                                    <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
+                                                        <ChooseAttachment message_group={details.message_group} />
+                                                    </div>
+                                                )}
+                                                {details.message_group === config?.swap_from && (
+                                                    <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
+                                                        <SwapCards />
                                                     </div>
                                                 )}
                                             </div>
