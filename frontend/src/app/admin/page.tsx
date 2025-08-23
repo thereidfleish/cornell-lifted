@@ -5,8 +5,11 @@ import AdminsSection from "./Admins";
 import HiddenCardOverridesSection from "./HiddenCardOverrides";
 import BrowseMessagesSection from "./BrowseMessages";
 import ProcessCards from "./ProcessCards";
+
 import EssentialsSection from "./MessageGroups";
 import FormAndEmailSection from "./FormAndEmail";
+import AttachmentOptions from "./AttachmentOptions";
+import SwappingOptions from "./SwappingOptions";
 
 const sidebarSections = [
   {
@@ -32,6 +35,12 @@ export default function AdminDashboardPage() {
     }
     if (activeTab === "Form and Email") {
       return <FormAndEmailSection />;
+    }
+    if (activeTab === "Attachments") {
+      return <AttachmentOptions />;
+    }
+    if (activeTab === "Swapping") {
+      return <SwappingOptions />;
     }
     if (activeTab === "Logs") {
       return <AdminLogsPage />;

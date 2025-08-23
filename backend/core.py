@@ -185,7 +185,7 @@ def set_attachment():
     
     return redirect(url_for("core.messages"))
 
-@core.route("/delete-attachment-pref/<id>")
+@core.route("/api/delete-attachment-pref/<id>")
 @login_required
 def delete_attachment_pref(id):
     conn = get_db_connection()
@@ -199,7 +199,7 @@ def delete_attachment_pref(id):
         conn.commit()
         conn.close()
 
-        return redirect(url_for("core.messages"))
+        return jsonify({"status": "success"})
 
     abort(401, "Not your account")
 

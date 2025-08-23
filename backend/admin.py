@@ -27,32 +27,6 @@ def logs_page():
         "recently_deleted_messages": recently_deleted_messages
     })
 
-@admin.route("/admin", methods=['GET', 'POST'])
-@login_required
-@admin_required(write_required=False)
-def admin_page():
-    if request.method == "POST":
-        return redirect(url_for('admin.admin_page')) # prevents form resubmission
-    
-    
-    conn = get_db_connection()
-    
-    # Swap Prefs Table
-    swap_prefs = conn.execute("select * from swap_prefs").fetchall()
-
-    # Attachments Table
-    attachments = conn.execute("select * from attachments order by id desc").fetchall()
-
-    # Attachment Prefs Table
-    attachment_prefs = conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id").fetchall()
-    conn.close()
-
-    return render_template("admin.html",
-                           pptx_templates_files=pptx_templates_files,
-                           swap_prefs=swap_prefs,
-                           attachments=attachments,
-                           attachment_prefs=attachment_prefs)
-
 ### Message Groups
 
 @admin.route("/api/admin/get-pptx-templates-files")
@@ -209,15 +183,33 @@ def get_rich_text(message_group, type):
 
 ### Attachments
 
-@admin.post("/update-attachment-message-group")
+@admin.route("/api/admin/get-attachments/<message_group>")
+@login_required
+@admin_required(write_required=False)
+def get_attachments(message_group):
+    conn = get_db_connection()
+    attachments = rows_to_dicts(conn.execute("select * from attachments where message_group = ? order by id desc", (message_group,)).fetchall())
+    conn.close()
+    return jsonify({"attachments": attachments})
+
+@admin.route("/api/admin/get-attachment-prefs/<message_group>")
+@login_required
+@admin_required(write_required=False)
+def get_attachment_prefs(message_group):
+    conn = get_db_connection()
+    attachment_prefs = rows_to_dicts(conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id where attachment_prefs.message_group = ?", (message_group,)).fetchall())
+    conn.close()
+    return jsonify({"attachment_prefs": attachment_prefs})
+
+@admin.post("/api/admin/update-attachment-message-group")
 @login_required
 @admin_required(write_required=True)
 def update_attachment_message_group():
     current_app.config["lifted_config"]["attachment_message_group"] = request.form.get("attachment-message-group")
     update_lifted_config(current_app.config["lifted_config"])
-    return redirect(url_for('admin.admin_page'))
+    return jsonify({"status": "Attachment message group updated successfully!"})
 
-@admin.route("/delete-attachment/<id>")
+@admin.route("/api/admin/delete-attachment/<id>")
 @login_required
 @admin_required(write_required=True)
 def delete_attachment(id):
@@ -225,24 +217,32 @@ def delete_attachment(id):
     conn.execute('delete from attachments where id = ?', (id,))
     conn.commit()
     conn.close()
+    return jsonify({"status": "Attachment deleted successfully!"})
 
-    return redirect(url_for("admin.admin_page"))
-
-@admin.post("/add-attachment/<message_group>")
+@admin.post("/api/admin/add-attachment/<message_group>")
 @login_required
 @admin_required(write_required=True)
 def add_attachment(message_group):
     attachment = request.form["attachment-name"]
     count = request.form["attachment-count"]
-
     conn = get_db_connection()
     conn.execute("insert into attachments (message_group, attachment, count) values (?, ?, ?)", (message_group, attachment, count))
     conn.commit()
     conn.close()
-    
-    return redirect(url_for("admin.admin_page"))
+    return jsonify({"status": "Attachment added successfully!"})
 
-@admin.post("/update-swapping-config")
+### Swapping
+
+@admin.get("/api/admin/get-swap-prefs")
+@login_required
+@admin_required(write_required=False)
+def get_swap_prefs():
+    conn = get_db_connection()
+    swap_prefs = rows_to_dicts(conn.execute("select * from swap_prefs").fetchall())
+    conn.close()
+    return jsonify({"swap_prefs": swap_prefs})
+
+@admin.post("/api/admin/update-swapping-config")
 @login_required
 @admin_required(write_required=True)
 def update_swapping_config():
@@ -250,9 +250,9 @@ def update_swapping_config():
     current_app.config["lifted_config"]["swap_to"] = request.form.get("swap-to")
     current_app.config["lifted_config"]["swap_text"] = request.form.get("swap-text")
     update_lifted_config(current_app.config["lifted_config"])
-    return redirect(url_for('admin.admin_page'))
+    return jsonify({"status": "Swapping config updated successfully!"})
 
-@admin.route("/delete-swap-pref/<id>")
+@admin.route("/api/admin/delete-swap-pref/<id>")
 @login_required
 @admin_required(write_required=True)
 def delete_swap_pref(id):
@@ -265,11 +265,9 @@ def delete_swap_pref(id):
     #                      (swap_pref["message_group_from"], swap_pref["message_group_to"], swap_pref["recipient_email"]))
     
     conn.execute('delete from swap_prefs where id = ?', (id,))
-
     conn.commit()
     conn.close()
-
-    return redirect(url_for("admin.admin_page"))
+    return jsonify({"status": "Swap pref deleted successfully!"})
 
 ### Browse Messages
 
