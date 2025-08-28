@@ -55,16 +55,17 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
       const { Quill } = await import("react-quill-new");
 
       // Prefer class-based fonts (easier CSS + no spaces in tokens)
-      const Font = Quill.import("attributors/class/font");
+      const Font = Quill.import("attributors/class/font") as any;
       Font.whitelist = ["georgia", "arial", "verdana", "schoolbell", "tenor-sans"];
       Quill.register(Font, true);
 
       // Use style-based sizes to get pixel values
-      const Size = Quill.import("attributors/style/size");
+      const Size = Quill.import("attributors/style/size") as any;
       Size.whitelist = ["10px", "11px", "12px", "14px", "16px", "18px", "20px"];
       Quill.register(Size, true);
 
-      Quill.register(Quill.import("attributors/style/align"), true);
+      const Align = Quill.import("attributors/style/align") as any;
+      Quill.register(Align, true);
 
       setReady(true);
     })();

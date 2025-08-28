@@ -25,7 +25,7 @@ export default function SendMessagePage() {
                     <h2 className="text-2xl font-bold text-cornell-red mb-4">The message form isn't open right now</h2>
                     <p className="mb-6 text-gray-700">You can't send a Lifted message at this time. Please check back later!</p>
                     <div className="flex flex-col gap-3">
-                        <a href="/faq" className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition">View FAQs</a>
+                        <a href="/faqs" className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition">View FAQs</a>
                         <a href="/messages" className="bg-gray-100 text-cornell-blue rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-blue hover:text-white transition">View Your Sent Messages</a>
                     </div>
                 </div>
