@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, abort, current_app, request
+from flask import Flask, render_template, session, abort, jsonify, request
 from flask_login import LoginManager, UserMixin, login_user, current_user
 from flask_oidc import OpenIDConnect, signals
 from werkzeug.exceptions import HTTPException
@@ -58,43 +58,26 @@ def after_setup(app):
         
         if hasattr(current_user, "id"):
             # print(current_user.id, "(", current_user.name, ")", "had an error", e.code)
-            helpers.log(current_user.id, current_user.full_name, "ERROR", str(e.code), error_message_body)
+            helpers.log(current_user.id, current_user.full_name, "ERROR", str(error_code), error_message_body)
 
-        
-        if e.code == 400:
-            error_code = "In other words, the server did not like something you just sent it.  Like if you sent your ex a Lifted message, they would probably not like it (please do that at your own risk — we are not endorsing this).  Or, if you were trying to reverse-engineer this web app, that's why you might be here.  Otherwise, I don't know what to tell you, it's probably something wrong on our end, so you should email us below."
-        
-        if e.code == 401 or 403:
+        if error_code == 400:
+            error_message_human_body = "In other words, the server did not like something you just sent it.  Like if you sent your ex a Lifted message, they would probably not like it (please do that at your own risk — we are not endorsing this).  Or, if you were trying to reverse-engineer this web app, that's why you might be here.  Otherwise, I don't know what to tell you, it's probably something wrong on our end, so you should email us below."
+
+        if error_code == 401 or 403:
             error_message_human_body = "In other words, you are either not logged in or you are trying to access a Lifted message that's not yours (don't do that!).  After Lifted Day, recipients' messages are for their eyes only...please ensure you're logged in and try again.  You might also wind up here if someone tried to share their message with you by sending you this link — tell them they need to download the pdf or screenshot it and send it to you that way instead!"
-        
-        if e.code == 404:
+
+        if error_code == 404:
             error_message_human_body = "In other words, this page or Lifted message just simply does not exist.  Not sure how you ended up here, but you probably did something wrong.  Or sneaky, like trying to increase the number in the URL to see if you had extra Lifted messages.  Or maybe it was our fault and you're missing messages.  Idk.  Send us an email below if you're not sure and we'll check it out!"
-        
-        if e.code == 500:
+
+        if error_code == 500:
             error_message_human_body = "In other words, something on our end went very wrong.  You probably didn't do anything wrong.  Although I am an InfoSci major, this is the first major web app I've built, so there's a good chance I missed some weird edge case.  Send me an email below and I'll look into it!"
         
-        return render_template(
-            "error.html",
-            error_code=error_code,
-            error_message_title=error_message_title,
-            error_message_body=error_message_body,
-            error_message_human_body=error_message_human_body
-            ), error_code
-
-    @app.template_filter('ordinal')
-    def ordinal(num):
-        if 10 <= num % 100 <= 20:
-            suffix = 'th'
-        else:
-            suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(num % 10, 'th')
-        return str(num) + suffix
-    
-    @app.template_filter('pluralize')
-    def pluralize(number, singular = '', plural = 's'):
-        if number == 1:
-            return singular
-        else:
-            return plural
+        return jsonify({
+            "error_code": error_code,
+            "error_message_title": error_message_title,
+            "error_message_body": error_message_body,
+            "error_message_human_body": error_message_human_body
+        }), error_code
 
 # Load Lifted configuration
 def load_lifted_config():

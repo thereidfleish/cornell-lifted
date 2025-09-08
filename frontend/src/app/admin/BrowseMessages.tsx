@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
-import Table, { TableHeader } from "@/components/Table";
+import { AgGridReact } from "ag-grid-react";
+import { themeQuartz } from 'ag-grid-community';
 import MessageGroupSelector from "@/components/MessageGroupSelector";
 import Loading from "@/components/Loading";
 import MessageModal from "@/components/messages/MessageModal";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
+
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
+
+// Register all Community features
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface Message {
   id: number;
@@ -18,18 +24,6 @@ export interface Message {
 }
 
 export default function BrowseMessagesSection() {
-
-const headers: TableHeader[] = [
-  { key: "tools", label: "Tools" },
-  { key: "created_timestamp", label: "Timestamp" },
-  { key: "message_group", label: "Message Group" },
-  { key: "sender_email", label: "Sender Email" },
-  { key: "recipient_email", label: "Recipient Email" },
-  { key: "sender_name", label: "Sender Name" },
-  { key: "recipient_name", label: "Recipient Name" },
-  { key: "message_content", label: "Message" },
-  { key: "id", label: "ID" },
-];
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -82,33 +76,10 @@ const headers: TableHeader[] = [
   const tableData = messages.map((msg) => ({
     tools: (
       <div className="flex gap-2">
-        {/* View card modal (💌) */}
-        <button
-          title="View message"
-          className="p-0 bg-none border-none text-xl cursor-pointer"
-          onClick={() => { setModalCardId(msg.id); setModalOpen(true); }}
-        >💌</button>
-        {/* Download PDF (⬇️) */}
-        <a
-          href={`/api/get-card-pdf/${msg.id}`}
-          title="Download PDF"
-          className="px-1 text-xl"
-          target="_blank"
-          rel="noopener noreferrer"
-        >⬇️</a>
-        {/* Edit (✍️) */}
-        <a
-          href={`/edit-message/${msg.id}`}
-          title="Edit message"
-          target="_blank"
-          className="px-1 text-xl"
-        >✍️</a>
-        {/* Delete (🗑️) */}
-        <button
-          title="Delete message"
-          className="p-0 bg-none border-none text-xl cursor-pointer"
-          onClick={() => { setDeleteId(msg.id); setConfirmOpen(true); }}
-        >🗑️</button>
+        <button title="View message" className="p-0 bg-none border-none text-xl cursor-pointer" onClick={() => { setModalCardId(msg.id); setModalOpen(true); }}>💌</button>
+        <a href={`/api/get-card-pdf/${msg.id}`} title="Download PDF" className="px-1 text-xl" target="_blank" rel="noopener noreferrer">⬇️</a>
+        <a href={`/edit-message/${msg.id}`} title="Edit message" target="_blank" className="px-1 text-xl">✍️</a>
+        <button title="Delete message" className="p-0 bg-none border-none text-xl cursor-pointer" onClick={() => { setDeleteId(msg.id); setConfirmOpen(true); }}>🗑️</button>
       </div>
     ),
     created_timestamp: msg.created_timestamp,
@@ -120,6 +91,22 @@ const headers: TableHeader[] = [
     message_content: msg.message_content,
     id: msg.id,
   }));
+
+  // Update columnDefs for message_content column
+const columnDefs = [
+  { headerName: "Tools", field: "tools", cellRenderer: (params: any) => params.value, sortable: false, filter: false, resizable: false, maxWidth: 150 },
+  { headerName: "Timestamp", field: "created_timestamp", wrapText: true, maxWidth: 120 },
+  { headerName: "Message Group", field: "message_group", wrapText: true, maxWidth: 120 },
+  { headerName: "Sender Email", field: "sender_email", wrapText: true, maxWidth: 160 },
+  { headerName: "Recipient Email", field: "recipient_email", wrapText: true, maxWidth: 160 },
+  { headerName: "Sender Name", field: "sender_name", wrapText: true, maxWidth: 150 },
+  { headerName: "Recipient Name", field: "recipient_name", wrapText: true, maxWidth: 150 },
+  {
+    headerName: "Message", field: "message_content", wrapText: true, minWidth: 500,
+    autoHeight: true,
+  },
+  { headerName: "ID", field: "id", maxWidth: 100 },
+];
   async function handleDeleteConfirmed() {
     if (deleteId === null) return;
     setDeleting(true);
@@ -172,7 +159,15 @@ const headers: TableHeader[] = [
       {loading ? (
         <Loading />
       ) : (
-          <Table headers={headers} data={tableData} maxHeight={600} />
+        <div className="ag-theme-alpine rounded-lg border border-gray-300" style={{ height: 600, width: "100%", minWidth: "1000px" }}>
+          <AgGridReact
+            columnDefs={columnDefs as any}
+            rowData={tableData}
+            pagination={tableData.length > 100}
+            paginationPageSize={100}
+            defaultColDef={{ cellStyle: { lineHeight: "1.5", padding: "8px" } }}
+          />
+        </div>
       )}
       <MessageModal
         cardId={modalCardId}
