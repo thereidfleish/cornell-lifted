@@ -24,17 +24,7 @@
     ],
     "form_message_group": "none",
     "attachment_message_group": "none",
-    "swap_from": "sp_25_p",
+    "swap_from": "none",
     "swap_to": "sp_25_e",
-    "swap_text": "Get your cards delivered virtually on the last day of classes instead.  Hard deadline to do this is <b>4/27/25 at 11:59 PM!</b>",
-    "rich_text_types": {
-        "form": "Form Description",
-        "sender": "Sender Confirmation Email",
-        "recipient": "Recipient You've Been Lifted! Email"
-    },
-    "admin_tabs": {
-        "lifted_config": "Lifted Configuration",
-        "message_tools": "Message Tools",
-        "advanced": "Advanced"
-    }
+    "swap_text": "Get your cards delivered virtually on the last day of classes instead.  Hard deadline to do this is <b>4/27/25 at 11:59 PM!</b>"
 }
