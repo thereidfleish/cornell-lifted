@@ -20,7 +20,6 @@ def rows_to_dicts(rows):
 
 @core.get("/api/auth/status")
 def auth_status():
-    print(current_user.is_authenticated)
     if current_user.is_authenticated:
         try:
             session["impersonating"]
