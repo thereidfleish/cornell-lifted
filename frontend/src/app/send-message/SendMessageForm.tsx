@@ -16,7 +16,7 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
     const [formErrors, setFormErrors] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [formDescription, setFormDescription] = useState<string>("");
-    const { user, config } = useGlobal();
+    const { user, config, loading } = useGlobal();
     const [dialog, setDialog] = useState<{ type: "success" | "error"; message: string; recipientEmail?: string } | null>(null);
     const [adminOverride, setAdminOverride] = useState(false);
     const [adminMessageGroup, setAdminMessageGroup] = useState(cardData?.message_group || "");
@@ -125,7 +125,7 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
     const [loadingFormDescription, setLoadingFormDescription] = useState(false);
 
     return (
-        <main className="bg-[#f4fbf3] font-tenor">
+        <main className="bg-[#f4fbf3] font-tenor pb-12">
             {/* Hero Section */}
             <section className="relative py-16 flex flex-col items-center">
                 <div className="flex flex-col items-center">
@@ -139,8 +139,27 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                     <p className="text-lg text-center text-gray-700 mb-6">Share gratitude and appreciation with someone special</p>
                 </div>
             </section>
+            
+            {/* Auth Section */}
+            {loading ? (
+                <section className="pb-12 pt-6">
+                    <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8 text-center">
+                        <Loading />
+                    </div>
+                </section>
+            ) : !user?.authenticated ? (
+                <section className="pb-12 pt-6">
+                    <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8 text-center">
+                        <div className="text-4xl mb-4">🔑</div>
+                        <h4 className="text-2xl font-bold text-cornell-blue mb-2">Sign In to Send Messages</h4>
+                        <p className="mb-4">Sign in with your Cornell NetID to send Lifted messages and spread gratitude across campus!</p>
+                        <a href="https://api.cornelllifted.com/login?next=/send-message" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block">Sign In with Cornell NetID</a>
+                    </div>
+                </section>
+            ) : (
+            <>
             {/* Main Content Section */}
-            <section className="max-w-3xl mx-auto bg-white rounded-xl shadow p-8 mb-12">
+            <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8">
                 {/* Form Description from API */}
                 {loadingFormDescription ? (
                     <div className="mb-6 flex justify-center items-center">
@@ -356,6 +375,8 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                     </div>
                 </form>
             </section>
+            </>
+            )}
         </main>
     );
 }

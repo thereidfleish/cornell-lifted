@@ -12,6 +12,7 @@
   "dependencies": {
     "ag-grid-community": "^34.1.2",
     "ag-grid-react": "^34.1.2",
+    "js-confetti": "^0.13.1",
     "next": "15.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",

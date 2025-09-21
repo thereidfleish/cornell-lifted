@@ -7,6 +7,7 @@ import TapAcceptanceForm from "./TapAcceptanceForm";
 import Loading from "@/components/Loading";
 import { useSparkleConfetti } from "./useSparkleConfetti";
 import { ProgressiveMessages } from "./ProgressiveMessages";
+import JSConfetti from 'js-confetti'
 
 const CirclePage: React.FC = () => {
 	const { user: globalUser, loading: globalLoading } = useGlobal();
@@ -17,6 +18,23 @@ const CirclePage: React.FC = () => {
 	const [userError, setUserError] = useState<string>("");
 	const [loading, setLoading] = useState(false);
 	const [refreshKey, setRefreshKey] = useState(0);
+
+	const jsConfettiRef = React.useRef<JSConfetti | null>(null);
+
+	const triggerAcceptanceConfetti = () => {
+		// Initialize JSConfetti only when needed (client-side)
+		if (!jsConfettiRef.current && typeof window !== 'undefined') {
+			jsConfettiRef.current = new JSConfetti();
+		}
+		
+		if (jsConfettiRef.current) {
+			jsConfettiRef.current.addConfetti({
+				emojis: ['🎉', '🎈', '✨', '🍪', '👨‍🌾', '🐏'],
+				emojiSize: 80,
+				confettiNumber: 150,
+			});
+		}
+	};
 	
 	// Use the sparkle confetti hook
 	const { 
@@ -67,8 +85,11 @@ const CirclePage: React.FC = () => {
 		}
 		
 		if (user && user.accept_tap === 1) {
+			// Trigger confetti for accepted taps
+			triggerAcceptanceConfetti();
+			
 			return (
-				<p className="text-center text-white">
+				<p className="text-center text-white mb-4">
 					Welcome to the Circle, {user.tap_name?.split(" ")[0]}! We're so excited for you to join us. 
 					Keep an eye on your email for further information, coming soon...<br /><br />
 					If you have any questions in the meantime, please reach out to whoever tapped you or wrote you a letter.
@@ -78,7 +99,7 @@ const CirclePage: React.FC = () => {
 		
 		if (user && user.accept_tap === 0) {
 			return (
-				<p className="text-center text-white">
+				<p className="text-center text-white mb-4">
 					We're sorry you rejected the tap. Please return the parcel to whoever tapped you and maintain the society's secrecy.<br /><br />
 					If you have any questions, please reach out to whoever tapped you or wrote you a letter.
 				</p>

@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { AgGridReact } from "ag-grid-react";
+import { themeQuartz, ColDef } from 'ag-grid-community';
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import Loading from "@/components/Loading";
 import { useGlobal } from "@/utils/GlobalContext";
+
+// Register all Community features
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface Person {
   NetID: string;
@@ -73,6 +79,32 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
     fetchEasterEgg();
   }, [selectedPerson]);
 
+  // AG Grid column definitions
+  const columnDefs: ColDef<Person>[] = [
+    { headerName: "NetID", field: "NetID", width: 90 },
+    { headerName: "Name", field: "Name", width: 200 },
+    { headerName: "Affiliation", field: "Primary Affiliation", width: 120 },
+    { headerName: "College", field: "College", width: 150 },
+    { headerName: "Department", field: "Primary Dept", width: 200 },
+    { headerName: "Title", field: "Primary Title", width: 200 }
+  ];
+
+  const handleRowSelection = (event: any) => {
+    const selectedRows = event.api.getSelectedRows();
+    if (selectedRows.length > 0) {
+      onSelect(selectedRows[0]);
+    }
+  };
+
+  // Calculate dynamic height based on number of rows
+  const getGridHeight = () => {
+    const headerHeight = 40; // Height of header row
+    const rowHeight = 42; // Approximate height per row
+    const padding = 10; // Some padding
+    const calculatedHeight = headerHeight + (searchResults.length * rowHeight) + padding;
+    return Math.min(calculatedHeight, 300); // Max height of 300px
+  };
+
   // Allowed affiliations
   const goodAffiliations = ["student", "faculty", "staff", "academic", "temporary"];
   let statusBg = "bg-green-50 text-green-900 border border-green-200";
@@ -106,36 +138,18 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
         {loadingSearch ? <Loading /> : (
           <>
             <div className="text-sm text-gray-700 mb-2">{searchStatus}</div>
-            <div className="overflow-auto" style={{ borderRadius: "0.75rem", border: "1px solid #d1d5db" }}>
-              <table className="rounded-lg" style={{display: "block", maxHeight: "350px", overflow: "auto" }}>
-                <thead className="sticky top-0 bg-gray-100">
-                  <tr>
-                    <th className="p-2 text-left">NetID</th>
-                    <th className="p-2 text-left">Name</th>
-                    <th className="p-2 text-left">Affiliation</th>
-                    <th className="p-2 text-left">College</th>
-                    <th className="p-2 text-left">Department</th>
-                    <th className="p-2 text-left">Title</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchResults.map((person, idx) => (
-                    <tr
-                      key={person.NetID}
-                      className={`cursor-pointer transition-colors duration-150 ${selectedPerson?.NetID === person.NetID ? "bg-blue-200" : "hover:bg-blue-100"} border-b border-gray-200`}
-                      onClick={() => onSelect(person)}
-                    >
-                      <td className="p-2">{person.NetID}</td>
-                      <td className="p-2">{person.Name}</td>
-                      <td className="p-2">{person["Primary Affiliation"]}</td>
-                      <td className="p-2">{person.College}</td>
-                      <td className="p-2">{person["Primary Dept"]}</td>
-                      <td className="p-2">{person["Primary Title"]}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {searchResults.length > 0 && (
+              <div className="ag-theme-quartz" style={{ height: `${getGridHeight()}px`, width: '100%' }}>
+                <AgGridReact
+                  rowData={searchResults}
+                  columnDefs={columnDefs}
+                  theme={themeQuartz}
+                  rowSelection="single"
+                  onSelectionChanged={handleRowSelection}
+                  suppressCellFocus={true}
+                />
+              </div>
+            )}
           </>
         )}
       </div>

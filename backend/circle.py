@@ -51,7 +51,6 @@ def update_tap_response():
     validate_user_is_tapped_or_admin()
     
     form = request.form
-    print(form)
 
     netid = current_user.id
     accept_tap = True if form["accept_tap"] == "accept" else False
@@ -60,14 +59,15 @@ def update_tap_response():
     monitor_inbox = form["monitor_inbox"]
     phonetic_spelling = form["phonetic_spelling"]
     allergens = form["allergens"]
+    physical_accommodations = form["physical_accommodations"]
     pronouns = form["pronouns"]
     notes = form["notes"]
 
     timestamp = datetime.now().replace(microsecond=0)
 
     conn = get_db_connection()
-    conn.execute('update cp_taps set responded_timestamp=?, accept_tap=?, clear_schedule=?, wear_clothing=?, monitor_inbox=?, pronouns=?, phonetic_spelling=?, allergens=?, notes=?  where netid=?',
-                    (timestamp, accept_tap, clear_schedule, wear_clothing, monitor_inbox, pronouns, phonetic_spelling, allergens, notes, netid))
+    conn.execute('update cp_taps set responded_timestamp=?, accept_tap=?, clear_schedule=?, wear_clothing=?, monitor_inbox=?, pronouns=?, phonetic_spelling=?, allergens=?, physical_accommodations=?, notes=?  where netid=?',
+                    (timestamp, accept_tap, clear_schedule, wear_clothing, monitor_inbox, pronouns, phonetic_spelling, allergens, physical_accommodations, notes, netid))
     # conn.execute('insert into cp_taps (netid, tap_name, created_timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     # (netid, current_user.name, timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes))
     conn.commit()

@@ -68,7 +68,6 @@ def add_message_group():
 @login_required
 @admin_required(write_required=True)
 def update_hidden_cards(message_group):
-    print(json.loads(request.data))
     if json.loads(request.data).get('hidden-cards'): # meaning a checkbox was ticked "on"
         current_app.config["lifted_config"]["hidden_cards"].append(message_group)
     else: # meaning a checkbox was ticked "off"

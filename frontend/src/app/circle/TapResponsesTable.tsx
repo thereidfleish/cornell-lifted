@@ -23,22 +23,24 @@ const TapResponsesTable: React.FC<TapResponsesTableProps> = ({ refreshKey, showD
 
 	// AG Grid column definitions
 	const columnDefs = [
-		{ headerName: "Responded Timestamp", field: "responded_timestamp", wrapText: true },
-		{ headerName: "NetID", field: "netid", wrapText: true },
-		{ headerName: "Name", field: "tap_name", wrapText: true },
+		{ headerName: "Responded Timestamp", field: "responded_timestamp", wrapText: true, width: 150 },
+		{ headerName: "NetID", field: "netid", wrapText: true, width: 80 },
+		{ headerName: "Name", field: "tap_name", wrapText: true, width: 200 },
 		{ 
 			headerName: "Accepted Tap", 
 			field: "accept_tap", 
 			cellRenderer: (params: any) => params.value,
-			wrapText: true
+			wrapText: true,
+			width: 120
 		},
-		{ headerName: "Clear Schedule", field: "clear_schedule", wrapText: true },
-		{ headerName: "Wear White", field: "wear_clothing", wrapText: true },
-		{ headerName: "Monitor Inbox", field: "monitor_inbox", wrapText: true },
+		{ headerName: "Clear Schedule", field: "clear_schedule", wrapText: true, width: 130 },
+		{ headerName: "Wear White", field: "wear_clothing", wrapText: true, width: 120 },
+		{ headerName: "Monitor Inbox", field: "monitor_inbox", wrapText: true, width: 130 },
 		{ headerName: "Notes", field: "notes", wrapText: true, minWidth: 200 },
-		{ headerName: "Pronouns", field: "pronouns", wrapText: true },
-		{ headerName: "Phonetic Spelling", field: "phonetic_spelling", wrapText: true },
-		{ headerName: "Allergens", field: "allergens", wrapText: true },
+		{ headerName: "Pronouns", field: "pronouns", wrapText: true, width: 100 },
+		{ headerName: "Phonetic Spelling", field: "phonetic_spelling", wrapText: true, width: 150 },
+		{ headerName: "Allergens", field: "allergens", wrapText: true, width: 100 },
+		{ headerName: "Physical Accommodations", field: "physical_accommodations", wrapText: true, width: 180 },
 		...(showDeleteButton ? [{ 
 			headerName: "Delete", 
 			field: "delete", 
@@ -73,6 +75,7 @@ const TapResponsesTable: React.FC<TapResponsesTableProps> = ({ refreshKey, showD
 			pronouns: tap.pronouns || "",
 			phonetic_spelling: tap.phonetic_spelling || "",
 			allergens: tap.allergens || "",
+			physical_accommodations: tap.physical_accommodations || "",
 		};
 
 		if (showDeleteButton) {
@@ -101,14 +104,6 @@ const TapResponsesTable: React.FC<TapResponsesTableProps> = ({ refreshKey, showD
 				<AgGridReact
 					columnDefs={columnDefs as any}
 					rowData={tableData}
-					pagination={tableData.length > 100}
-					paginationPageSize={100}
-					defaultColDef={{ 
-						cellStyle: { lineHeight: "1.6", padding: "8px" },
-						resizable: true,
-						sortable: true,
-						filter: true
-					}}
 				/>
 			</div>
 		</section>

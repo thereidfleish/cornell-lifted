@@ -71,7 +71,6 @@ def list_images():
 
     # List all images in the specified directory
     image_dir = Path("../frontend/public") / directory
-    print(image_dir)
     if not image_dir.exists() or not image_dir.is_dir():
         return jsonify({"error": "Directory not found"}), 404
 
@@ -465,11 +464,14 @@ def get_form_description():
 @core.route("/api/people-search")
 @login_required
 def get_person_info():
-    # Sanitize input to prevent LDAP injection
-    query = ldap3.utils.conv.escape_filter_chars(request.args.get("q"))
 
-    # Remove leading a trailing whitespace
-    query = request.args.get("q").strip()
+    # Get the query and strip whitespace
+    query = request.args.get("q", "").strip()
+    # If there's an '@', strip everything to the right (including '@')
+    if "@" in query:
+        query = query.split("@", 1)[0]
+    # Sanitize input to prevent LDAP injection
+    query = ldap3.utils.conv.escape_filter_chars(query)
 
     # Join the words with '*' and add '*' at the beginning and end
     formatted_query = '*' + '*'.join(query.split()) + '*'

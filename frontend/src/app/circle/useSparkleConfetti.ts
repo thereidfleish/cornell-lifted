@@ -12,15 +12,15 @@ export const useSparkleConfetti = () => {
 		['✦', '✧'], // Default sparkles
 		['🔵', '⭕'], // Circle
 		['🐏'], // Ram
-		['🍎', '🥕', '🌽', '🥬'], // Produce items
-		['🍪'], // Chocolate chip cookie
-		['✨', '💫'], // Light sparkle
-		['☕'], // Hot chocolate
-		['💌'], // Message with heart
-		['🌸', '🌺', '🌻', '🌷'], // Flower
-		['🎡', '🎈'], // Ferris wheel
-		['💕'], // Two purple hearts
-		['👨‍🌾', '🚜', '🌾'] // Farmer emojis
+		['🍎', '🥕', '🌽', '🥬'], // Anabel's Grocery
+		['🍪'], // Half-Baked
+		['✨', '💫'], // Winter Lights/BCI
+		['☕'], // Exams/Winter Lifted Hot Chocolate
+		['💌'], // Lifted Message
+		['🌸', '🌺', '🌻', '🌷'], // Lifted Flower
+		['🎡', '🎈'], // Lifted Pinwheel and Balloon
+		['💕'], // Perfect Match
+		['👨‍🌾', '🚜', '🌾'] // Farmer's Market at Cornell
 	];
 
 	// Progressive messages that unlock after each full cycle

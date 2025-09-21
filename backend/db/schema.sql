@@ -66,7 +66,8 @@
 --     notes TEXT,
 --     pronouns TEXT,
 --     phonetic_spelling TEXT,
---     allergens TEXT
+--     allergens TEXT,
+--     physical_accommodations TEXT
 -- );
 
 

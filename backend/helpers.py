@@ -202,7 +202,7 @@ def send_email(message_group, type, to, cc=None, bcc=None):
         print("Email would be sent!")
 
 college_dict = {
-        "AG": "Agriculture and Life Sciences",
+        "AG": "CALS",
         "AR": "Architecture, Art and Planning",
         "AS": "Arts and Sciences",
         "BU": "Business",
@@ -213,7 +213,7 @@ college_dict = {
         "EN": "Engineering",
         "GR": "Graduate",
         "HE": "Human Ecology",
-        "IL": "Industrial and Labor Relations",
+        "IL": "ILR",
         "LA": "Law",
         "VM": "Veterinary Medicine",
         "PPHE": "Public Policy",
