@@ -1,20 +1,10 @@
 import React, { useState } from "react";
-import Table, { TableHeader } from "@/components/Table";
+import { AgGridReact } from "ag-grid-react";
+import { themeQuartz } from 'ag-grid-community';
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
-const ADMIN_HEADERS: TableHeader[] = [
-	{ key: "responded_timestamp", label: "Responded Timestamp" },
-	{ key: "netid", label: "NetID" },
-	{ key: "tap_name", label: "Name" },
-	{ key: "accept_tap", label: "Accepted Tap" },
-	{ key: "clear_schedule", label: "Clear Schedule" },
-	{ key: "wear_clothing", label: "Wear White" },
-	{ key: "monitor_inbox", label: "Monitor Inbox" },
-	{ key: "notes", label: "Notes" },
-	{ key: "pronouns", label: "Pronouns" },
-	{ key: "phonetic_spelling", label: "Phonetic Spelling" },
-	{ key: "allergens", label: "Allergens" },
-	{ key: "delete", label: "Delete" },
-];
+// Register all Community features
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const AddCandidateFormAndResponses: React.FC = () => {
 	const [netid, setNetid] = useState("");
@@ -54,6 +44,33 @@ const AddCandidateFormAndResponses: React.FC = () => {
 			setError("Failed to add candidate. Please try again.");
 		}
 	};
+
+	// AG Grid column definitions
+	const columnDefs = [
+		{ headerName: "Responded Timestamp", field: "responded_timestamp", wrapText: true },
+		{ headerName: "NetID", field: "netid", wrapText: true },
+		{ headerName: "Name", field: "tap_name", wrapText: true },
+		{ 
+			headerName: "Accepted Tap", 
+			field: "accept_tap", 
+			cellRenderer: (params: any) => params.value,
+			wrapText: true
+		},
+		{ headerName: "Clear Schedule", field: "clear_schedule", wrapText: true },
+		{ headerName: "Wear White", field: "wear_clothing", wrapText: true },
+		{ headerName: "Monitor Inbox", field: "monitor_inbox", wrapText: true },
+		{ headerName: "Notes", field: "notes", wrapText: true, minWidth: 200 },
+		{ headerName: "Pronouns", field: "pronouns", wrapText: true },
+		{ headerName: "Phonetic Spelling", field: "phonetic_spelling", wrapText: true },
+		{ headerName: "Allergens", field: "allergens", wrapText: true },
+		{ 
+			headerName: "Delete", 
+			field: "delete", 
+			cellRenderer: (params: any) => params.value,
+			sortable: false, 
+			filter: false
+		},
+	];
 
 		const tableData = taps.map(tap => {
 			let accepted = "";
@@ -132,7 +149,20 @@ const AddCandidateFormAndResponses: React.FC = () => {
 			</section>
 			<section className="mb-8">
 				<h2 className="text-xl font-bold text-white mb-2 mt-3">Tap Responses</h2>
-				<Table headers={ADMIN_HEADERS} data={tableData} maxHeight={1000} />
+				<div className="ag-theme-alpine rounded-lg border border-gray-300" style={{ height: 600, width: "100%", minWidth: "1000px" }}>
+					<AgGridReact
+						columnDefs={columnDefs as any}
+						rowData={tableData}
+						pagination={tableData.length > 100}
+						paginationPageSize={100}
+						defaultColDef={{ 
+							cellStyle: { lineHeight: "1.6", padding: "8px" },
+							resizable: true,
+							sortable: true,
+							filter: true
+						}}
+					/>
+				</div>
 			</section>
 		</div>
 	);

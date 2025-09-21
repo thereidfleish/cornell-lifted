@@ -45,6 +45,7 @@ export default function MessagesPage() {
     console.log("User from context:", user);
 
     useEffect(() => {
+        if (!user?.authenticated) return;
         setMessagesLoading(true);
         fetch("/api/messages")
             .then((res) => res.json())
@@ -57,7 +58,7 @@ export default function MessagesPage() {
                 console.error("Error fetching /api/messages:", err);
                 setMessagesLoading(false);
             });
-    }, []);
+    }, [user?.authenticated]);
 
     return (
         <main className="bg-[#f4fbf3] font-tenor px-4">

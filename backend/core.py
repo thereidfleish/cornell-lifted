@@ -35,7 +35,7 @@ def auth_status():
                      "is_admin": is_admin(write_required=False),
                      "admin_write_perm": is_admin(write_required=True)}
         })
-    return jsonify({"authenticated": False}), 401
+    return jsonify({"authenticated": False})
 
 @core.get("/api/config")
 def config():
@@ -160,7 +160,7 @@ def get_messages():
 
         return jsonify(output)
     else:
-        return {"error": "User not authenticated"}, 401
+        return {"error": "User not authenticated"}
 
 @core.route("/api/get-attachment-pref/<message_group>")
 @login_required
