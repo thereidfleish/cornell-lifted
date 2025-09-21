@@ -1,6 +1,6 @@
 # Cornell Lifted
 
-Welcome!  This is a web app for the Lifted event at Cornell University, where students, faculty, and staff send and receive appreciation messages. The web app allows users to send, view, and download personalized messages, and provides an admin interface for managing the event.
+Welcome!  This is a web app for the [Lifted](https://cornelllifted.com/) event at Cornell University, where students, faculty, and staff send and receive appreciation messages. The web app allows users to send, view, and download personalized messages, and provides an admin interface for managing the event.
 
 ## Background
 
@@ -70,11 +70,12 @@ The frontend will start on `http://localhost:3000` by default.
 ## Development Notes
 - The frontend and backend run independently; API calls from the frontend are proxied to the backend.
 - Update `frontend/next.config.ts` if you need to change API proxy settings.
+- Ensure you have a `.env` (backend) and `.env.local` (frontend).
 - For OIDC authentication, ensure your environment and secrets are set up as required by Cornell SSO.
 - Admin features are protected and require admin status in the backend database.
-- If you're running this, you are likely part of Lifted and can just ask Reid for all the details
+- If you're running this project, you are likely part of Lifted and can just ask Reid for all the details
 
 ## Contact
-Created and maintained by Reid Fleishman '25, CP XXI (Lifted Lead and Secretary FA24/SP25)
+Created and maintained by Reid Fleishman '25, CP XXI (Lifted Project Lead and Secretary FA24/SP25)
 
 For questions or issues, email [lifted@cornell.edu](mailto:lifted@cornell.edu) or [rf377@cornell.edu](mailto:rf377@cornell.edu) (I'll get emails for both!)
