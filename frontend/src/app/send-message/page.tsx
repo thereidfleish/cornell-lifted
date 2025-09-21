@@ -20,7 +20,7 @@ export default function SendMessagePage() {
 
     if (config.form_message_group === "none") {
         return (
-            <main className="flex flex-col items-center justify-center">
+            <main className="flex flex-col items-center justify-center min-h-[60vh]">
                 <div className="bg-white rounded-xl shadow-lg p-8 max-w-lg w-full text-center border border-gray-200">
                     <h2 className="text-2xl font-bold text-cornell-red mb-4">The message form isn't open right now</h2>
                     <p className="mb-6 text-gray-700">You can't send a Lifted message at this time. Please check back later!</p>
