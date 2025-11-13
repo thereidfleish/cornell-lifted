@@ -552,3 +552,383 @@ def swap_messages():
     helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Swapped Cards to eLifted")
     
     return jsonify({"swapped": True})
+
+@core.get("/api/analytics")
+def get_analytics():
+    """Get analytics data for Lifted messages"""
+    semester = request.args.get("semester", "all")
+    
+    conn = get_db_connection()
+    
+    # Build query conditions based on semester
+    where_clause = ""
+    params = []
+    if semester != "all":
+        # Query both physical and elifted for the semester
+        where_clause = "WHERE (message_group = ? OR message_group = ?)"
+        params = [f"{semester}_p", f"{semester}_e"]
+    
+    # 1. Cards written breakdown
+    total_cards = conn.execute(f"SELECT COUNT(*) as count FROM messages {where_clause}", params).fetchone()["count"]
+    physical_cards = conn.execute(f"SELECT COUNT(*) as count FROM messages {where_clause} {'AND' if where_clause else 'WHERE'} message_group LIKE '%_p'", params).fetchone()["count"]
+    elifted_cards = conn.execute(f"SELECT COUNT(*) as count FROM messages {where_clause} {'AND' if where_clause else 'WHERE'} message_group LIKE '%_e'", params).fetchone()["count"]
+    
+    # 2. Unique individuals who received and sent messages
+    unique_recipients = conn.execute(f"SELECT COUNT(DISTINCT recipient_email) as count FROM messages {where_clause}", params).fetchone()["count"]
+    unique_senders = conn.execute(f"SELECT COUNT(DISTINCT sender_email) as count FROM messages {where_clause}", params).fetchone()["count"]
+    
+    # 3. Leaderboards - strip @cornell.edu from netids
+    sending_leaderboard_raw = rows_to_dicts(conn.execute(f"""
+        SELECT sender_email as netid, COUNT(*) as count 
+        FROM messages {where_clause}
+        GROUP BY sender_email 
+        ORDER BY count DESC 
+        LIMIT 5
+    """, params).fetchall())
+    
+    receiving_leaderboard_raw = rows_to_dicts(conn.execute(f"""
+        SELECT recipient_email as netid, COUNT(*) as count 
+        FROM messages {where_clause}
+        GROUP BY recipient_email 
+        ORDER BY count DESC 
+        LIMIT 5
+    """, params).fetchall())
+    
+    # Format leaderboards - just remove @cornell.edu
+    sending_leaderboard = []
+    for entry in sending_leaderboard_raw:
+        netid = entry['netid'].replace('@cornell.edu', '')
+        sending_leaderboard.append({
+            'name': netid,
+            'count': entry['count']
+        })
+    
+    receiving_leaderboard = []
+    for entry in receiving_leaderboard_raw:
+        netid = entry['netid'].replace('@cornell.edu', '')
+        receiving_leaderboard.append({
+            'name': netid,
+            'count': entry['count']
+        })
+    
+    # 4. Attachment swaps (if applicable)
+    swap_stats = []
+    try:
+        # Get attachment preferences
+        attachment_prefs = rows_to_dicts(conn.execute(f"""
+            SELECT a.attachment as name, COUNT(*) as count
+            FROM attachment_prefs ap
+            JOIN attachments a ON ap.attachment_id = a.id
+            {where_clause.replace('message_group', 'ap.message_group') if where_clause else ''}
+            GROUP BY a.attachment
+            ORDER BY count DESC
+        """, params).fetchall())
+        
+        # Get swap preferences
+        total_swaps = conn.execute(f"""
+            SELECT COUNT(DISTINCT recipient_email) as count
+            FROM swap_prefs
+            {where_clause.replace('message_group', 'message_group_from') if where_clause else ''}
+        """, params).fetchone()["count"]
+        
+        swap_stats = {
+            "total_swaps": total_swaps,
+            "attachments": attachment_prefs
+        }
+    except:
+        swap_stats = {"total_swaps": 0, "attachments": []}
+    
+    # 5. Most common words
+    messages_text = conn.execute(f"SELECT message_content FROM messages {where_clause}", params).fetchall()
+    word_freq = {}
+    stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'what', 'which', 'who', 'when', 'where', 'why', 'how', 'all', 'each', 'every', 'both', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'just', 'don', 'now', 'your', 'my', 'me', 'am'}
+    
+    for row in messages_text:
+        if row["message_content"]:
+            words = row["message_content"].lower().split()
+            for word in words:
+                # Remove punctuation
+                word = ''.join(c for c in word if c.isalnum())
+                if word and word not in stop_words and len(word) > 2:
+                    word_freq[word] = word_freq.get(word, 0) + 1
+    
+    # Get top 50 words for word cloud
+    common_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)[:50]
+    
+    # 6. Message length statistics
+    message_lengths = conn.execute(f"""
+        SELECT 
+            message_content,
+            LENGTH(message_content) - LENGTH(REPLACE(message_content, ' ', '')) + 1 as word_count
+        FROM messages 
+        {where_clause}
+        ORDER BY word_count
+    """, params).fetchall()
+    
+    if message_lengths:
+        shortest_msg = message_lengths[0]
+        longest_msg = message_lengths[-1]
+        avg_words = sum(msg["word_count"] for msg in message_lengths) / len(message_lengths)
+    else:
+        shortest_msg = {"message_content": "", "word_count": 0}
+        longest_msg = {"message_content": "", "word_count": 0}
+        avg_words = 0
+    
+    # 7. Timeline of message submissions
+    if semester == "all":
+        # For all-time view, show submissions by semester (physical vs elifted)
+        timeline_raw = rows_to_dicts(conn.execute("""
+            SELECT 
+                REPLACE(REPLACE(message_group, '_p', ''), '_e', '') as semester,
+                SUM(CASE WHEN message_group LIKE '%_p' THEN 1 ELSE 0 END) as physical,
+                SUM(CASE WHEN message_group LIKE '%_e' THEN 1 ELSE 0 END) as elifted,
+                COUNT(*) as total
+            FROM messages
+            GROUP BY REPLACE(REPLACE(message_group, '_p', ''), '_e', '')
+        """).fetchall())
+        
+        # Sort timeline by year (ascending) and season (spring before fall)
+        def timeline_sort_key(item):
+            sem_code = item['semester']  # e.g., "sp_25" or "fa_24"
+            parts = sem_code.split('_')
+            if len(parts) == 2:
+                season, year = parts
+                year_num = int(year)
+                season_order = 0 if season == 'sp' else 1
+                return (year_num, season_order)
+            return (0, 0)
+        
+        timeline = sorted(timeline_raw, key=timeline_sort_key)
+    else:
+        # For specific semester, show timeline by date
+        timeline = rows_to_dicts(conn.execute(f"""
+            SELECT DATE(created_timestamp) as date, COUNT(*) as count
+            FROM messages
+            {where_clause}
+            GROUP BY DATE(created_timestamp)
+            ORDER BY date
+        """, params).fetchall())
+    
+    # 8. Participation ranking (only for all-time view)
+    participation_leaderboard = []
+    if semester == "all":
+        # Count how many semesters each person participated in (sent or received)
+        participation_raw = rows_to_dicts(conn.execute("""
+            SELECT 
+                email,
+                COUNT(DISTINCT semester) as semester_count
+            FROM (
+                SELECT 
+                    sender_email as email,
+                    REPLACE(REPLACE(message_group, '_p', ''), '_e', '') as semester
+                FROM messages
+                UNION
+                SELECT 
+                    recipient_email as email,
+                    REPLACE(REPLACE(message_group, '_p', ''), '_e', '') as semester
+                FROM messages
+            )
+            GROUP BY email
+            ORDER BY semester_count DESC
+            LIMIT 5
+        """).fetchall())
+        
+        for entry in participation_raw:
+            netid = entry['email'].replace('@cornell.edu', '')
+            participation_leaderboard.append({
+                'name': netid,
+                'count': entry['semester_count']
+            })
+    
+    # Get available message groups and extract unique semesters
+    message_groups = rows_to_dicts(conn.execute("""
+        SELECT DISTINCT message_group 
+        FROM messages 
+        ORDER BY message_group DESC
+    """).fetchall())
+    
+    # Extract unique base semesters and format display names
+    def format_semester_name(semester_code):
+        """Convert sp_25 to Spring 2025, fa_24 to Fall 2024, etc."""
+        parts = semester_code.split('_')
+        if len(parts) == 2:
+            season_code, year = parts
+            season_map = {
+                'sp': 'Spring',
+                'fa': 'Fall',
+                'su': 'Summer',
+                'wi': 'Winter'
+            }
+            season = season_map.get(season_code, season_code.upper())
+            full_year = f"20{year}" if len(year) == 2 else year
+            return f"{season} {full_year}"
+        return semester_code
+    
+    unique_semesters = {}
+    for group in message_groups:
+        semester = group["message_group"].replace("_p", "").replace("_e", "")
+        if semester not in unique_semesters:
+            unique_semesters[semester] = format_semester_name(semester)
+    
+    # Custom sort function for semesters (most recent first, spring before fall in same year)
+    def semester_sort_key(sem_tuple):
+        sem_code = sem_tuple[0]  # e.g., "sp_25" or "fa_24"
+        parts = sem_code.split('_')
+        if len(parts) == 2:
+            season, year = parts
+            # Convert year to int for proper numeric sorting
+            year_num = int(year)
+            # Spring (sp) = 1, Fall (fa) = 0, so fall comes after spring in same year
+            # For descending order: negate year, and use 0 for spring, 1 for fall
+            season_order = 0 if season == 'sp' else 1
+            return (-year_num, season_order)
+        return (0, 0)
+    
+    # Create list of semester objects with value and label
+    available_semesters = [
+        {"value": sem, "label": label} 
+        for sem, label in sorted(unique_semesters.items(), key=semester_sort_key)
+    ]
+    
+    conn.close()
+    
+    return jsonify({
+        "cards_breakdown": {
+            "total": total_cards,
+            "physical": physical_cards,
+            "elifted": elifted_cards
+        },
+        "unique_recipients": unique_recipients,
+        "unique_senders": unique_senders,
+        "leaderboards": {
+            "sending": sending_leaderboard,
+            "receiving": receiving_leaderboard,
+            "participation": participation_leaderboard
+        },
+        "swap_stats": swap_stats,
+        "common_words": common_words,
+        "message_stats": {
+            "shortest": {
+                "message": shortest_msg["message_content"],
+                "word_count": shortest_msg["word_count"]
+            },
+            "longest": {
+                "message": longest_msg["message_content"],
+                "word_count": longest_msg["word_count"]
+            },
+            "avg_words": round(avg_words, 1)
+        },
+        "timeline": timeline,
+        "available_semesters": available_semesters,
+        "is_all_time": request.args.get("semester", "all") == "all"
+    })
+
+@core.get("/api/friend-group")
+@login_required
+def predict_friend_group():
+    """Predict friend group based on network analysis - requires login"""
+    if not current_user.is_authenticated:
+        return jsonify({"error": "Authentication required"}), 401
+    
+    # Use the logged-in user's email
+    email = current_user.email
+    netid = email.replace('@cornell.edu', '')
+    
+    conn = get_db_connection()
+    
+    # Check if user exists in database
+    user_exists = conn.execute("""
+        SELECT COUNT(*) as count FROM messages 
+        WHERE sender_email = ? OR recipient_email = ?
+    """, [email, email]).fetchone()["count"]
+    
+    if user_exists == 0:
+        conn.close()
+        return jsonify({"error": "NetID not found in Lifted messages"}), 404
+    
+    # 1. Get direct connections (people they sent to or received from)
+    direct_connections = rows_to_dicts(conn.execute("""
+        SELECT DISTINCT 
+            CASE 
+                WHEN sender_email = ? THEN recipient_email 
+                ELSE sender_email 
+            END as connection_email,
+            COUNT(*) as interaction_count
+        FROM messages
+        WHERE sender_email = ? OR recipient_email = ?
+        GROUP BY connection_email
+    """, [email, email, email]).fetchall())
+    
+    # Build a weighted graph of connections
+    connection_scores = {}
+    
+    for conn_person in direct_connections:
+        person_email = conn_person['connection_email']
+        person_netid = person_email.replace('@cornell.edu', '')
+        
+        # Start with base score from direct interactions
+        score = conn_person['interaction_count'] * 10
+        
+        # 2. Find mutual connections (friends of friends)
+        mutual_connections = rows_to_dicts(conn.execute("""
+            SELECT COUNT(DISTINCT mutual) as mutual_count
+            FROM (
+                SELECT CASE 
+                    WHEN sender_email = ? THEN recipient_email 
+                    ELSE sender_email 
+                END as mutual
+                FROM messages
+                WHERE sender_email = ? OR recipient_email = ?
+            )
+            WHERE mutual IN (
+                SELECT CASE 
+                    WHEN sender_email = ? THEN recipient_email 
+                    ELSE sender_email 
+                END
+                FROM messages
+                WHERE sender_email = ? OR recipient_email = ?
+            )
+        """, [person_email, person_email, person_email, email, email, email]).fetchall())
+        
+        mutual_count = mutual_connections[0]['mutual_count'] if mutual_connections else 0
+        score += mutual_count * 5
+        
+        # 3. Check for reciprocal communication
+        reciprocal = conn.execute("""
+            SELECT COUNT(*) as count FROM messages
+            WHERE (sender_email = ? AND recipient_email = ?)
+               OR (sender_email = ? AND recipient_email = ?)
+        """, [email, person_email, person_email, email]).fetchone()["count"]
+        
+        if reciprocal >= 2:  # Both directions
+            score += 20
+        
+        connection_scores[person_netid] = {
+            'score': score,
+            'direct_interactions': conn_person['interaction_count'],
+            'mutual_connections': mutual_count
+        }
+    
+    # Sort by score and get top predictions
+    sorted_connections = sorted(connection_scores.items(), key=lambda x: x[1]['score'], reverse=True)
+    
+    # Identify likely friend group (top connections with score above threshold)
+    friend_group = []
+    threshold = sorted_connections[0][1]['score'] * 0.3 if sorted_connections else 0
+    
+    for person_netid, data in sorted_connections[:15]:  # Limit to top 15
+        if data['score'] >= threshold:
+            friend_group.append({
+                'netid': person_netid,
+                'confidence': min(100, int((data['score'] / sorted_connections[0][1]['score']) * 100)) if sorted_connections else 0,
+                'interactions': data['direct_interactions'],
+                'mutual_friends': data['mutual_connections']
+            })
+    
+    conn.close()
+    
+    return jsonify({
+        'netid': netid.replace('@cornell.edu', ''),
+        'friend_group': friend_group,
+        'total_connections': len(connection_scores)
+    })

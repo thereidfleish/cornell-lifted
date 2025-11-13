@@ -12,15 +12,22 @@
   "dependencies": {
     "ag-grid-community": "^34.1.2",
     "ag-grid-react": "^34.1.2",
+    "chart.js": "^4.5.1",
+    "d3": "^7.9.0",
+    "d3-cloud": "^1.2.7",
+    "date-fns": "^4.1.0",
     "js-confetti": "^0.13.1",
     "next": "15.4.7",
     "react": "19.1.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "19.1.0",
     "react-quill-new": "^3.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/d3": "^7.4.3",
+    "@types/d3-cloud": "^1.2.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

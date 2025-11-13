@@ -47,7 +47,10 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
   const [subject, setSubject] = useState("");
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
+  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
   const quillRef = useRef<any>(null);
+  const previewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Register Quill attributors **on the client** before mounting the editor
   useEffect(() => {
@@ -76,8 +79,14 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
     fetch(`/api/admin/get-rich-text/${messageGroup}/${type}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r)))
       .then((data) => {
-        setHtml(data.html || "");
+        const htmlContent = data.html || "";
+        setHtml(htmlContent);
         setSubject(data.subject || "");
+        
+        // Load initial preview for email types
+        if (type !== "form" && htmlContent) {
+          updatePreview(htmlContent);
+        }
       })
       .finally(() => setLoading(false));
   }, [messageGroup, type]);
@@ -96,62 +105,149 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
     );
     setStatus(res.ok ? "Saved successfully!" : "Failed to save.");
     setTimeout(() => setStatus(""), 2000);
+    
+    // Refresh preview after saving
+    if (res.ok && type !== "form") {
+      updatePreview(currentHtml);
+    }
   };
+
+  // Function to fetch live preview
+  const updatePreview = async (content: string) => {
+    if (type === "form" || !content) return;
+    
+    setPreviewLoading(true);
+    try {
+      const res = await fetch("/api/admin/preview-email-live", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html: content }),
+      });
+      
+      if (res.ok) {
+        const previewHtmlText = await res.text();
+        setPreviewHtml(previewHtmlText);
+      }
+    } catch (err) {
+      console.error("Preview error:", err);
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  // Debounced preview update for live editing (only for email types)
+  useEffect(() => {
+    if (type === "form" || !html) return;
+    
+    // Clear previous timeout
+    if (previewTimeoutRef.current) {
+      clearTimeout(previewTimeoutRef.current);
+    }
+    
+    // Set new timeout to refresh preview after 1 second of no edits
+    previewTimeoutRef.current = setTimeout(() => {
+      updatePreview(html);
+    }, 1000);
+    
+    return () => {
+      if (previewTimeoutRef.current) {
+        clearTimeout(previewTimeoutRef.current);
+      }
+    };
+  }, [html, type]);
 
   if (!ready) return null; // wait until Quill attributors are registered
 
   return (
     <div className="w-full">
-      {type === "email" && (
-        <div className="mb-2">
-          <label htmlFor={`${type}-subject-input`} className="font-semibold">
+      {/* Show a Subject input for any email-like editor (recipient/sender/etc.), not only when type === 'email' */}
+      {type !== "form" && (
+        <div className="mb-2 flex items-center gap-3">
+          <label htmlFor={`${type}-subject-input`} className="font-semibold w-36">
             Subject:
           </label>
           <input
             id={`${type}-subject-input`}
             type="text"
-            className="border rounded px-2 py-1 ml-2"
+            className="border rounded px-3 py-2 flex-1"
             value={subject}
+            placeholder="Email subject"
             onChange={(e) => setSubject(e.target.value)}
           />
         </div>
       )}
 
-      {loading ? (
-        <div>Loading…</div>
-      ) : (
-        <>
-          <ReactQuill
-            // ref={quillRef}
-            value={html}
-            onChange={setHtml}
-            formats={formats}
-            modules={{ toolbar: toolbarOptions }}
-            theme="snow"
-            className="bg-white"
-          />
-        </>
-      )}
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* Editor Section */}
+        <div className="flex-1">
+          {loading ? (
+            <div>Loading…</div>
+          ) : (
+            <>
+              <ReactQuill
+                // ref={quillRef}
+                value={html}
+                onChange={setHtml}
+                formats={formats}
+                modules={{ toolbar: toolbarOptions }}
+                theme="snow"
+                className="bg-white"
+              />
+            </>
+          )}
 
-        <div className="flex gap-2 mt-4">
-          <button
-            type="button"
-            onClick={() => handleSave(false)}
-            className="px-4 py-2 rounded bg-cornell-red text-white font-semibold shadow hover:bg-red-700 border border-cornell-red transition-colors duration-150"
-          >
-            Save
-          </button>
-          {type !== "form" && (
+          <div className="flex gap-2 mt-4">
             <button
               type="button"
-              onClick={() => handleSave(true)}
-              className="px-4 py-2 rounded bg-white text-cornell-red font-semibold shadow border border-cornell-red hover:bg-gray-100 transition-colors duration-150"
+              onClick={() => handleSave(false)}
+              className="px-4 py-2 rounded bg-cornell-red text-white font-semibold shadow hover:bg-red-700 border border-cornell-red transition-colors duration-150"
             >
-              Save and Send Test Email to Yourself
+              Save
             </button>
-          )}
+            {type !== "form" && (
+              <button
+                type="button"
+                onClick={() => handleSave(true)}
+                className="px-4 py-2 rounded bg-white text-cornell-red font-semibold shadow border border-cornell-red hover:bg-gray-100 transition-colors duration-150"
+              >
+                Save and Send Test Email to Yourself
+              </button>
+            )}
+          </div>
+          {status && <div className="mt-2 text-sm text-green-600">{status}</div>}
         </div>
-      {status && <div className="mt-2 text-sm text-green-600">{status}</div>}
+
+        {/* Live Preview Section - Only for email types */}
+        {type !== "form" && !loading && (
+          <div className="flex-1 lg:max-w-[50%]">
+            <div className="sticky top-4">
+              <h4 className="font-semibold mb-2 text-gray-700 flex items-center gap-2">
+                Live Preview
+                {previewLoading && (
+                  <span className="text-xs text-gray-500">(updating...)</span>
+                )}
+              </h4>
+              <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-white shadow-lg">
+                {previewHtml ? (
+                  <iframe
+                    srcDoc={previewHtml}
+                    className="w-full h-[600px] border-0"
+                    title="Email Preview"
+                    sandbox="allow-same-origin"
+                  />
+                ) : (
+                  <div className="w-full h-[600px] flex items-center justify-center text-gray-500">
+                    <p>Preview will appear here...</p>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Preview updates automatically as you type (with 1 second delay)
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

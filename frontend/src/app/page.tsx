@@ -3,11 +3,13 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { LiftedHomepageStats } from "@/types/User";
 import Carousel from "@/components/Carousel";
+import { useGlobal } from "@/utils/GlobalContext";
 
 export default function Home() {
   // Fetch stats from backend API
   const [stats, setStats] = useState<LiftedHomepageStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
+  const { user, config, loading } = useGlobal();
 
   useEffect(() => {
     fetch("/api/stats/lifted")
@@ -43,7 +45,7 @@ export default function Home() {
   ];
 
   // Demo: form open/closed
-  const formOpen = true;
+  const formOpen = config?.form_message_group !== "none";
 
   return (
     <main className="bg-[#fffefa] font-tenor">
@@ -56,19 +58,22 @@ export default function Home() {
             alt="Cornell Lifted Logo"
             className="block mx-auto lg:mx-0 lg:self-start mb-8 transition-transform duration-300 hover:scale-105"
           />
-          <h1 className="text-cornell-red font-schoolbell text-5xl md:text-6xl font-bold mb-4">Spread Gratitude Across Cornell</h1>
-          <p className="text-2xl text-gray-700 mb-6">Join Cornell's gratitude movement that transforms campus with thousands of thank-you messages.</p>
-          <p className="text-2xl text-gray-700 mb-6">Tuesday, May 6th, 2025 on the Arts Quad</p>
+          <h1 className="text-cornell-red font-schoolbell text-5xl font-bold mb-4">Spread Gratitude Across Cornell</h1>
+          <p className="text-xl text-gray-700 mb-6">Join Cornell's gratitude movement that transforms campus with thousands of thank-you messages.</p>
+          <p className="text-xl font-bold mb-6">❄️ A special Winter Edition will be held on Monday, December 8th, 2025 in Willard Straight Hall Lobby.  Details to come soon!</p>
           <div className="flex flex-col gap-2">
-            <a className={`bg-cornell-red text-white text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center ${formOpen ? "" : "opacity-50 pointer-events-none"}`} href="/send-message">Send a Lifted Message</a>
+            {formOpen && (
+              <a className="bg-cornell-red text-white text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center" href="/send-message">Send a Lifted Message</a>
+            )}
             <a className="bg-white border border-gray-200 text-gray-800 text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center" href="/messages">View My Messages</a>
-            {!formOpen && (
+            
+          </div>
+          {!formOpen && (
               <p className="mt-3 text-cornell-red">The Lifted submission form is now closed. Keep an eye out for the next semester's Lifted event!</p>
             )}
-          </div>
         </div>
 
-        <div className="flex-1 flex justify-center items-center relative">
+        <div className="flex-1 flex justify-center items-center relative mt-10 lg:mt-0">
           <div className="relative">
             <div className="w-[450px] rounded-[25px] overflow-hidden shadow-lg bg-white p-3.5 animate-float">
               <img src="../images/home_spring/1.jpg" alt="Cornell Lifted" className="object-cover w-full h-full rounded-[18px]" />

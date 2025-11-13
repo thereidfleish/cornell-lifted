@@ -138,6 +138,151 @@ def create_csv(cards, output_path):
         # Write data rows
         writer.writerows(cards)
 
+def get_lifted_stats():
+    """
+    Get current Lifted statistics for use in emails
+    """
+    conn = get_db_connection()
+    
+    total_received = conn.execute("select count(*) from messages").fetchone()[0]
+    unique_received = conn.execute("select count(distinct recipient_email) from messages").fetchone()[0]
+    unique_sent = conn.execute("select count(distinct sender_email) from messages").fetchone()[0]
+
+    conn.close()
+
+    return {
+        "total_messages": total_received,
+        "unique_recipients": unique_received,
+        "unique_senders": unique_sent
+    }
+
+def process_html_for_email(html_content):
+    """
+    Process HTML content and wrap it in a beautiful email template
+    similar to the Cornell Lifted website design
+    """
+    # Get current stats for the email
+    stats = get_lifted_stats()
+    
+    # Add line spacing for email content
+    # processed_html = html_content.replace("<p>", "<p style='margin: 0px 0px 12px 0px; line-height: 1.6;'>")
+    
+    # Create the email template with Cornell Lifted branding
+    email_template = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cornell Lifted</title>
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                background-color: #f4fbf3;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                line-height: 1.4;
+                color: #374151;
+            }}
+            .email-container {{
+                max-width: 800px;
+                margin: 0 auto;
+                background-color: #f4fbf3;
+                padding: 20px;
+            }}
+            .email-container p {{
+                margin: 0 0 2px 0;
+            }}
+            .header {{
+                text-align: center;
+                padding: 30px 20px;
+                background-color: #f4fbf3;
+            }}
+            .logo {{
+                max-width: 200px;
+                height: auto;
+            }}
+            .content-card {{
+                background-color: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                margin: 20px 0;
+                border: 1px solid #e5e7eb;
+            }}
+            .footer {{
+                text-align: center;
+                padding: 30px 20px;
+                background-color: #f4fbf3;
+                font-size: 14px;
+                color: #6b7280;
+            }}
+            .footer-links {{
+                margin-top: 15px;
+            }}
+            .footer-links a {{
+                color: #b31b1b;
+                text-decoration: none;
+                margin: 0 10px;
+            }}
+            .footer-links a:hover {{
+                text-decoration: underline;
+            }}
+            .cornell-blue {{
+                color: #003d82;
+            }}
+            .cornell-red {{
+                color: #b31b1b;
+            }}
+            .highlight-box {{
+                background-color: #dbeafe;
+                border-left: 4px solid #003d82;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 0 8px 8px 0;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <!-- Header -->
+            <div class="header">
+                <img src="https://cornelllifted.com/images/logo.png" alt="Cornell Lifted Logo" class="logo">
+            </div>
+            
+            <!-- Main Content -->
+            <div class="content-card">
+                <div class="content-body">
+                    {html_content}
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+            <p style="margin: 0 0 10px 0;">
+                    Made with 💌 by the Lifted Team
+                </p>
+                <p style="margin: 0 0 10px 0;">
+                    <strong class="cornell-red">Cornell Lifted</strong><br>
+                    Join {stats['unique_senders']:,} others in writing {stats['total_messages']:,} messages of gratitude across the Cornell community since 2016.
+                    <br>
+                    Read more about Lifted here: https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals
+                </p>
+                <div class="footer-links">
+                    <a href="https://cornelllifted.com">Website</a>
+                    <span style="color: #d1d5db;">|</span>
+                    <a href="https://cornelllifted.com/faqs">FAQs</a>
+                    <span style="color: #d1d5db;">|</span>
+                    <a href="https://www.instagram.com/cornelllifted">Instagram @cornelllifted</a>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return email_template
+
 def send_email(message_group, type, to, cc=None, bcc=None):
     if current_app.config["is_windows"]:
         CoInitialize()
@@ -163,11 +308,9 @@ def send_email(message_group, type, to, cc=None, bcc=None):
             Msg.Subject = file.read()
 
         with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
-            html_content = file.read()
-            html_content = html_content.replace("{{LOGO}}", """<img src='https://cornelllifted.com/images/logo.png'
-                                            style='display: block; max-width: 200px; margin-left: auto; margin-right: auto;'>
-                                            """)
-
+            raw_html_content = file.read()
+            # Process the HTML content with the beautiful email template
+            html_content = process_html_for_email(raw_html_content)
             Msg.HTMLBody = html_content
 
         Msg.Send()

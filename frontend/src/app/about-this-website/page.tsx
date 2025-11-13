@@ -19,6 +19,13 @@ export default function AboutThisWebsitePage() {
         <h5 className="text-lg font-semibold my-2">Changelog</h5>
         <div className="space-y-4">
           <div>
+            <b>Version 4.1 (10/11/25)</b>
+            <ul className="list-disc ml-6">
+              <li>Various quality of life improvements, such as migration to better tables</li>
+              <li>New You've Been Lifted email template!</li>
+            </ul>
+          </div>
+          <div>
             <b>Version 4.0 (8/23/25)</b>
             <ul className="list-disc ml-6">
               <li>We've migrated the web app from pure Flask/Jinja2 to Next.js/React frontend and Flask backend!  This improves the overall user experience and maintainability of the web app.</li>

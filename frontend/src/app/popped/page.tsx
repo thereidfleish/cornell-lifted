@@ -3,6 +3,7 @@
 import React from "react";
 // Stub Carousel component (replace with your actual Carousel)
 import Carousel from "@/components/Carousel";
+import AnalyticsSection from "@/components/AnalyticsSection";
 
 // Semester data (replace with API if needed)
 const semesters = [
@@ -56,8 +57,8 @@ const semesters = [
 export default function PoppedPage() {
   return (
     <main className="bg-[#f4fbf3] font-tenor">
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="flex flex-col items-center mb-8">
+      <div className="mx-auto px-4 py-10">
+        <div className="flex flex-col items-center mb-8 max-w-3xl mx-auto">
             <img
             src="../images/logo.png"
             width={250}
@@ -67,7 +68,13 @@ export default function PoppedPage() {
           <h2 className="text-cornell-red font-schoolbell text-4xl mb-2 font-bold text-center">Lifted Popped</h2>
           <p className="text-lg text-center text-gray-700 mb-6">Stats and fun facts from each semester's Lifted</p>
         </div>
-        <div className="bg-white rounded-xl shadow-lg p-6">
+
+        {/* Analytics Section */}
+        <div className="max-w-7xl mx-auto mb-12">
+          <AnalyticsSection />
+        </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-6 mt-12 max-w-3xl mx-auto">
           <p className="text-center mb-0 mt-2">Use the arrows to scroll through the pages of stats and fun facts!</p>
           {semesters.map((sem) => (
             <div key={sem.key} className="carousel-container mx-auto p-3 mb-6">

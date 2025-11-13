@@ -128,20 +128,11 @@ def save_rich_text(message_group, type):
 
     if type == "form":
         html_content = html_content.replace("<p>", "<p style='margin: 0px'>")
-    else:
-        html_content = html_content.replace("<p>", "<p style='margin: 0px; line-height: 1.5'>")
 
-    if type != "form":
-        # html_content = html_content.replace("<p><br></p>", "")
-        
-        html_content = "<div style='background-color: white; padding: 15px; max-width: 1000px; margin-left: auto; margin-right: auto; border-radius: 5px'>" + html_content + "</div>"
-
-        html_content = "<div style='background-color: #cfecf7; padding: 15px; margin-bottom: 50px;'>" + html_content + "</div>"
-    
     dir_path = f"templates/rich_text/{message_group}"
     os.makedirs(dir_path, exist_ok=True)
 
-    # Save the HTML to a file
+    # Save the raw HTML to a file (without email template wrapper)
     with open(f'{dir_path}/{type}.html', 'w', encoding='utf-8') as file:
         file.write(html_content)
     
@@ -178,7 +169,39 @@ def get_rich_text(message_group, type):
                         'html': html,
                         'subject': subject})
     else:
-        return jsonify({'status': 'no files found'}) 
+        return jsonify({'status': 'no files found'})
+
+@admin.route("/api/admin/preview-email/<message_group>/<type>")
+@login_required
+@admin_required(write_required=False)
+def preview_email(message_group, type):
+    """Return the full rendered email HTML for preview from saved files"""
+    dir_path_html = f"templates/rich_text/{message_group}/{type}.html"
+    
+    if Path(dir_path_html).exists():
+        with open(dir_path_html, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+        
+        # Use the same email template wrapper as actual emails
+        full_email_html = helpers.process_html_for_email(html_content)
+        return full_email_html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    else:
+        return "<html><body><p>No email template found</p></body></html>", 404, {'Content-Type': 'text/html; charset=utf-8'}
+
+@admin.post("/api/admin/preview-email-live")
+@login_required
+@admin_required(write_required=False)
+def preview_email_live():
+    """Return the full rendered email HTML for live preview with provided HTML content"""
+    data = request.get_json()
+    html_content = data.get("html", "")
+    
+    if not html_content:
+        return "<html><body><p>No content provided</p></body></html>", 200, {'Content-Type': 'text/html; charset=utf-8'}
+    
+    # Use the same email template wrapper as actual emails
+    full_email_html = helpers.process_html_for_email(html_content)
+    return full_email_html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 ### Attachments
 

@@ -1,5 +1,7 @@
 {
     "message_group_list_map": {
+        "fa_25_p": "Fall 2025 Physical Lifted",
+        "fa_25_e": "Fall 2025 eLifted",
         "sp_25_p": "Spring 2025 Physical Lifted",
         "sp_25_e": "Spring 2025 eLifted",
         "fa_24_p": "Fall 2024 Physical Lifted",
@@ -20,14 +22,16 @@
         "sp_18_p",
         "sp_21_p",
         "sp_22_p",
-        "sp_25_p",
         "fa_24_p",
         "sp_24_p",
-        "sp_23_p"
+        "sp_23_p",
+        "fa_25_e",
+        "fa_25_p",
+        "sp_25_p"
     ],
     "form_message_group": "none",
     "attachment_message_group": "none",
-    "swap_from": "none",
-    "swap_to": "sp_25_e",
+    "swap_from": "fa_25_p",
+    "swap_to": "fa_25_e",
     "swap_text": "Get your cards delivered virtually on the last day of classes instead.  Hard deadline to do this is <b>4/27/25 at 11:59 PM!</b>"
 }

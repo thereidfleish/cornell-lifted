@@ -28,8 +28,23 @@ export default function FormAndEmail() {
     }
   }, [statusMsg]);
 
-  // For rich text editors
-  const [rtMessageGroup, setRTMessageGroup] = useState<string>(selected);
+  // For rich text editors - initialize with the first available message group
+  const firstMessageGroup = React.useMemo(() => {
+    if (config?.message_group_list_map) {
+      const keys = Object.keys(config.message_group_list_map);
+      return keys.length > 0 ? keys[0] : "";
+    }
+    return "";
+  }, [config?.message_group_list_map]);
+
+  const [rtMessageGroup, setRTMessageGroup] = useState<string>("");
+
+  // Initialize rtMessageGroup once config is loaded
+  React.useEffect(() => {
+    if (firstMessageGroup && !rtMessageGroup) {
+      setRTMessageGroup(firstMessageGroup);
+    }
+  }, [firstMessageGroup, rtMessageGroup]);
 
   return (
     <div className="space-y-8">

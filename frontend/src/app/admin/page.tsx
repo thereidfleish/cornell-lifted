@@ -1,5 +1,6 @@
 "use client"
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useGlobal } from "@/utils/GlobalContext";
 import AdminLogsPage from "./Logs";
 import AdminsSection from "./Admins";
@@ -28,12 +29,28 @@ const sidebarSections = [
   },
 ];
 
-export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState("Message Groups");
+// Convert tab name to URL slug
+const toSlug = (tab: string) => tab.toLowerCase().replace(/\s+/g, "-");
+// Convert URL slug to tab name
+const fromSlug = (slug: string) => 
+  sidebarSections.flatMap(s => s.items).find(item => toSlug(item) === slug) || "Message Groups";
+
+function AdminDashboardContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { user } = useGlobal() as any;
+
+  const tabParam = searchParams?.get("tab");
+  const [activeTab, setActiveTab] = useState(() => tabParam ? fromSlug(tabParam) : "Message Groups");
 
   // Check admin status (user?.user?.is_admin is typical)
   const isAdmin = user?.user?.is_admin;
+
+  // Update URL when tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    router.replace(`/admin?tab=${toSlug(tab)}`);
+  };
 
   function renderTabContent() {
     if (activeTab === "Message Groups") {
@@ -96,7 +113,7 @@ export default function AdminDashboardPage() {
                 <li key={item}>
                   <button
                     className={`w-full text-left px-3 py-2 rounded-lg transition font-medium text-gray-700 cursor-pointer ${activeTab === item ? "bg-cornell-blue text-white" : "hover:bg-blue-500 hover:text-white"}`}
-                    onClick={() => setActiveTab(item)}
+                    onClick={() => handleTabChange(item)}
                   >
                     {item}
                   </button>
@@ -111,5 +128,13 @@ export default function AdminDashboardPage() {
         {renderTabContent()}
       </main>
     </div>
+  );
+}
+
+export default function AdminDashboardPage() {
+  return (
+    <Suspense fallback={<div className="flex-1 p-8"><h1 className="text-4xl font-bold">Loading Admin Dashboard...</h1></div>}>
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
