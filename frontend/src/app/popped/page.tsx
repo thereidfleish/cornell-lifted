@@ -4,6 +4,8 @@ import React from "react";
 // Stub Carousel component (replace with your actual Carousel)
 import Carousel from "@/components/Carousel";
 import AnalyticsSection from "@/components/AnalyticsSection";
+import { useGlobal } from "@/utils/GlobalContext";
+import SnowAccumulation from "@/components/SnowAccumulation";
 
 // Semester data (replace with API if needed)
 const semesters = [
@@ -55,12 +57,15 @@ const semesters = [
 ];
 
 export default function PoppedPage() {
+  const { isWinter } = useGlobal();
+  const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
+
   return (
-    <main className="bg-[#f4fbf3] font-tenor">
+    <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor`}>
       <div className="mx-auto px-4 py-10">
         <div className="flex flex-col items-center mb-8 max-w-3xl mx-auto">
             <img
-            src="../images/logo.png"
+            src={logoSrc}
             width={250}
             alt="Cornell Lifted Logo"
             className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
@@ -74,7 +79,8 @@ export default function PoppedPage() {
           <AnalyticsSection />
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6 mt-12 max-w-3xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-6 mt-12 max-w-3xl mx-auto relative" style={{ overflow: 'visible' }}>
+          <SnowAccumulation />
           <p className="text-center mb-0 mt-2">Use the arrows to scroll through the pages of stats and fun facts!</p>
           {semesters.map((sem) => (
             <div key={sem.key} className="carousel-container mx-auto p-3 mb-6">

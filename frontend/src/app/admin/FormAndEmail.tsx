@@ -28,23 +28,7 @@ export default function FormAndEmail() {
     }
   }, [statusMsg]);
 
-  // For rich text editors - initialize with the first available message group
-  const firstMessageGroup = React.useMemo(() => {
-    if (config?.message_group_list_map) {
-      const keys = Object.keys(config.message_group_list_map);
-      return keys.length > 0 ? keys[0] : "";
-    }
-    return "";
-  }, [config?.message_group_list_map]);
-
   const [rtMessageGroup, setRTMessageGroup] = useState<string>("");
-
-  // Initialize rtMessageGroup once config is loaded
-  React.useEffect(() => {
-    if (firstMessageGroup && !rtMessageGroup) {
-      setRTMessageGroup(firstMessageGroup);
-    }
-  }, [firstMessageGroup, rtMessageGroup]);
 
   return (
     <div className="space-y-8">
@@ -69,32 +53,35 @@ export default function FormAndEmail() {
         <h2 className="text-xl font-bold">Form and Email Text</h2>
         <p>Configure the rich text for the form description and the "You've Been Lifted" email for a specific message group. Use the dropdown below to select which message group to edit.</p>
         <MessageGroupSelector
-          initialValue={rtMessageGroup}
           showNoneOption={false}
           onChange={opt => setRTMessageGroup(opt.key)}
           className="max-w-md"
           dropdown={true}
         />
-        <div className="flex flex-col gap-8">
-          <div>
-            <h3 className="font-semibold mb-2">Form Description</h3>
-            <p className="text-sm mb-2">This is the description text shown at the top of the form for the selected message group.</p>
-            <div className="border rounded p-2 bg-white">
-              <React.Suspense fallback={<div>Loading editor...</div>}>
-                <RichTextEditor messageGroup={rtMessageGroup} type="form" />
-              </React.Suspense>
+        {rtMessageGroup ? (
+          <div className="flex flex-col gap-8">
+            <div>
+              <h3 className="font-semibold mb-2">Form Description</h3>
+              <p className="text-sm mb-2">This is the description text shown at the top of the form for the selected message group.</p>
+              <div className="border rounded p-2 bg-white">
+                <React.Suspense fallback={<div>Loading editor...</div>}>
+                  <RichTextEditor messageGroup={rtMessageGroup} type="form" />
+                </React.Suspense>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">You've Been Lifted Email</h3>
+              <p className="text-sm mb-2">This is the email text sent to recipients when they are Lifted for the selected message group.</p>
+              <div className="border rounded p-2 bg-white">
+                <React.Suspense fallback={<div>Loading editor...</div>}>
+                  <RichTextEditor messageGroup={rtMessageGroup} type="recipient" />
+                </React.Suspense>
+              </div>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold mb-2">You've Been Lifted Email</h3>
-            <p className="text-sm mb-2">This is the email text sent to recipients when they are Lifted for the selected message group.</p>
-            <div className="border rounded p-2 bg-white">
-              <React.Suspense fallback={<div>Loading editor...</div>}>
-                <RichTextEditor messageGroup={rtMessageGroup} type="recipient" />
-              </React.Suspense>
-            </div>
-          </div>
-        </div>
+        ) : (
+          <div className="text-gray-500">Loading message groups...</div>
+        )}
       </div>
     </div>
   );

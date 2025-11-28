@@ -42,11 +42,15 @@ const loadingMessages = [
 ];
 
 export default function Loading() {
-  // Use the current time to select the message globally
-  const now = Date.now();
-  const tenSecondBlock = Math.floor(now / 10000); // 10,000 ms = 10 seconds
-  const messageIdx = tenSecondBlock % loadingMessages.length;
-  const message = loadingMessages[messageIdx];
+  const [message, setMessage] = useState(loadingMessages[0]);
+
+  useEffect(() => {
+    // Only run on client side
+    const now = Date.now();
+    const tenSecondBlock = Math.floor(now / 10000); // 10,000 ms = 10 seconds
+    const messageIdx = tenSecondBlock % loadingMessages.length;
+    setMessage(loadingMessages[messageIdx]);
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full p-5">

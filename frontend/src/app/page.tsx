@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { LiftedHomepageStats } from "@/types/User";
 import Carousel from "@/components/Carousel";
 import { useGlobal } from "@/utils/GlobalContext";
+import SnowAccumulation from "@/components/SnowAccumulation";
 
 export default function Home() {
   // Fetch stats from backend API
   const [stats, setStats] = useState<LiftedHomepageStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
-  const { user, config, loading } = useGlobal();
+  const { user, config, loading, isWinter } = useGlobal();
+
+  const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
 
   useEffect(() => {
     fetch("/api/stats/lifted")
@@ -48,19 +51,19 @@ export default function Home() {
   const formOpen = config?.form_message_group !== "none";
 
   return (
-    <main className="bg-[#fffefa] font-tenor">
+    <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#fffefa]'} font-tenor`}>
       {/* Hero Section */}
-      <section className="flex flex-col lg:flex-row items-center justify-center px-4 py-10 bg-gray-100">
+      <section className={`flex flex-col lg:flex-row items-center justify-center px-4 py-10 ${isWinter ? 'bg-[#e3eeff]' : 'bg-gray-100'}`}>
         <div className="flex-2 flex flex-col justify-center items-center lg:items-start lg:pl-20">
           <img
-            src="../images/logo.png"
+            src={logoSrc}
             width={250}
             alt="Cornell Lifted Logo"
             className="block mx-auto lg:mx-0 lg:self-start mb-8 transition-transform duration-300 hover:scale-105"
           />
           <h1 className="text-cornell-red font-schoolbell text-5xl font-bold mb-4">Spread Gratitude Across Cornell</h1>
           <p className="text-xl text-gray-700 mb-6">Join Cornell's gratitude movement that transforms campus with thousands of thank-you messages.</p>
-          <p className="text-xl font-bold mb-6">❄️ A special Winter Edition will be held on Monday, December 8th, 2025 in Willard Straight Hall Lobby.  Details to come soon!</p>
+          <p className="text-xl font-bold mb-6">Monday, December 8th, 2025 in Willard Straight Hall Lobby.  The form closes either after 2000 recipients (due to space constraints) or Sunday, November 30th!</p>
           <div className="flex flex-col gap-2">
             {formOpen && (
               <a className="bg-cornell-red text-white text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center" href="/send-message">Send a Lifted Message</a>
@@ -83,9 +86,10 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section id="impact" className="py-12 bg-white">
+      <section id="impact" className={`py-12 ${isWinter ? 'bg-[#d7e7ff]' : 'bg-white'}`}>
         <div className="mx-auto max-w-4xl px-4">
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white rounded-xl shadow-lg p-8 relative" style={{ overflow: 'visible' }}>
+            <SnowAccumulation />
             <h3 className="text-center mb-6 text-2xl font-bold text-cornell-red">Our Impact Since 2016</h3>
             {loadingStats ? (
               <div className="text-center text-gray-500">Loading stats...</div>
@@ -112,22 +116,25 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="how" className="bg-[var(--light-gray)] py-16">
+      <section id="how" className={`py-16 ${isWinter ? 'bg-[#d7e7ff]' : 'bg-[var(--light-gray)]'}`}>
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="text-cornell-red font-schoolbell text-4xl mb-4 text-center font-bold">How Lifted Works</h2>
           <p className="text-lg text-center mb-8 text-gray-700">A simple process to spread joy and gratitude</p>
           <div className="flex flex-col md:flex-row gap-8 mt-8">
-            <div className="flex-1 bg-white rounded-xl shadow p-6 flex flex-col items-center">
+            <div className="flex-1 bg-white rounded-xl shadow p-6 flex flex-col items-center relative" style={{ overflow: 'visible' }}>
+              <SnowAccumulation />
               <div className="text-4xl mb-2">✍️</div>
               <h3 className="text-xl font-bold mb-2 text-cornell-blue">Write a Message</h3>
               <p className="text-center">Send a heartfelt note to someone who has made a difference in your Cornell experience - a friend, professor, or staff member.</p>
             </div>
-            <div className="flex-1 bg-white rounded-xl shadow p-6 flex flex-col items-center">
+            <div className="flex-1 bg-white rounded-xl shadow p-6 flex flex-col items-center relative" style={{ overflow: 'visible' }}>
+              <SnowAccumulation />
               <div className="text-4xl mb-2">📬</div>
               <h3 className="text-xl font-bold mb-2 text-cornell-blue">We Deliver</h3>
               <p className="text-center">On the last day of classes, your message will be displayed alongside thousands of others, creating a beautiful display of campus-wide gratitude.</p>
             </div>
-            <div className="flex-1 bg-white rounded-xl shadow p-6 flex flex-col items-center">
+            <div className="flex-1 bg-white rounded-xl shadow p-6 flex flex-col items-center relative" style={{ overflow: 'visible' }}>
+              <SnowAccumulation />
               <div className="text-4xl mb-2">💖</div>
               <h3 className="text-xl font-bold mb-2 text-cornell-blue">Spread Joy</h3>
               <p className="text-center">Your recipient discovers their card attached to a cheerful balloon or flower on the Arts Quad in Spring, or amid dazzling lights in Willard Straight Hall in Fall.</p>
@@ -155,13 +162,14 @@ export default function Home() {
       </section>
 
       {/* Example Messages Section */}
-      <section id="examples" className="bg-[var(--light-gray)] py-16">
+      <section id="examples" className={`py-16 ${isWinter ? 'bg-[#e3eeff]' : 'bg-[var(--light-gray)]'}`}>
         <div className="mx-auto px-4">
           <h2 className="text-cornell-red font-schoolbell text-4xl mb-4 text-center font-bold">Example Messages</h2>
           <p className="text-lg text-center mb-8 text-gray-700">Get inspired with these sample messages</p>
           <div className="flex flex-wrap justify-center gap-8">
             {exampleMessages.map((msg, i) => (
-              <div key={i} className="bg-white rounded-xl shadow p-6 w-100 mb-4">
+              <div key={i} className="bg-white rounded-xl shadow p-6 w-100 mb-4 relative" style={{ overflow: 'visible' }}>
+                <SnowAccumulation />
                 <h5 className="font-bold mb-2 text-cornell-blue text-center">{msg.type}</h5>
                 <div>
                   <p><b>To:</b> {msg.to}</p>

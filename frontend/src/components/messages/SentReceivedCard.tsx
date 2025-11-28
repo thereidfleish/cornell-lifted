@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useGlobal } from "@/utils/GlobalContext";
 import ChooseAttachment from "./ChooseAttachment";
 import SwapCards from "./SwapCards";
+import SnowAccumulation from "@/components/SnowAccumulation";
+import StringLights from "@/components/StringLights";
 
 type SentReceivedCardProps = {
     details: LiftedEventTypeDetails;
@@ -17,7 +19,7 @@ export default function SentReceivedCard({ details, year_name, season_name, late
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCardId, setSelectedCardId] = useState<number | string | null>(null);
     const [overrideHiddenMessage, setOverrideHiddenMessage] = useState(false);
-    const { config } = useGlobal();
+    const { config, isWinter } = useGlobal();
 
     const isELifted = details.type === "e";
     const isPhysical = details.type === "p";
@@ -34,7 +36,10 @@ export default function SentReceivedCard({ details, year_name, season_name, late
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-lg mb-4 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-lg mb-4 relative" style={{ overflow: 'visible' }}>
+            <StringLights />
+            <SnowAccumulation />
+            <div className="overflow-hidden rounded-xl">
             <div className="bg-[#0076BD]/5 border-b-2 border-[#0076BD]/10 p-4">
                 <h4 className={`font-bold text-xl ${isELifted ? 'text-cornell-red' : 'text-cornell-blue'}`}>{season_name} {year_name} {details.type_name}</h4>
             </div>
@@ -95,7 +100,7 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                                     latest_physical_event ? (
                                                         <div className="shadow-lg rounded-lg p-4 transition-all duration-500 ease-in-out scale-100 hover:scale-102">
                                                             <h2 className="text-3xl text-cornell-red font-schoolbell mb-4">🎈 Coming Soon!</h2>
-                                                            <p className="text-sm text-gray-800 mb-4">Pick up your {details.received_count} physical card{details.received_count !== 1 ? 's' : ''} on the <b>Arts Quad before 7 PM</b> on the last day of classes <b>(Tuesday, May 6th)!</b></p>
+                                                            <p className="text-sm text-gray-800 mb-4">Pick up your {details.received_count} physical card{details.received_count !== 1 ? 's' : ''} in the <b>Willard Straight Hall Lobby before 7 PM</b> on the last day of classes <b>(Monday, December 8th)!</b></p>
                                                             {details.chosen_attachment && (
                                                                 <p className="text-sm text-gray-800 mb-4">You'll also receive a <b>{details.chosen_attachment?.attachment_name}</b> alongside your cards!</p>
                                                             )}
@@ -209,6 +214,7 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                         overrideHiddenMessage={overrideHiddenMessage}
                     />
                 </div>
+            </div>
             </div>
         </div>
     );

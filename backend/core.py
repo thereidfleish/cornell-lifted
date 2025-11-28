@@ -31,7 +31,7 @@ def auth_status():
             "impersonating": session["impersonating"],
             "user": {"id": current_user.id,
                      "email": current_user.email,
-                     "name": current_user.name,
+                     "name": current_user.full_name,
                      "is_admin": is_admin(write_required=False),
                      "admin_write_perm": is_admin(write_required=True)}
         })
@@ -467,6 +467,9 @@ def get_person_info():
 
     # Get the query and strip whitespace
     query = request.args.get("q", "").strip()
+    # Check if expanded search is requested
+    expand_search = request.args.get("expand_search", "").lower() == "true"
+    
     # If there's an '@', strip everything to the right (including '@')
     if "@" in query:
         query = query.split("@", 1)[0]
@@ -479,9 +482,15 @@ def get_person_info():
     server = ldap3.Server(host=os.getenv("LDAP_HOST"), port=int(os.getenv("LDAP_PORT")), use_ssl=True, get_info=ldap3.ALL)
     conn = ldap3.Connection(server, f'uid={os.getenv("LDAP_UID")},ou=Directory Administrators,o=cornell university,c=us', os.getenv("LDAP_PW"), auto_bind=True)
 
-    # This query allows you to either search by NetID and show all results, OR you can type a name and it will only show ppl who
-    # 1) have a Cornell affiliation, and 2) don't have an affiliation of alumni or retiree 
-    conn.search('ou=People,o=Cornell University,c=us', f"(|(uid=*{query}*)(&(|(uid=<other-uid>)(cn={formatted_query}))(cornelleduprimaryaffiliation=*)(!(|(cornelleduprimaryaffiliation=alumni)(cornelleduprimaryaffiliation=retiree)))))", attributes=[
+    # Build the search filter based on whether expanded search is enabled
+    if expand_search:
+        # Expanded search: remove all affiliation restrictions
+        search_filter = f"(|(uid=*{query}*)(cn={formatted_query}))"
+    else:
+        # Default search: only show people with Cornell affiliation, excluding alumni and retirees
+        search_filter = f"(|(uid=*{query}*)(&(|(uid=<other-uid>)(cn={formatted_query}))(cornelleduprimaryaffiliation=*)(!(|(cornelleduprimaryaffiliation=alumni)(cornelleduprimaryaffiliation=retiree)))))"
+    
+    conn.search('ou=People,o=Cornell University,c=us', search_filter, attributes=[
         "uid",
         "cn",
         "cornelleduacadcollege",

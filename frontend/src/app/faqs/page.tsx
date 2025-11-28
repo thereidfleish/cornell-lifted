@@ -1,6 +1,8 @@
 "use client"
 import Image from "next/image";
 import React, { useState } from "react";
+import { useGlobal } from "@/utils/GlobalContext";
+import SnowAccumulation from "@/components/SnowAccumulation";
 
 // FAQ data from helpers.py
 const faqs = {
@@ -71,12 +73,15 @@ function Accordion({ question, answer }: { question: string; answer: string }) {
 }
 
 export default function FaqPage() {
+  const { isWinter } = useGlobal();
+  const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
+
   return (
-    <main className="bg-[#f4fbf3] font-tenor">
+    <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor`}>
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="flex flex-col items-center mb-8">
             <img
-            src="../images/logo.png"
+            src={logoSrc}
             width={250}
             alt="Cornell Lifted Logo"
             className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
@@ -84,7 +89,8 @@ export default function FaqPage() {
           <h2 className="text-cornell-red font-schoolbell text-4xl mb-2 font-bold text-center">Frequently Asked Questions</h2>
           <p className="text-lg text-center text-gray-700 mb-6">Find answers to common questions about Lifted</p>
         </div>
-        <div className="relative bg-white rounded-xl shadow-lg p-6">
+        <div className="relative bg-white rounded-xl shadow-lg p-6" style={{ overflow: 'visible' }}>
+          <SnowAccumulation />
           {/* Balloon decorations */}
           <div className="absolute -top-8 left-8 w-12 h-16 balloon balloon-red opacity-70" />
           <div className="absolute -top-8 right-8 w-12 h-16 balloon balloon-blue opacity-70" />

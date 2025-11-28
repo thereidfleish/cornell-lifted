@@ -3,6 +3,7 @@ import Loading from "@/components/Loading";
 import { useGlobal } from "@/utils/GlobalContext";
 import { CardData } from "@/types/User";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
+import SnowAccumulation from "@/components/SnowAccumulation";
 
 export interface MessageModalProps {
     cardId: number | string | null;
@@ -107,7 +108,9 @@ export default function MessageModal({
             <div
                 ref={modalRef}
                 className={`bg-white rounded-xl shadow-lg max-w-xl w-full p-6 relative transform transition-all duration-300 ${animating ? "scale-100 translate-y-0 opacity-100" : "scale-95 translate-y-8 opacity-0"}`}
+                style={{ overflow: 'visible' }}
             >
+                <SnowAccumulation />
                 <button
                     className="absolute top-3 right-3 text-gray-400 hover:text-cornell-red text-4xl cursor-pointer"
                     onClick={onClose}

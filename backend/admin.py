@@ -183,7 +183,7 @@ def preview_email(message_group, type):
             html_content = file.read()
         
         # Use the same email template wrapper as actual emails
-        full_email_html = helpers.process_html_for_email(html_content)
+        full_email_html = helpers.process_html_for_email(html_content, message_group)
         return full_email_html, 200, {'Content-Type': 'text/html; charset=utf-8'}
     else:
         return "<html><body><p>No email template found</p></body></html>", 404, {'Content-Type': 'text/html; charset=utf-8'}
@@ -195,12 +195,13 @@ def preview_email_live():
     """Return the full rendered email HTML for live preview with provided HTML content"""
     data = request.get_json()
     html_content = data.get("html", "")
+    message_group = data.get("message_group", None)
     
     if not html_content:
         return "<html><body><p>No content provided</p></body></html>", 200, {'Content-Type': 'text/html; charset=utf-8'}
     
     # Use the same email template wrapper as actual emails
-    full_email_html = helpers.process_html_for_email(html_content)
+    full_email_html = helpers.process_html_for_email(html_content, message_group)
     return full_email_html, 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 ### Attachments

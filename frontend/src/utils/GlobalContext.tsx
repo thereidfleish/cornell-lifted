@@ -1,11 +1,14 @@
 "use client"
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, LiftedConfig } from "@/types/User";
+import { isWinterTheme } from "@/utils/winterTheme";
+import posthog from "posthog-js";
 
 type GlobalState = {
     user: User;
     config: LiftedConfig;
     loading: boolean;
+    isWinter: boolean;
     refreshConfig: () => Promise<void>;
 };
 
@@ -15,6 +18,7 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [user, setUser] = useState<User>(null);
     const [config, setConfig] = useState<LiftedConfig>(null);
     const [loading, setLoading] = useState(true);
+    const [isWinter, setIsWinter] = useState(false);
 
     const fetchGlobalData = async () => {
         try {
@@ -24,6 +28,23 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             ]);
             setUser(statusRes);
             setConfig(configRes);
+
+            console.log("Fetched global data:", { statusRes, configRes });
+            
+            // Set PostHog person properties when user is authenticated
+            if (statusRes?.authenticated && statusRes.user) {
+                posthog.identify(statusRes.user.id, {
+                    email: statusRes.user.id,
+                    name: statusRes.user.name,
+                    is_admin: statusRes.user.is_admin,
+                });
+            } else if (!statusRes?.authenticated) {
+                // Reset PostHog when user logs out
+                posthog.reset();
+            }
+            
+            // Determine if winter theme should be active
+            setIsWinter(isWinterTheme(configRes.form_message_group));
         } catch (err) {
             console.error("Failed to load global data", err);
         } finally {
@@ -42,7 +63,7 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }, []);
 
     return (
-        <GlobalContext.Provider value={{ user, config, loading, refreshConfig }}>
+        <GlobalContext.Provider value={{ user, config, loading, isWinter, refreshConfig }}>
             {children}
         </GlobalContext.Provider>
     );

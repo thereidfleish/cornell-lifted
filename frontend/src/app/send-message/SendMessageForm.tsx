@@ -5,6 +5,7 @@ import PeopleSearch, { Person } from "@/components/PeopleSearch";
 import MessageGroupSelector from "@/components/MessageGroupSelector";
 import { useGlobal } from "@/utils/GlobalContext";
 import { CardData } from "@/types/User";
+import SnowAccumulation from "@/components/SnowAccumulation";
 
 export default function SendMessageForm({ editMode = false, cardData }: { editMode?: boolean; cardData?: CardData }) {
     // Form state
@@ -16,7 +17,7 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
     const [formErrors, setFormErrors] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [formDescription, setFormDescription] = useState<string>("");
-    const { user, config, loading } = useGlobal();
+    const { user, config, loading, isWinter } = useGlobal();
     const [dialog, setDialog] = useState<{ type: "success" | "error"; message: string; recipientEmail?: string } | null>(null);
     const [adminOverride, setAdminOverride] = useState(false);
     const [adminMessageGroup, setAdminMessageGroup] = useState(cardData?.message_group || "");
@@ -50,16 +51,16 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
     // Form validation
     function validateForm() {
         const errors: string[] = [];
-        if (!senderName) errors.push("Sender name is required.");
-        if (!recipientName) errors.push("Recipient name is required.");
+        if (!senderName) errors.push("Sender name is required.  If you'd like to send an anonymous message, type 'Anonymous' (or anything else!).");
+        if (!recipientName) errors.push("Recipient name is required.  Otherwise, how will they know who the message is for??");
         if (adminOverride) {
             if (!adminMessageGroup) errors.push("Message group is required (admin override).");
             if (!adminSenderEmail) errors.push("Sender email is required (admin override).");
             if (!adminRecipientEmail) errors.push("Recipient email is required (admin override).");
         } else {
-            if (!recipientNetID) errors.push("Recipient NetID is required.");
+            if (!recipientNetID) errors.push("Recipient NetID is required.  Otherwise, how are we supposed to know who to send the message to??");
         }
-        if (!messageContent) errors.push("Message content is required.");
+        if (!messageContent) errors.push("Message content is required.  It wouldn't be much of a Lifted message without a, ya know...message...");
         setFormErrors(errors);
         return errors.length === 0;
     }
@@ -124,13 +125,15 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
     // Add loading state for form description
     const [loadingFormDescription, setLoadingFormDescription] = useState(false);
 
+    const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
+
     return (
-        <main className="bg-[#f4fbf3] font-tenor pb-12">
+        <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor pb-12`}>
             {/* Hero Section */}
             <section className="relative py-16 flex flex-col items-center">
                 <div className="flex flex-col items-center">
                     <img
-                        src="../images/logo.png"
+                        src={logoSrc}
                         width={250}
                         alt="Cornell Lifted Logo"
                         className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
@@ -148,18 +151,36 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                     </div>
                 </section>
             ) : !user?.authenticated ? (
-                <section className="pb-12 pt-6">
-                    <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8 text-center">
-                        <div className="text-4xl mb-4">🔑</div>
-                        <h4 className="text-2xl font-bold text-cornell-blue mb-2">Sign In to Send Messages</h4>
-                        <p className="mb-4">Sign in with your Cornell NetID to send Lifted messages and spread gratitude across campus!</p>
-                        <a href="https://api.cornelllifted.com/login?next=/send-message" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block">Sign In with Cornell NetID</a>
-                    </div>
-                </section>
+                <>
+                    {/* Form Description Section - Show for logged out users */}
+                    <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8 relative mb-6" style={{ overflow: 'visible' }}>
+                        <SnowAccumulation />
+                        {/* Form Description from API */}
+                        {loadingFormDescription ? (
+                            <div className="mb-6 flex justify-center items-center">
+                                <Loading />
+                            </div>
+                        ) : formDescription && (
+                            <>
+                                <style>{`.prose a { text-decoration: underline; text-decoration-color: #b31b1b; }`}</style>
+                                <div className="mb-6 text-gray-700 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formDescription }} />
+                            </>
+                        )}
+                    </section>
+                    <section className="pb-12 pt-6">
+                        <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8 text-center">
+                            <div className="text-4xl mb-4">🔑</div>
+                            <h4 className="text-2xl font-bold text-cornell-blue mb-2">Sign In to Send Messages</h4>
+                            <p className="mb-4">Sign in with your Cornell NetID to send Lifted messages and spread gratitude across campus!</p>
+                            <a href="https://api.cornelllifted.com/login?next=/send-message" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block">Sign In with Cornell NetID</a>
+                        </div>
+                    </section>
+                </>
             ) : (
             <>
-            {/* Main Content Section */}
-            <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8">
+            {/* Main Content Section - Combined with Form Description */}
+            <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8 relative" style={{ overflow: 'visible' }}>
+                <SnowAccumulation />
                 {/* Form Description from API */}
                 {loadingFormDescription ? (
                     <div className="mb-6 flex justify-center items-center">
@@ -174,7 +195,7 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                 {/* User Banner */}
                 {user && (
                     <div className="w-full bg-blue-100 text-cornell-blue rounded-lg p-2 mb-4 font-sm shadow-sm border border-blue-200">
-                        Hi, {user.user?.name}! You are signed in as {user.user?.email}
+                        Hi, {user.user?.name?.split(' ')[0]}! You are signed in as {user.user?.email}
                     </div>
                 )}
                 {/* Admin Override Button */}
@@ -194,7 +215,8 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                 {/* Dialogs for success/error */}
                 {dialog && dialog.type === "success" && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300">
-                        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+                        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center relative" style={{ overflow: 'visible' }}>
+                            <SnowAccumulation />
                             <h3 className="text-2xl font-bold text-cornell-blue mb-4">{editMode ? "Message Edited!" : "Message Sent!"}</h3>
                             {editMode ? (
                                 <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog?.recipientEmail}</span> was edited successfully.</p>
@@ -226,7 +248,8 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                 )}
                 {dialog && dialog.type === "error" && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300">
-                        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+                        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center relative" style={{ overflow: 'visible' }}>
+                            <SnowAccumulation />
                             <h3 className="text-2xl font-bold text-red-700 mb-4">Error</h3>
                             <p className="mb-2 text-gray-700">{dialog.message}</p>
                             <div className="mt-6">
@@ -370,7 +393,6 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                                 {editMode ? "Edit Message" : "Submit Message"}
                             </button>
                         )}
-                        <p className="mt-3 text-gray-500">Please ensure you get a confirmation message after submitting.</p>
                         <p className="mt-3 text-gray-500">Your message will be delivered on the last day of classes.</p>
                     </div>
                 </form>

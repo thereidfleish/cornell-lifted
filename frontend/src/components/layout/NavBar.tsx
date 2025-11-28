@@ -5,20 +5,20 @@ import { useRouter } from "next/navigation";
 import { useGlobal } from "@/utils/GlobalContext";
 import {User} from "@/types/User";
 
-function NavLinks({ user, className = "" }: { user: User; className?: string }) {
+function NavLinks({ user, className = "", onClick }: { user: User; className?: string; onClick?: () => void }) {
     const navLinkClass = `text-gray-700 transition-all duration-300 ease-in-out hover:text-[var(--cornell-red)] hover:-translate-y-[2px] ${className}`;
     return (
         <>
-            <Link href="/faqs" className={navLinkClass}>FAQs</Link>
-            <Link href="/popped" className={navLinkClass}>Popped</Link>
+            <Link href="/faqs" className={navLinkClass} onClick={onClick}>FAQs</Link>
+            <Link href="/popped" className={navLinkClass} onClick={onClick}>Popped</Link>
             { user?.user?.is_admin && (
-                <Link href="/admin" className={navLinkClass}>Admin</Link>
+                <Link href="/admin" className={navLinkClass} onClick={onClick}>Admin</Link>
             )}
         </>
     );
 }
 
-function ActionLinks({ vertical = false }) {
+function ActionLinks({ vertical = false, onClick }: { vertical?: boolean; onClick?: () => void }) {
     const sendClass = `border border-blue-500 text-blue-500 px-4 py-1.5 rounded-full text-center shadow-md transition-all duration-300 ease-in-out${vertical ? " mb-2" : ""} hover:bg-blue-600 hover:text-white hover:-translate-y-[2px] hover:text-[var(--cornell-red)]`;
     const viewClass = `border border-red-500 text-red-500 px-4 py-1.5 rounded-full text-center shadow-md transition-all duration-300 ease-in-out${vertical ? "" : ""} hover:bg-red-500 hover:text-white hover:-translate-y-[2px] hover:text-[var(--cornell-red)]`;
     return (
@@ -26,12 +26,14 @@ function ActionLinks({ vertical = false }) {
             <Link
                 href="/send-message"
                 className={sendClass}
+                onClick={onClick}
             >
                 Send Message 💌
             </Link>
             <Link
                 href="/messages"
                 className={viewClass}
+                onClick={onClick}
             >
                 View Messages 📬
             </Link>
@@ -42,7 +44,7 @@ function ActionLinks({ vertical = false }) {
 export default function NavBar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const toggleMobileMenu = () => setMobileOpen((open) => !open);
-    const { user, config, refreshConfig } = useGlobal();
+    const { user, config, refreshConfig, isWinter } = useGlobal();
 
     const router = useRouter();
 
@@ -55,6 +57,8 @@ export default function NavBar() {
         }
     };
 
+    const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
+
     return (
         <nav className="sticky top-0 z-50 bg-white shadow">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +66,7 @@ export default function NavBar() {
                     {/* Logo/brand on the left */}
                     <div className="flex-shrink-0 flex items-center h-16">
                         <Link href="/" className="inline-block">
-                            <img src="../images/logo.png" alt="Cornell Lifted Logo" className="h-8 w-auto" />
+                            <img src={logoSrc} alt="Cornell Lifted Logo" className="h-8 w-auto" />
                         </Link>
                     </div>
 
@@ -100,11 +104,11 @@ export default function NavBar() {
                 <div className="lg:hidden bg-white border-t border-gray-200 shadow-md animate-fade-in-down">
                     <div className="max-w-7xl mx-auto px-4 py-4">
                         <div className="flex flex-col mb-4">
-                            <NavLinks user={user} className="py-2 d-block" />
+                            <NavLinks user={user} className="py-2 d-block" onClick={() => setMobileOpen(false)} />
                             <div className="border-t border-gray-200 my-2" />
                         </div>
                         <div className="flex flex-col space-y-2">
-                            <ActionLinks vertical />
+                            <ActionLinks vertical onClick={() => setMobileOpen(false)} />
                         </div>
                     </div>
                 </div>

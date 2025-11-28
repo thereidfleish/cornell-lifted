@@ -1,4 +1,5 @@
 import React from "react";
+import SnowAccumulation from "@/components/SnowAccumulation";
 
 interface DeleteConfirmationProps {
     open: boolean;
@@ -13,7 +14,8 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ open, onConfirm
     if (!open) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-            <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full text-center">
+            <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full text-center relative" style={{ overflow: 'visible' }}>
+                <SnowAccumulation />
                 <h3 className="text-xl font-bold text-cornell-red mb-4">{title || "Are you sure you want to delete this item?"}</h3>
                 <p className="mb-6 text-gray-700">{description || "This action cannot be undone."}</p>
                 <div className="flex justify-center gap-4">

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useGlobal } from "@/utils/GlobalContext";
 import Loading from "@/components/Loading";
 import SentReceivedCard from "@/components/messages/SentReceivedCard";
+import SnowAccumulation from "@/components/SnowAccumulation";
+import StringLights from "@/components/StringLights";
 
 export type Attachment = {
     id: number;
@@ -37,7 +39,7 @@ export type LiftedEvent = {
 };
 
 export default function MessagesPage() {
-    const { user, config, loading } = useGlobal();
+    const { user, config, loading, isWinter } = useGlobal();
     const [showOlder, setShowOlder] = useState(false);
     const [messagesData, setMessagesData] = useState<LiftedEvent[]>([]);
     const [messagesLoading, setMessagesLoading] = useState(true);
@@ -60,13 +62,17 @@ export default function MessagesPage() {
             });
     }, [user?.authenticated]);
 
+    // throw new Error("Debugging: Remove this line to run the MessagesPage component");
+
+    const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
+
     return (
-        <main className="bg-[#f4fbf3] font-tenor px-4">
+        <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor px-4`}>
             {/* Hero Section */}
             <section className="relative pt-16 flex flex-col items-center">
                 <div className="flex flex-col items-center">
                     <img
-                        src="../images/logo.png"
+                        src={logoSrc}
                         width={250}
                         alt="Cornell Lifted Logo"
                         className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
@@ -92,9 +98,11 @@ export default function MessagesPage() {
                 <section id="messages-dashboard" className="py-8">
                     <div className="max-w-6xl mx-auto">
                         {/* User greeting */}
-                        <div className="bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between mb-6 p-6">
+                        <div className="bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between mb-6 p-6 relative" style={{ overflow: 'visible' }}>
+                            <StringLights />
+                            <SnowAccumulation />
                             <div>
-                                <h3 className="text-3xl text-cornell-red font-schoolbell mb-1">Welcome, {user?.user?.name}!</h3>
+                                <h3 className="text-3xl text-cornell-red font-schoolbell mb-1">Welcome, {user?.user?.name.split(' ')[0]}!</h3>
                                 <p className="text-gray-700">You are signed in as {user?.user?.email}</p>
                             </div>
                             <a href="/send-message" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow hover:bg-cornell-blue transition mt-4 md:mt-0">Send a New Message</a>
@@ -142,7 +150,9 @@ export default function MessagesPage() {
                             </div>
                         </div>
                         {/* Help Section */}
-                        <div className="mt-8 bg-white rounded-xl shadow p-6">
+                        <div className="mt-8 bg-white rounded-xl shadow p-6 relative" style={{ overflow: 'visible' }}>
+                            <StringLights />
+                            <SnowAccumulation />
                             <h3 className="text-cornell-blue text-xl font-bold mb-2">Missing messages?</h3>
                             <p>If you think you're missing a message, send us an email at <a href="mailto:lifted@cornell.edu" className="text-cornell-red underline">lifted@cornell.edu</a> and we'll help you find your messages!</p>
                             <p className="mb-0">If you received a message to a non-NetID email (such as touchdown@cornell.edu or i.love.lifted@gmail.com), you won't see it here. Send us an email and we'll find your message!</p>

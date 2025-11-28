@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import Image from "next/image";
+import React, { useEffect } from "react";
+import posthog from "posthog-js";
 
 // This file acts as both the error page and the global error boundary for Next.js App Router
 // If used as a page, it reads error info from query params
@@ -18,6 +18,13 @@ interface ErrorPageProps {
 export default function ErrorPage(props: ErrorPageProps) {
   // Try to get error info from props, error object, or from search params (for client-side redirects)
   let { error_code, error_message_title, error_message_body, error_message_human_body, error } = props;
+
+  // Capture error with PostHog when error boundary is triggered
+  useEffect(() => {
+    if (error) {
+      posthog.captureException(error);
+    }
+  }, [error]);
 
   // If this is a global error boundary call, parse error fields from error.message if possible
   if (error && (!error_code || !error_message_title)) {

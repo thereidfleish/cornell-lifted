@@ -156,13 +156,28 @@ def get_lifted_stats():
         "unique_senders": unique_sent
     }
 
-def process_html_for_email(html_content):
+def process_html_for_email(html_content, message_group=None):
     """
     Process HTML content and wrap it in a beautiful email template
     similar to the Cornell Lifted website design
     """
+    from flask import current_app
+    
     # Get current stats for the email
     stats = get_lifted_stats()
+    
+    # Determine if winter theme should be used based on message group
+    is_winter = False
+    if message_group and message_group.startswith("fa_"):
+        is_winter = True
+    elif not message_group and current_app:
+        # If no message group provided, check the current form message group
+        form_message_group = current_app.config.get("lifted_config", {}).get("form_message_group", "")
+        is_winter = form_message_group.startswith("fa_")
+    
+    # Select the appropriate logo and background colors
+    logo_url = "https://cornelllifted.com/images/logo_winter.png" if is_winter else "https://cornelllifted.com/images/logo.png"
+    bg_color = "#e3eeff" if is_winter else "#f4fbf3"
     
     # Add line spacing for email content
     # processed_html = html_content.replace("<p>", "<p style='margin: 0px 0px 12px 0px; line-height: 1.6;'>")
@@ -179,7 +194,7 @@ def process_html_for_email(html_content):
             body {{
                 margin: 0;
                 padding: 0;
-                background-color: #f4fbf3;
+                background-color: {bg_color};
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                 line-height: 1.4;
                 color: #374151;
@@ -187,7 +202,7 @@ def process_html_for_email(html_content):
             .email-container {{
                 max-width: 800px;
                 margin: 0 auto;
-                background-color: #f4fbf3;
+                background-color: {bg_color};
                 padding: 20px;
             }}
             .email-container p {{
@@ -196,7 +211,7 @@ def process_html_for_email(html_content):
             .header {{
                 text-align: center;
                 padding: 30px 20px;
-                background-color: #f4fbf3;
+                background-color: {bg_color};
             }}
             .logo {{
                 max-width: 200px;
@@ -212,13 +227,17 @@ def process_html_for_email(html_content):
             }}
             .footer {{
                 text-align: center;
-                padding: 30px 20px;
-                background-color: #f4fbf3;
+                padding: 5px 20px;
+                background-color: {bg_color};
                 font-size: 14px;
                 color: #6b7280;
             }}
+            .footer p {{
+                margin: 15px 0;
+                line-height: 1.6;
+            }}
             .footer-links {{
-                margin-top: 15px;
+                margin-top: 20px;
             }}
             .footer-links a {{
                 color: #b31b1b;
@@ -226,6 +245,13 @@ def process_html_for_email(html_content):
                 margin: 0 10px;
             }}
             .footer-links a:hover {{
+                text-decoration: underline;
+            }}
+            .chronicle-link {{
+                color: #b31b1b !important;
+                text-decoration: none;
+            }}
+            .chronicle-link:hover {{
                 text-decoration: underline;
             }}
             .cornell-blue {{
@@ -247,7 +273,7 @@ def process_html_for_email(html_content):
         <div class="email-container">
             <!-- Header -->
             <div class="header">
-                <img src="https://cornelllifted.com/images/logo.png" alt="Cornell Lifted Logo" class="logo">
+                <img src="{logo_url}" alt="Cornell Lifted Logo" class="logo">
             </div>
             
             <!-- Main Content -->
@@ -259,21 +285,21 @@ def process_html_for_email(html_content):
             
             <!-- Footer -->
             <div class="footer">
-            <p style="margin: 0 0 10px 0;">
-                    Made with 💌 by the Lifted Team
+                <p style="margin-bottom: 20px;">
+                    <strong class="cornell-red">Made with 💌 by the Lifted Team</strong>
                 </p>
-                <p style="margin: 0 0 10px 0;">
-                    <strong class="cornell-red">Cornell Lifted</strong><br>
+                <p>
                     Join {stats['unique_senders']:,} others in writing {stats['total_messages']:,} messages of gratitude across the Cornell community since 2016.
-                    <br>
-                    Read more about Lifted here: https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals
+                </p>
+                <p>
+                    <a class="chronicle-link" href="https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals">Read more about Lifted on the Cornell Chronicle</a>
                 </p>
                 <div class="footer-links">
                     <a href="https://cornelllifted.com">Website</a>
                     <span style="color: #d1d5db;">|</span>
                     <a href="https://cornelllifted.com/faqs">FAQs</a>
                     <span style="color: #d1d5db;">|</span>
-                    <a href="https://www.instagram.com/cornelllifted">Instagram @cornelllifted</a>
+                    <a href="https://www.instagram.com/cornelllifted">Instagram - @cornelllifted</a>
                 </div>
             </div>
         </div>
@@ -310,7 +336,7 @@ def send_email(message_group, type, to, cc=None, bcc=None):
         with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
             raw_html_content = file.read()
             # Process the HTML content with the beautiful email template
-            html_content = process_html_for_email(raw_html_content)
+            html_content = process_html_for_email(raw_html_content, message_group)
             Msg.HTMLBody = html_content
 
         Msg.Send()

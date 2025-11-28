@@ -28,6 +28,7 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
   const [searchStatus, setSearchStatus] = useState<string>("");
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [easterEgg, setEasterEgg] = useState<string>("");
+  const [expandedSearch, setExpandedSearch] = useState(false);
   const { user, config } = useGlobal();
 
   useEffect(() => {
@@ -38,7 +39,8 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
     }
     setLoadingSearch(true);
     const timer = setTimeout(() => {
-      fetch(`/api/people-search?q=${encodeURIComponent(searchInput)}`)
+      const expandParam = expandedSearch ? '&expand_search=true' : '';
+      fetch(`/api/people-search?q=${encodeURIComponent(searchInput)}${expandParam}`)
         .then((res) => res.json())
         .then((data) => {
           setLoadingSearch(false);
@@ -56,7 +58,7 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
         });
     }, 700);
     return () => clearTimeout(timer);
-  }, [searchInput]);
+  }, [searchInput, expandedSearch]);
 
   useEffect(() => {
     async function fetchEasterEgg() {
@@ -130,7 +132,7 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
       {selectedPerson && (
         <div className={`mt-3 p-2 rounded text-sm ${statusBg}`}>
           Selected: <b>{selectedPerson.NetID}</b> ({selectedPerson.Name}, {selectedPerson["Primary Affiliation"]}) {easterEgg}
-          {user?.user?.email === `${selectedPerson.NetID}@cornell.edu` && <span> - Wait, that's you! While you can technically send a Lifted message to yourself, we encourage you to also spread the love to those around you :)</span>}
+          {user?.user?.email === `${selectedPerson.NetID}@cornell.edu` && <span> - Wait, that's you! While you can <i>technically</i> send a Lifted message to yourself, we encourage you to also spread the love to those around you :)</span>}
           {statusMsg}
         </div>
       )}
@@ -138,6 +140,18 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
         {loadingSearch ? <Loading /> : (
           <>
             <div className="text-sm text-gray-700 mb-2">{searchStatus}</div>
+            {searchResults.length === 0 && searchInput && !loadingSearch && !expandedSearch && (
+              <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                <p className="text-blue-900 mb-3">Looking to send to an alumnus or someone else?</p>
+                <button
+                  type="button"
+                  className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition"
+                  onClick={() => setExpandedSearch(true)}
+                >
+                  Expand Search
+                </button>
+              </div>
+            )}
             {searchResults.length > 0 && (
               <div className="ag-theme-quartz" style={{ height: `${getGridHeight()}px`, width: '100%' }}>
                 <AgGridReact
