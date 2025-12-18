@@ -11,6 +11,7 @@ export type User = {
 } | null;
 
 export type LiftedConfig = {
+  theme: string;
   message_group_list_map: {
     [key: string]: string;
   };

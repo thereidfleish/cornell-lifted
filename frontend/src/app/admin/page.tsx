@@ -13,6 +13,7 @@ import FormAndEmailSection from "./FormAndEmail";
 import AttachmentOptions from "./AttachmentOptions";
 import SwappingOptions from "./SwappingOptions";
 import Impersonate from "./Impersonate";
+import ThemeSection from "./Theme";
 
 const sidebarSections = [
   {
@@ -25,7 +26,7 @@ const sidebarSections = [
   },
   {
     title: "Advanced",
-    items: ["Impersonation", "Admins", "Logs"],
+    items: ["Theme", "Impersonation", "Admins", "Logs"],
   },
 ];
 
@@ -82,6 +83,9 @@ function AdminDashboardContent() {
     }
     if (activeTab === "Impersonation") {
       return <Impersonate />;
+    }
+    if (activeTab === "Theme") {
+      return <ThemeSection />;
     }
     return (
       <div className="bg-white rounded-xl shadow p-6">

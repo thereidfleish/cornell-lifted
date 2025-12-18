@@ -3,16 +3,16 @@
  */
 
 /**
- * Determines if the winter theme should be active based on the form message group
- * Winter theme is active when the most recent (form) message group is from Fall semester
+ * Determines if the winter theme should be active based on the theme config setting
+ * Winter theme is active when theme is set to "fall"
  */
-export function isWinterTheme(formMessageGroup: string | undefined): boolean {
-    if (!formMessageGroup || formMessageGroup === "none") {
+export function isWinterTheme(theme: string | undefined): boolean {
+    if (!theme) {
         return false;
     }
     
-    // Check if the message group starts with "fa_" (Fall semester)
-    return formMessageGroup.startsWith("fa_");
+    // Winter theme is active when theme is "fall"
+    return theme === "fall";
 }
 
 /**

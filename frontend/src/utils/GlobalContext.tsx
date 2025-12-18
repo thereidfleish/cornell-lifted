@@ -44,7 +44,7 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             }
             
             // Determine if winter theme should be active
-            setIsWinter(isWinterTheme(configRes.form_message_group));
+            setIsWinter(isWinterTheme(configRes.theme));
         } catch (err) {
             console.error("Failed to load global data", err);
         } finally {

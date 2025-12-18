@@ -53,6 +53,7 @@ export default function FormAndEmail() {
         <h2 className="text-xl font-bold">Form and Email Text</h2>
         <p>Configure the rich text for the form description and the "You've Been Lifted" email for a specific message group. Use the dropdown below to select which message group to edit.</p>
         <MessageGroupSelector
+          initialValue={rtMessageGroup}
           showNoneOption={false}
           onChange={opt => setRTMessageGroup(opt.key)}
           className="max-w-md"

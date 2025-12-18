@@ -266,6 +266,20 @@ def update_swapping_config():
     update_lifted_config(current_app.config["lifted_config"])
     return jsonify({"status": "Swapping config updated successfully!"})
 
+@admin.post("/api/admin/update-theme")
+@login_required
+@admin_required(write_required=True)
+def update_theme():
+    request_data = json.loads(request.data)
+    theme = request_data.get("theme")
+    
+    if theme not in ["fall", "spring"]:
+        return jsonify({"status": "Invalid theme. Must be 'fall' or 'spring'"}), 400
+    
+    current_app.config["lifted_config"]["theme"] = theme
+    update_lifted_config(current_app.config["lifted_config"])
+    return jsonify({"status": "Theme updated successfully!"})
+
 @admin.route("/api/admin/delete-swap-pref/<id>")
 @login_required
 @admin_required(write_required=True)

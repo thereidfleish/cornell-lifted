@@ -166,14 +166,12 @@ def process_html_for_email(html_content, message_group=None):
     # Get current stats for the email
     stats = get_lifted_stats()
     
-    # Determine if winter theme should be used based on message group
+    # Determine if winter theme should be used based on theme config
     is_winter = False
-    if message_group and message_group.startswith("fa_"):
-        is_winter = True
-    elif not message_group and current_app:
-        # If no message group provided, check the current form message group
-        form_message_group = current_app.config.get("lifted_config", {}).get("form_message_group", "")
-        is_winter = form_message_group.startswith("fa_")
+    if current_app:
+        # Check the theme setting in lifted_config
+        theme = current_app.config.get("lifted_config", {}).get("theme", "spring")
+        is_winter = theme == "fall"
     
     # Select the appropriate logo and background colors
     logo_url = "https://cornelllifted.com/images/logo_winter.png" if is_winter else "https://cornelllifted.com/images/logo.png"
