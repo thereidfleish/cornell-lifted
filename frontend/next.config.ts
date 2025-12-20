@@ -4,9 +4,6 @@ import { withPostHogConfig } from "@posthog/nextjs-config";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   allowedDevOrigins: [
     "https://cornelllifted.com"
   ],

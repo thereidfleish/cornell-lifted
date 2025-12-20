@@ -18,12 +18,12 @@
     "d3-cloud": "^1.2.7",
     "date-fns": "^4.1.0",
     "js-confetti": "^0.13.1",
-    "next": "15.4.7",
+    "next": "16.0.10",
     "posthog-js": "^1.292.0",
     "posthog-node": "^5.11.2",
-    "react": "19.1.0",
+    "react": "19.2.3",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "19.1.0",
+    "react-dom": "19.2.3",
     "react-quill-new": "^3.6.0",
     "react-snowfall": "^2.3.0"
   },
@@ -33,11 +33,15 @@
     "@types/d3": "^7.4.3",
     "@types/d3-cloud": "^1.2.9",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "eslint": "^9",
-    "eslint-config-next": "15.4.7",
+    "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3"
   }
 }

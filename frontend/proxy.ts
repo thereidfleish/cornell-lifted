@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Only intercept API responses
   if (request.nextUrl.pathname.startsWith('/api/')) {
     // Let the API route run, but if it returns an error, redirect to /error

@@ -2,7 +2,6 @@
 /__pycache__
 .DS_Store
 /all_cards_output
-/tmp_output
 *.pem
 client_secrets.json
 client_secrets_test.json
