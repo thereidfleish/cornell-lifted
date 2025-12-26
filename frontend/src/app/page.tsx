@@ -63,7 +63,7 @@ export default function Home() {
           />
           <h1 className="text-cornell-red font-schoolbell text-5xl font-bold mb-4">Spread Gratitude Across Cornell</h1>
           <p className="text-xl text-gray-700 mb-6">Join Cornell's gratitude movement that transforms campus with thousands of thank-you messages.</p>
-          <p className="text-xl font-bold mb-6">Monday, December 8th, 2025 in Willard Straight Hall Lobby.  The form closes either after 2000 recipients (due to space constraints) or Sunday, November 30th!</p>
+          <p className="text-xl font-bold mb-6">Monday, May 5th, 2026 on the Arts Quad</p>
           <div className="flex flex-col gap-2">
             {formOpen && (
               <a className="bg-cornell-red text-white text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center" href="/send-message">Send a Lifted Message</a>

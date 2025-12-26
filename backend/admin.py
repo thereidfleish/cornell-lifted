@@ -29,13 +29,6 @@ def logs_page():
 
 ### Message Groups
 
-@admin.route("/api/admin/get-pptx-templates-files")
-@login_required
-@admin_required(write_required=False)
-def get_pptx_templates_files():
-    pptx_templates_files = [os.path.splitext(file)[0] for file in os.listdir("pptx_templates")]
-    return jsonify({"pptx_templates_files": pptx_templates_files})
-
 @admin.post("/api/admin/add-message-group")
 @login_required
 @admin_required(write_required=True)
@@ -91,21 +84,52 @@ def remove_message_group(message_group):
     update_lifted_config(current_app.config["lifted_config"])
     return jsonify({"status": "Message group removed successfully!"})
 
-@admin.route("/api/admin/get-pptx-template/<message_group>")
+@admin.route("/api/admin/get-google-slides-id/<message_group>")
 @login_required
 @admin_required(write_required=False)
-def get_pptx_template(message_group):
-    return send_file(f"pptx_templates/{message_group}.pptx", mimetype=mimetypes.guess_type(message_group)[0])
+def get_google_slides_id(message_group):
+    conn = get_db_connection()
+    result = conn.execute("select presentation_id from google_slides_ids where message_group=?", (message_group,)).fetchone()
+    conn.close()
+    if result:
+        return jsonify({"presentation_id": result["presentation_id"]})
+    return jsonify({"presentation_id": None})
 
-@admin.post("/api/admin/upload-pptx-template/<message_group>")
+@admin.post("/api/admin/save-google-slides-id/<message_group>")
 @login_required
 @admin_required(write_required=True)
-def upload_pptx_template(message_group):
-    file = request.files['file']
-    if os.path.splitext(file.filename)[1] != ".pptx":
-        return "You need to upload a PPTX file!!"
-    file.save(f"pptx_templates/{message_group}.pptx")
-    return jsonify({"status": "PPTX template uploaded successfully!"})
+def save_google_slides_id(message_group):
+    import re
+    url = request.form.get('url', '')
+    
+    # Extract presentation ID from various Google Slides URL formats
+    # Format 1: https://docs.google.com/presentation/d/{ID}/edit...
+    # Format 2: Just the ID itself
+    match = re.search(r'/presentation/d/([a-zA-Z0-9-_]+)', url)
+    if match:
+        presentation_id = match.group(1)
+    elif re.match(r'^[a-zA-Z0-9-_]+$', url):
+        # If it's just an ID
+        presentation_id = url
+    else:
+        return jsonify({"status": "error", "message": "Invalid Google Slides URL or ID"}), 400
+    
+    conn = get_db_connection()
+    # Check if entry exists
+    existing = conn.execute("select id from google_slides_ids where message_group=?", (message_group,)).fetchone()
+    
+    if existing:
+        # Update existing
+        conn.execute("update google_slides_ids set presentation_id=? where message_group=?", 
+                    (presentation_id, message_group))
+    else:
+        # Insert new
+        conn.execute("insert into google_slides_ids (message_group, presentation_id) values (?, ?)",
+                    (message_group, presentation_id))
+    
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success", "presentation_id": presentation_id})
 
 ### Form and Email
 
@@ -401,29 +425,53 @@ def get_process_status():
 def process_all_cards(message_group):
     print("Starting task")
     
+    # Get the Google Slides presentation ID
+    conn = get_db_connection()
+    presentation_result = conn.execute("select presentation_id from google_slides_ids where message_group=?", 
+                                      (message_group,)).fetchone()
+    
+    if not presentation_result:
+        conn.close()
+        return jsonify({"status": "error", "message": "No Google Slides template found for this message group"}), 404
+    
+    presentation_id = presentation_result["presentation_id"]
+    
     sql = """select messages.*, attachment_prefs.attachment_id, attachments.attachment from messages
              left join attachment_prefs on messages.recipient_email = attachment_prefs.recipient_email and messages.message_group = attachment_prefs.message_group
              left join attachments on attachment_prefs.attachment_id = attachments.id
-             where messages.message_group=?""" + (" order by recipient_email asc" if request.args.get('alphabetical') == "true" else "")
+             where messages.message_group=?"""
     
-    conn = get_db_connection()
     cards = conn.execute(sql, (message_group,)).fetchall()
+    
+    # Sort alphabetically by netid (letters then numbers) if requested
+    if request.args.get('alphabetical') == "true":
+        import re
+        def netid_sort_key(card):
+            email = card['recipient_email']
+            # Extract letters and numbers from email prefix (before @)
+            match = re.match(r'^([a-z]+)(\d+)', email)
+            if match:
+                letters, numbers = match.groups()
+                return (letters, int(numbers))
+            return (email, 0)  # fallback for non-standard format
+        cards = sorted(cards, key=netid_sort_key)
     conn.close()
     
     if len(cards) == 0:
-        return "No cards found", 404
+        return jsonify({"status": "error", "message": "No cards found"}), 404
 
     output_filepath = "all_cards_output/" + message_group + datetime.now().strftime(" %m-%d-%Y at %H-%M-%S")
     
     should_process_pptx_pdf = True if request.args.get("pptx-pdf") == "true" else False
 
     with open(f"{output_filepath}.txt", "w") as file:
-        file.write(f".csv{', .pptx, .pdf' if should_process_pptx_pdf == True else ''}\n0%")
+        file.write(f".csv{', .pptx, .pdf' if should_process_pptx_pdf == True else ''}\n0% starting")
     
     helpers.create_csv(cards, output_filepath)
 
     if should_process_pptx_pdf:
-        helpers.cards_to_pptx_and_pdf(cards, message_group, output_filepath)
+        import google_tools
+        google_tools.cards_to_pdf(presentation_id, [dict(card) for card in cards], output_filepath)
     
     return jsonify({"status": "Processing started!"})
 

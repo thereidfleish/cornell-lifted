@@ -2,8 +2,9 @@ Flask
 flask-login
 pandas
 ldap3
-Flask-WTF
 waitress
-comtypes
-pywin32
 python-dotenv
+authlib
+requests
+Flask-WTF
+google-api-python-client

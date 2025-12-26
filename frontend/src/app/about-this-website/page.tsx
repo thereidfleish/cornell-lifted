@@ -19,16 +19,22 @@ export default function AboutThisWebsitePage() {
         <h5 className="text-lg font-semibold my-2">Changelog</h5>
         <div className="space-y-4">
           <div>
+            <b>Version 4.2.1 (12/25/25)</b>
+            <ul className="list-disc ml-6">
+              <li>Cards are now created and exported via Google Slides API instead of Powerpoint.  This will make card PDF exporting much more reliable!</li>
+            </ul>
+          </div>
+          <div>
             <b>Version 4.2 (11/14/25)</b>
             <ul className="list-disc ml-6">
               <li>New winter theme for Fall 2025 Lifted!</li>
-              <li>Misc. changes to get ready and open form for Fall 2025 Lifted!</li>
+              <li>Misc. changes to get ready for Fall 2025 Lifted!</li>
             </ul>
           </div>
           <div>
             <b>Version 4.1 (10/11/25)</b>
             <ul className="list-disc ml-6">
-              <li>Various quality of life improvements, such as migration to better tables</li>
+              <li>Various quality of life improvements, such as migration to nicer looking tables</li>
               <li>New You've Been Lifted email template!</li>
             </ul>
           </div>

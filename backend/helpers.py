@@ -1,5 +1,5 @@
-from comtypes import client, CoInitialize, CoUninitialize
-import win32com.client
+# from comtypes import client, CoInitialize, CoUninitialize
+# import win32com.client
 import csv
 import os
 from datetime import datetime
@@ -40,93 +40,6 @@ def process_attachment_prefs_to_dict(attachment_prefs):
         dict[attachment_pref["message_group"]] = attachment_pref
 
     return dict
-
-def cards_to_pptx_and_pdf(cards, message_group, output_filepath, override_template=False):
-    if current_app.config["is_windows"]:
-        # print("Beginning replacing placeholders")
-        CoInitialize()
-
-        powerpoint = client.CreateObject("PowerPoint.Application")
-
-        # Eventually remove this once we migrate over to using dicts instead of SQLite Row objects everywhere
-        cards = [dict(row) for row in cards]
-
-        num_cards = len(cards)
-
-        conn = get_db_connection()
-        attachments = conn.execute("select * from attachments where message_group=? order by id desc",
-                                        (message_group,)).fetchall()
-        conn.close()
-
-        attachment_id_to_slide_num_dict = {
-            "default": 1
-        }
-        
-        for idx, attachment in enumerate(attachments):
-            attachment_id_to_slide_num_dict[attachment['id']] = idx + 2
-
-            if override_template:
-                new_card = cards[0].copy()
-                new_card["attachment_id"] = attachment['id']
-                new_card["attachment"] = attachment['attachment']
-                cards.append(new_card)
-                
-        # NEED with window to be true for text resizing to work!!!!
-        input_pptx = f"pptx_templates/{message_group}.pptx"
-        presentation = powerpoint.Presentations.Open(os.path.abspath(input_pptx), WithWindow=True, ReadOnly=False)
-        
-        for i, card in enumerate(cards):
-            if num_cards > 1 and not override_template:
-                if i % 100 == 0:
-                    progress = round(i/num_cards*100 ,2)
-                    with open(f"{output_filepath}.txt", "a") as file:
-                        file.write(f"\n{progress}%")
-                    print(f"{progress}% converting cards to pptx")
-
-            card_attachment_id = card["attachment_id"] if card["attachment_id"] else "default"
-            card_attachment_name = card["attachment"] if card["attachment_id"] else "default"
-            message_content = "This template is for: " + card_attachment_name + "\n\n" + card["message_content"] if override_template else card["message_content"]
-
-            presentation.Slides(attachment_id_to_slide_num_dict[card_attachment_id]).Duplicate().MoveTo(presentation.Slides.Count)
-
-            replacements_dict = {
-                            "{{NET_ID}}": card["recipient_email"].split("@")[0],
-                            "{{RECIPIENT_NAME}}": card["recipient_name"],
-                            "{{SENDER_NAME}}": card["sender_name"],
-                            "{{MESSAGE}}": message_content
-                        }
-            # Iterate through shapes
-            for shape in presentation.Slides(presentation.Slides.Count).Shapes:
-                if shape.HasTextFrame:
-                    text_frame = shape.TextFrame2
-                    text_range = text_frame.TextRange
-                    # for paragraph in text_range.Paragraphs():
-                        # print(paragraph.Text)
-                    for run in text_range.Runs():
-                        # print(run.Text)
-                        for placeholder, replacement in replacements_dict.items():
-                            if placeholder in ''.join(run.Text.split()):
-                                run.Text = run.Text.replace(placeholder, replacement)
-
-                    text_frame.AutoSize = 2
-
-        for i in range(len(attachments)+1):
-            presentation.Slides(1).Delete()
-        
-        if not os.path.exists(os.path.dirname(output_filepath)):
-            os.makedirs(os.path.dirname(output_filepath))
-        
-        if num_cards > 1 and not override_template:
-            print("Saving PPTX...")
-            presentation.SaveAs(os.path.abspath(f"{output_filepath}.pptx"))
-        # print("Converting and Saving PPTX to PDF...")
-        presentation.SaveAs(os.path.abspath(f"{output_filepath}.pdf"), 32)
-        presentation.Close()
-        # print("Done!")
-        # powerpoint.Quit()
-        CoUninitialize()
-    else:
-        print("Mac - no functionality")
 
 def create_csv(cards, output_path):
     with open(output_path + ".csv", 'w', newline="", encoding="utf-8") as csvfile:

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import os
 import helpers
+import google_tools
 
 from app import is_admin, get_db_connection, get_logs_connection
 import json
@@ -295,19 +296,76 @@ def get_card_pdf(id):
     override_template = request.args.get("override-template", False)
     message_group = override_template if override_template else card['message_group']
 
-    filepath = os.path.join("single_card_output", message_group, id)
-    download_name=f"Lifted Message #{id} From {card["sender_email"]}"
+    # Get the Google Slides presentation ID for this message group
+    conn = get_db_connection()
+    presentation_result = conn.execute("select presentation_id from google_slides_ids where message_group=?", 
+                                      (message_group,)).fetchone()
+    
+    if not presentation_result:
+        conn.close()
+        abort(404, "No Google Slides template found for this message group")
+    
+    presentation_id = presentation_result["presentation_id"]
+    
+    # Check if this is a test card (IDs 12870 or 16193) and we need to generate for all attachment templates
+    is_test_card = id in ["12870", "16193"]
+    
+    if is_test_card and override_template:
+        # Fetch all attachments for this message group
+        attachments = rows_to_dicts(conn.execute(
+            "select * from attachments where message_group=? order by id desc",
+            (message_group,)
+        ).fetchall())
+        conn.close()
+        
+        # Create test cards for default + each attachment
+        test_cards = []
+        
+        # Default card (no attachment)
+        base_message = card['message_content']
+        default_card = dict(card)
+        default_card['message_content'] = f"This slide is for template: Default (no attachment)\n\n{base_message}"
+        default_card['attachment_id'] = None
+        test_cards.append(default_card)
+        
+        # Attachment-specific cards
+        for attachment in attachments:
+            attachment_card = dict(card)
+            attachment_card['message_content'] = f"This slide is for template: {attachment['attachment']} ({attachment['id']})\n\n{base_message}"
+            attachment_card['attachment_id'] = attachment['id']
+            test_cards.append(attachment_card)
+        
+        # Generate PDF with all test cards
+        filepath = os.path.join("single_card_output", message_group, f"test_{id}")
+        download_name = f"Test Card {id} - All Templates"
+        
+        google_tools.cards_to_pdf(
+            presentation_id=presentation_id,
+            cards=test_cards,
+            output_filepath=filepath,
+            message_group=message_group  # Use the override template's message_group
+        )
+        
+        return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
+    
+    conn.close()
+    
+    # Normal single card handling
+    filepath = os.path.join("single_card_output", message_group, str(id))
+    download_name=f"Lifted Message #{id} From {card['sender_email']}"
 
-    # Get a cached version if it exists, otherwise get a fresh copy via pptx
+    # Get a cached version if it exists, otherwise get a fresh copy via Google Slides
     if os.path.isfile(filepath + ".pdf") and not override_template:
         return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
 
-    helpers.cards_to_pptx_and_pdf(cards=[card],
-                                  message_group=message_group,
-                                  output_filepath=filepath,
-                                  override_template=True if override_template else False)
+    # Generate PDF using Google Slides
+    google_tools.cards_to_pdf(
+        presentation_id=presentation_id,
+        cards=[dict(card)],  # Pass as single-item list
+        output_filepath=filepath
+    )
 
-    # helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
+    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
 
     return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
 
@@ -779,7 +837,7 @@ def get_analytics():
         if semester not in unique_semesters:
             unique_semesters[semester] = format_semester_name(semester)
     
-    # Custom sort function for semesters (most recent first, spring before fall in same year)
+    # Custom sort function for semesters (most recent first, fall before spring in same year)
     def semester_sort_key(sem_tuple):
         sem_code = sem_tuple[0]  # e.g., "sp_25" or "fa_24"
         parts = sem_code.split('_')
@@ -787,9 +845,9 @@ def get_analytics():
             season, year = parts
             # Convert year to int for proper numeric sorting
             year_num = int(year)
-            # Spring (sp) = 1, Fall (fa) = 0, so fall comes after spring in same year
-            # For descending order: negate year, and use 0 for spring, 1 for fall
-            season_order = 0 if season == 'sp' else 1
+            # Fall (fa) = 0, Spring (sp) = 1, so fall comes before spring in same year
+            # For descending order: negate year, and use 0 for fall, 1 for spring
+            season_order = 0 if season == 'fa' else 1
             return (-year_num, season_order)
         return (0, 0)
     

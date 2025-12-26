@@ -123,10 +123,10 @@ export default function ProcessCards() {
                 Use this tool to download all cards for a specific message group in CSV, PPTX, and PDF formats. You can choose to process PPTX/PDF and sort alphabetically.
             </p>
             <p>
-                Downloading as a PDF will be necessary for sending the cards to Cornell Print Services. In most cases, downloading the PDF is enough; however, you can also download a PPTX to later convert to PDF on your computer (this is useful if you want to use Apple's emojis instead of Microsoft's).
+                Downloading as a PDF will be necessary for sending the cards to Cornell Print Services. In most cases, downloading the PDF is enough; however, you can also download a PPTX to later convert to PDF on your computer (this is useful if you want to use Apple's emojis instead of Google's).
             </p>
             <p>
-                <b>Important:</b> After clicking the "Process" button, DO NOT click it again!! Processing the PPTX/PDFs can take up to a few hours, depending on how many cards there are and how large/complex your PPTX template is. The PDF doesn't have a progress percent but will take a while. Please just be patient; it will complete eventually :)
+                <b>Important:</b> After clicking the "Process" button, DO NOT click it again!! Processing the PPTX/PDFs can take up to an hour, depending on how many cards there are. Please just be patient; it will complete eventually :)
             </p>
             <p>
                 If this doesn't work for some reason, there is an alternative that is a bit more cumbersome, using CSVs and Google AppScript. Contact Reid for instructions on how to do this.

@@ -70,6 +70,14 @@
 --     physical_accommodations TEXT
 -- );
 
+-- DROP TABLE IF EXISTS google_slides_ids;
+
+-- CREATE TABLE google_slides_ids (
+--     id INTEGER PRIMARY KEY NOT NULL,
+--     message_group TEXT NOT NULL,
+--     presentation_id TEXT NOT NULL
+-- );
+
 
 -- LOGS DB
 
