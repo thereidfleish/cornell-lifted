@@ -81,11 +81,6 @@ def list_images():
 
     return jsonify({"images": images})
 
-@core.get("/about-this-website")
-def about_this_website():
-    # helpers.log(current_user.id, current_user.full_name, "INFO", None, "Accessed About This Website")
-    return render_template("about-this-website.html")
-
 @core.get("/api/messages")
 @login_required
 def get_messages():
