@@ -11,13 +11,20 @@ export default function AboutThisWebsitePage() {
 
         <h5 className="text-lg font-semibold my-2">Web App Credits</h5>
         <p className="mb-2">Special thanks to Cornell IT for working with us on implementing NetID authentication and LDAP querying!</p>
-        <p className="mb-2">Powered by Next.js, React, Flask, SQLite, Powerpoint, Outlook, and a trusted mini Windows PC hosting the whole thing :)</p>
+        <p className="mb-2">Powered by Next.js, React, Flask, SQLite, Google Slides, Outlook, and a trusted mini Windows PC hosting the whole thing :)</p>
         <p className="mb-2">To report any bugs or issues, please email <a href="mailto:lifted@cornell.edu">lifted@cornell.edu</a>.</p>
-        <p className="mb-6">~ RF, NS, VW</p>
+        <p className="mb-6">~ RF '25, NS '25, VW '25</p>
 
 
         <h5 className="text-lg font-semibold my-2">Changelog</h5>
         <div className="space-y-4">
+          <div>
+            <b>Version 4.2.2 (2/10/25)</b>
+            <ul className="list-disc ml-6">
+              <li>Added Fall 2025 Popped!</li>
+              <li>Updated content on various pages</li>
+            </ul>
+          </div>
           <div>
             <b>Version 4.2.1 (12/25/25)</b>
             <ul className="list-disc ml-6">

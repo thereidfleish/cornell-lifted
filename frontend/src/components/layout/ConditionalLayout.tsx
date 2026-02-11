@@ -35,7 +35,7 @@ export const ConditionalLayout = ({ children }: ConditionalLayoutProps) => {
   return (
     <>
       {!hideNavAndFooter && <NavBar />}
-      {isWinter && (
+      {isWinter && pathname !== "/circle" && (
         <Snowfall
           // Controls the number of snowflakes that are created (default 150)
           color="white"

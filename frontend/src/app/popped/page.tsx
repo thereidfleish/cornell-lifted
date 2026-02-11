@@ -10,6 +10,11 @@ import SnowAccumulation from "@/components/SnowAccumulation";
 // Semester data (replace with API if needed)
 const semesters = [
   {
+    name: "Fall 2025",
+    key: "fa_25",
+    pdf: "Lifted_Popped_Fall_2025.pdf",
+  },
+  {
     name: "Spring 2025",
     key: "sp_25",
     pdf: "Lifted_Popped_Spring_2025.pdf",

@@ -36,8 +36,8 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="border-t border-gray-800 pt-6 text-center text-sm text-gray-300 space-y-4">
-                    <p>Version 4.2.1 (12/25/25) | <a href="https://reidserver.statuspage.io" target="_blank" className={footerLinkClass}>System Status</a> | <Link href="/about-this-website" className={footerLinkClass}>About this Website</Link></p>
-                    <p className="mt-2">© 2025 Lifted at Cornell</p>
+                    <p>Version 4.2.2 (2/10/25) | <a href="https://reidserver.statuspage.io" target="_blank" className={footerLinkClass}>System Status</a> | <Link href="/about-this-website" className={footerLinkClass}>About this Website</Link></p>
+                    <p className="mt-2">© 2026 Lifted at Cornell</p>
                     <p className="mt-2">This organization is a registered student organization of Cornell University.</p>
                     <p className="mt-2"><a href="https://hr.cornell.edu/about/workplace-rights/equal-education-and-employment" target="_blank" className={footerLinkClass}>Equal Education and Employment Opportunity (EEEO) Statement</a></p>
                     <p className="mt-2 mb-0">Made with 💌 by <Link href="/circle" className={footerLinkClass} style={{ textDecoration: "none" }}>🐏</Link></p>

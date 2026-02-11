@@ -1,6 +1,8 @@
 {
     "theme": "fall",
     "message_group_list_map": {
+        "sp_26_p": "Spring 2026 Physical Lifted",
+        "sp_26_e": "Spring 2026 eLifted",
         "fa_25_p": "Fall 2025 Physical Lifted",
         "fa_25_e": "Fall 2025 eLifted",
         "sp_25_p": "Spring 2025 Physical Lifted",
@@ -27,7 +29,9 @@
         "sp_24_p",
         "sp_23_p",
         "fa_25_p",
-        "sp_25_p"
+        "sp_25_p",
+        "sp_26_p",
+        "sp_26_e"
     ],
     "form_message_group": "none",
     "attachment_message_group": "none",
