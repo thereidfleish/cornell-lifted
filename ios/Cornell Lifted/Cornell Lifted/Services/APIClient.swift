@@ -23,4 +23,20 @@ final class APIClient {
         return try JSONDecoder()
             .decode(Config.self, from: data)
     }
+    
+    func getMessages() async throws -> [Messages] {
+        let url = URL(string: "\(url)/messages")!
+        let (data, _) = try await URLSession.shared.data(from: url)
+        
+
+        if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
+           let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+            print(String(decoding: jsonData, as: UTF8.self))
+        } else {
+            print("json data malformed")
+        }
+
+        return try JSONDecoder()
+            .decode([Messages].self, from: data)
+    }
 }

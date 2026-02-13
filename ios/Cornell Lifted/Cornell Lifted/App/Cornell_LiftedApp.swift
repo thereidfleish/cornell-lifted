@@ -15,6 +15,9 @@ struct Cornell_LiftedApp: App {
         let api = APIClient()
         let authService = AuthService()
         
+        // Restore persisted cookies early so authenticated requests can reuse the session
+        AuthService.restoreCookies()
+        
         _environment = StateObject(
             wrappedValue: AppEnvironment(api: api, authService: authService)
         )
@@ -31,3 +34,4 @@ struct Cornell_LiftedApp: App {
         }
     }
 }
+

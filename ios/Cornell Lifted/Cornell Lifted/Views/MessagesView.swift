@@ -9,30 +9,77 @@ import SwiftUI
 
 struct MessagesView: View {
     @EnvironmentObject var environment: AppEnvironment
+    @StateObject var viewModel: MessagesViewModel
     
     var body: some View {
         NavigationStack {
             ScrollView {
-                Text("Explore the gratitude you've shared and received throughout your Cornell experience")
-                    .multilineTextAlignment(.center)
-                    .font(.custom("TenorSans", size: 20))
-                
-                Text("Hi \(environment.status?.user?.name)")
-                
-                Text("Status: \(environment.status)")
-                
-                Button("Sign in with Cornell") {
-                    Task {
-                        do {
-                            try await environment.login()
-                            await environment.getStatus()
-//                            await environment.loginCompleted()
-                        } catch {
-                            print(error)
+                VStack(alignment: .leading) {
+                    Text("Explore the gratitude you've shared and received throughout your Cornell experience")
+                        .multilineTextAlignment(.center)
+                        .font(.custom("TenorSans", size: 18))
+                    
+                    if let user = environment.status?.user {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Welcome, \(user.name.split(separator: " ")[0])!")
+                                    .font(.custom("Schoolbell-Regular", size: 25))
+                                    .foregroundStyle(.red)
+                                
+                                Text(user.email)
+                                    .font(.custom("TenorSans", size: 15))
+                            }
+                            
+                            Spacer()
+                            
+                            Button("Send a Message") {
+                                Task {
+                                    do {
+                                        
+                                    } catch {
+                                    }
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
                         }
+                        .frame(maxWidth: .infinity)
+                        
+                        
+                        Text("Your Lifted Timeline")
+                            .font(.custom("Schoolbell-Regular", size: 25))
+                        
+                        if let messages = viewModel.messages {
+                            ForEach(messages, id: \.event) { event in
+                                Text(verbatim: "\(event.season_name) \(event.year_name) Lifted")
+                                    .font(.custom("Schoolbell-Regular", size: 25))
+                                    .foregroundStyle(.blue)
+                            }
+                        } else {
+                            Text("Loading...")
+                        }
+                        
+//                        Text(verbatim: "\(viewModel.messages)")
+                        
+                        
+                    } else {
+                        Button("Sign in with NetID") {
+                            Task {
+                                do {
+                                    try await environment.login()
+                                    await environment.getStatus()
+                                } catch {
+                                    print(error)
+                                }
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
                     }
                 }
-                .buttonStyle(.borderedProminent)
+                
+                
+                //                Text("Status: \(environment.status)")
                 
                 
             }
@@ -41,15 +88,17 @@ struct MessagesView: View {
                 ToolbarItem(placement: .principal) {
                     Text("Your Lifted Journey")
                         .font(.custom("Schoolbell-Regular", size: 30)) // Apply your custom font here
-                        .foregroundColor(.red) // You can also change color
+                        .foregroundStyle(.red) // You can also change color
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
+            .task {
+                await viewModel.getMessages()
+            }
         }
-        
-        
     }
 }
 
-#Preview {
-    MessagesView()
-}
+//#Preview {
+//    MessagesView()
+//}

@@ -19,7 +19,7 @@ struct MainTabView: View {
                 SendMessageView()
                     .tabItem { Label("Send Message", systemImage: "paperplane.fill") }
                 
-                MessagesView()
+                MessagesView(viewModel: MessagesViewModel())
                     .tabItem { Label("View Messages", systemImage: "tray.fill") }
             }
         }
