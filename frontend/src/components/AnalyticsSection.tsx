@@ -83,9 +83,6 @@ export default function AnalyticsSection() {
       <div className="mx-auto px-4">
         {/* Header with Dropdown */}
         <div className="text-center mb-12">
-          <p className="text-gray-700 mb-6">
-            Explore the impact of gratitude across Cornell
-          </p>
           <div className="inline-block">
             <label className="text-gray-700 mr-3 font-semibold">
               View Data For:
@@ -443,9 +440,6 @@ export default function AnalyticsSection() {
               <h3 className="text-gray-800 font-bold text-xl mb-4 text-center">
                 Top Participants
               </h3>
-              <p className="text-gray-600 text-center text-xs mb-3">
-                Most semesters participated
-              </p>
               <div className="space-y-2">
                 {data.leaderboards.participation.map((participant, index) => (
                   <div
@@ -459,7 +453,7 @@ export default function AnalyticsSection() {
                       <span className="text-gray-800 font-medium">{participant.name}</span>
                     </div>
                     <span className="text-cornell-red font-semibold">
-                      {participant.count} {participant.count === 1 ? 'sem' : 'sems'}
+                      {participant.count} {participant.count === 1 ? 'semester' : 'semesters'}
                     </span>
                   </div>
                 ))}

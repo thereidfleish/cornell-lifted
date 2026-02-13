@@ -25,16 +25,16 @@ export const useSparkleConfetti = () => {
 
 	// Progressive messages that unlock after each full cycle
 	const progressiveMessages = [
-		"i see we've peaked your interest",
+		"i see we've piqued your interest",
 		"nice try, nothing more to see here", 
 		"wow, such dedication!",
 		"i see how it is...",
-		"don't you have homework to do or smth?",
+		"don't you have something better to do?",
 		"your computer must be cooked by now",
-		"i'm having way too much fun rn coding this up (also thx claude code)",
+		"i'm having way too much fun coding this up (also thx claude code)",
 		"ok, we're done here",
 		"i knew it...you'd never leave...",
-		"hmm...what could this be? have any thoughts? let us know at circle@cornell.edu :) (also screenshot this page and email it too)"
+		"hmm...what could this be? have any thoughts? let us know at circle@cornell.edu :) (also screenshot this page and attach it too)"
 	];
 
 	// Sparkle confetti effect
