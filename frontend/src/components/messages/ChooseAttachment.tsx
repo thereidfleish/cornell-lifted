@@ -14,9 +14,10 @@ interface AttachmentPref {
 
 type Props = {
 	message_group: string;
+	onAttachmentChange?: (attachmentName: string | null) => void;
 };
 
-const ChooseAttachment: React.FC<Props> = ({ message_group }) => {
+const ChooseAttachment: React.FC<Props> = ({ message_group, onAttachmentChange }) => {
 	const [attachments, setAttachments] = useState<Attachment[]>([]);
 	const [chosenPref, setChosenPref] = useState<AttachmentPref | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -52,6 +53,10 @@ const ChooseAttachment: React.FC<Props> = ({ message_group }) => {
 		const data = await res.json().catch(() => ({}));
 		setStatusMsg(data.status === "success" ? "Attachment chosen!" : data.status || "Error choosing attachment.");
 		await fetchData();
+		const chosenAttachment = attachments.find(a => a.id === id);
+		if (onAttachmentChange && chosenAttachment) {
+			onAttachmentChange(chosenAttachment.attachment);
+		}
 		setTimeout(() => setStatusMsg("") , 2000);
 	};
 
@@ -62,33 +67,36 @@ const ChooseAttachment: React.FC<Props> = ({ message_group }) => {
 		const data = await res.json().catch(() => ({}));
 		setStatusMsg(data.status === "success" ? "Attachment cleared!" : data.status || "Error clearing attachment.");
 		await fetchData();
+		if (onAttachmentChange) {
+			onAttachmentChange(null);
+		}
 		setTimeout(() => setStatusMsg("") , 2000);
 	};
 
 	return (
-		<div className="relative">
-			{loading && (
-				<div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10">
-					<div className="text-lg font-semibold text-cornell-blue">Loading...</div>
-				</div>
-			)}
+		<div>
 			<h4 className="font-bold mb-2">Choose Your Card Attachment!</h4>
 			<p className="text-sm mb-2">You'll receive this alongside your cards! If you only want your cards, leave this blank. Hard deadline to select an attachment is <b>Sunday 4/27/25 at 11:59 PM!</b></p>
 			{statusMsg && <div className="text-green-600 font-semibold mb-2">{statusMsg}</div>}
-			<div className={loading ? "pointer-events-none opacity-50" : ""}>
-				{chosenPref ? (
-					<div className="mb-2">
-						<span className="font-semibold">Current Attachment:</span> {attachments.find(a => a.id === chosenPref.attachment_id)?.attachment || "Unknown"}
-						<button
-							className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300"
-							onClick={handleClear}
-						>
-							Clear
-						</button>
-					</div>
-				) : (
-					<div className="mb-2 text-gray-700">No attachment chosen yet.</div>
-				)}
+			{chosenPref ? (
+				<div className="mb-2">
+					<span className="font-semibold">Current Attachment:</span> {attachments.find(a => a.id === chosenPref.attachment_id)?.attachment || "Unknown"}
+					<button
+						className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300"
+						onClick={handleClear}
+						disabled={loading}
+					>
+						Clear
+					</button>
+				</div>
+			) : (
+				<div className="mb-2 text-gray-700">No attachment chosen yet.</div>
+			)}
+			{loading ? (
+				<div className="flex items-center justify-center py-8">
+					<div className="text-sm font-semibold text-cornell-blue">Loading...</div>
+				</div>
+			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
 					{attachments.map(att => (
 						<button
@@ -102,7 +110,7 @@ const ChooseAttachment: React.FC<Props> = ({ message_group }) => {
 						</button>
 					))}
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

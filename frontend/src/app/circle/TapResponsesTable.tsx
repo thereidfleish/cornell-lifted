@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Loading from "../../components/Loading";
+import FormattedTimestamp from "@/components/FormattedTimestamp";
 import { AgGridReact } from "ag-grid-react";
 import { themeQuartz } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
@@ -14,16 +16,32 @@ interface TapResponsesTableProps {
 
 const TapResponsesTable: React.FC<TapResponsesTableProps> = ({ refreshKey, showDeleteButton, onRefresh }) => {
 	const [taps, setTaps] = useState<any[]>([]);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	useEffect(() => {
+		let mounted = true;
+		setIsLoading(true);
 		fetch("/api/circle/get-taps")
-			.then(res => res.ok ? res.json() : [])
-			.then(taps => setTaps(Array.isArray(taps) ? taps : []));
+			.then(res => res.ok ? res.json() : Promise.resolve([]))
+			.then(taps => {
+				if (!mounted) return;
+				setTaps(Array.isArray(taps) ? taps : []);
+			})
+			.catch(() => {
+				if (!mounted) return;
+				setTaps([]);
+			})
+			.finally(() => {
+				if (!mounted) return;
+				setIsLoading(false);
+			});
+
+		return () => { mounted = false; };
 	}, [refreshKey]);
 
 	// AG Grid column definitions
 	const columnDefs = [
-		{ headerName: "Responded Timestamp", field: "responded_timestamp", wrapText: true, width: 150 },
+		{ headerName: "Responded Timestamp", field: "responded_timestamp", wrapText: true, width: 240, cellRenderer: (params: any) => <FormattedTimestamp timestamp={params.value} /> },
 		{ headerName: "NetID", field: "netid", wrapText: true, width: 80 },
 		{ headerName: "Name", field: "tap_name", wrapText: true, width: 200 },
 		{ 
@@ -53,10 +71,10 @@ const TapResponsesTable: React.FC<TapResponsesTableProps> = ({ refreshKey, showD
 	const tableData = taps.map(tap => {
 		let accepted = "";
 		let bg = undefined;
-		if (tap.accept_tap === 1) {
+		if (tap.accept_tap === true) {
 			accepted = "Yes";
 			bg = "lightgreen";
-		} else if (tap.accept_tap === 0) {
+		} else if (tap.accept_tap === false) {
 			accepted = "No";
 			bg = "lightcoral";
 		}
@@ -101,10 +119,16 @@ const TapResponsesTable: React.FC<TapResponsesTableProps> = ({ refreshKey, showD
 		<section className="mb-8">
 			<h2 className="text-xl font-bold text-white mb-2 mt-3">Tap Responses</h2>
 			<div className="ag-theme-alpine rounded-lg border border-gray-300" style={{ height: 600, width: "100%", minWidth: "1000px" }}>
-				<AgGridReact
-					columnDefs={columnDefs as any}
-					rowData={tableData}
-				/>
+				{isLoading ? (
+					<div style={{ height: "100%", width: "100%" }}>
+						<Loading />
+					</div>
+				) : (
+					<AgGridReact
+						columnDefs={columnDefs as any}
+						rowData={tableData}
+					/>
+				)}
 			</div>
 		</section>
 	);

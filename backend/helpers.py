@@ -4,15 +4,16 @@ import csv
 import os
 from datetime import datetime
 from flask import current_app
-from app import get_logs_connection, get_db_connection
+from app import supabase_client
 
 def log(user_email, user_name, log_type, error_code, log_content):
-    conn = get_logs_connection()
-    timestamp = datetime.now().replace(microsecond=0)
-    conn.execute("insert into logs (log_timestamp, user_email, user_name, log_type, error_code, log_content) values (?, ?, ?, ?, ?, ?)",
-                 (timestamp, user_email, user_name, log_type, error_code, log_content))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("logs").insert({
+        "user_email": user_email,
+        "user_name": user_name,
+        "log_type": log_type,
+        "error_code": error_code,
+        "log_content": log_content
+    }).execute()
 
 def process_cards_to_dict(cards):
     dict = {}
@@ -52,21 +53,16 @@ def create_csv(cards, output_path):
         writer.writerows(cards)
 
 def get_lifted_stats():
-    """
-    Get current Lifted statistics for use in emails
-    """
-    conn = get_db_connection()
-    
-    total_received = conn.execute("select count(*) from messages").fetchone()[0]
-    unique_received = conn.execute("select count(distinct recipient_email) from messages").fetchone()[0]
-    unique_sent = conn.execute("select count(distinct sender_email) from messages").fetchone()[0]
+    stats = supabase_client.schema("lifted").rpc('get_lifted_stats', {}).execute().data
 
-    conn.close()
+    total_received = stats['total_received']
+    unique_received = stats['unique_received']
+    unique_sent = stats['unique_sent']
 
     return {
-        "total_messages": total_received,
-        "unique_recipients": unique_received,
-        "unique_senders": unique_sent
+        "total_received": total_received,
+        "unique_received": unique_received,
+        "unique_sent": unique_sent
     }
 
 def process_html_for_email(html_content, message_group=None):
@@ -200,7 +196,7 @@ def process_html_for_email(html_content, message_group=None):
                     <strong class="cornell-red">Made with 💌 by the Lifted Team</strong>
                 </p>
                 <p>
-                    Join {stats['unique_senders']:,} others in writing {stats['total_messages']:,} messages of gratitude across the Cornell community since 2016.
+                    Join {stats['unique_sent']:,} others in writing {stats['total_received']:,} messages of gratitude across the Cornell community since 2016.
                 </p>
                 <p>
                     <a class="chronicle-link" href="https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals">Read more about Lifted on the Cornell Chronicle</a>

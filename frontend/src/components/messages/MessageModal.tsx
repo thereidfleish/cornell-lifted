@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+﻿import React, { useEffect, useState, useRef } from "react";
 import Loading from "@/components/Loading";
 import { useGlobal } from "@/utils/GlobalContext";
 import { CardData } from "@/types/User";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
 import SnowAccumulation from "@/components/SnowAccumulation";
+import FormattedTimestamp from "@/components/FormattedTimestamp";
 
 export interface MessageModalProps {
     cardId: number | string | null;
@@ -133,7 +134,9 @@ export default function MessageModal({
                         {card.attachment && (
                             <p className="text-center mt-2">The recipient chose to receive a <b>{card.attachment}</b> alongside this message</p>
                         )}
-                        <p className="text-xs text-gray-500 text-center mt-2">Message written at {card.created_timestamp}</p>
+                        <p className="text-xs text-gray-500 text-center mt-2">
+                            Message written at <FormattedTimestamp timestamp={card.created_timestamp} />
+                        </p>
                         {/* Edit/Delete options */}
                         {user?.user?.email === card.sender_email && card.message_group === config?.form_message_group && (
                             <div className="flex justify-center gap-4 mt-4">

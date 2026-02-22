@@ -8,8 +8,7 @@ import os
 import mimetypes
 import helpers
 
-from app import admin_required, update_lifted_config, get_db_connection, get_logs_connection, load_user
-from core import rows_to_dicts
+from app import admin_required, update_lifted_config, load_user, supabase_client
 
 admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
 
@@ -17,10 +16,8 @@ admin = Blueprint('admin', __name__, template_folder='templates', static_folder=
 @login_required
 @admin_required(write_required=False)
 def logs_page():
-    conn = get_logs_connection()
-    logs = rows_to_dicts(conn.execute("select * from logs order by id desc").fetchall())
-    recently_deleted_messages = rows_to_dicts(conn.execute("select * from recently_deleted_messages order by id desc").fetchall())
-    conn.close()
+    logs = supabase_client.schema("lifted").table("logs").select("*").order("id", desc=True).execute().data
+    recently_deleted_messages = supabase_client.schema("lifted").table("recently_deleted_messages").select("*").order("id", desc=True).execute().data
 
     return jsonify({
         "logs": logs,
@@ -88,11 +85,10 @@ def remove_message_group(message_group):
 @login_required
 @admin_required(write_required=False)
 def get_google_slides_id(message_group):
-    conn = get_db_connection()
-    result = conn.execute("select presentation_id from google_slides_ids where message_group=?", (message_group,)).fetchone()
-    conn.close()
+    result = supabase_client.schema("lifted").table("google_slides_ids").select("presentation_id").eq("message_group", message_group).maybe_single().execute()
+
     if result:
-        return jsonify({"presentation_id": result["presentation_id"]})
+        return jsonify({"presentation_id": result.data["presentation_id"]})
     return jsonify({"presentation_id": None})
 
 @admin.post("/api/admin/save-google-slides-id/<message_group>")
@@ -114,21 +110,8 @@ def save_google_slides_id(message_group):
     else:
         return jsonify({"status": "error", "message": "Invalid Google Slides URL or ID"}), 400
     
-    conn = get_db_connection()
-    # Check if entry exists
-    existing = conn.execute("select id from google_slides_ids where message_group=?", (message_group,)).fetchone()
-    
-    if existing:
-        # Update existing
-        conn.execute("update google_slides_ids set presentation_id=? where message_group=?", 
-                    (presentation_id, message_group))
-    else:
-        # Insert new
-        conn.execute("insert into google_slides_ids (message_group, presentation_id) values (?, ?)",
-                    (message_group, presentation_id))
-    
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("google_slides_ids").upsert({"message_group": message_group, "presentation_id": presentation_id}, on_conflict="message_group").execute()
+
     return jsonify({"status": "success", "presentation_id": presentation_id})
 
 ### Form and Email
@@ -234,9 +217,7 @@ def preview_email_live():
 @login_required
 @admin_required(write_required=False)
 def get_attachment_prefs(message_group):
-    conn = get_db_connection()
-    attachment_prefs = rows_to_dicts(conn.execute("select attachment_prefs.*, attachments.attachment from attachment_prefs inner join attachments on attachments.id = attachment_prefs.attachment_id where attachment_prefs.message_group = ?", (message_group,)).fetchall())
-    conn.close()
+    attachment_prefs = supabase_client.schema("lifted").table("attachment_prefs").select("*, attachments(attachment)").eq("message_group", message_group).execute().data
     return jsonify({"attachment_prefs": attachment_prefs})
 
 @admin.post("/api/admin/update-attachment-message-group")
@@ -251,10 +232,7 @@ def update_attachment_message_group():
 @login_required
 @admin_required(write_required=True)
 def delete_attachment(id):
-    conn = get_db_connection()
-    conn.execute('delete from attachments where id = ?', (id,))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("attachments").delete().eq("id", id).execute()
     return jsonify({"status": "Attachment deleted successfully!"})
 
 @admin.post("/api/admin/add-attachment/<message_group>")
@@ -263,10 +241,7 @@ def delete_attachment(id):
 def add_attachment(message_group):
     attachment = request.form["attachment-name"]
     count = request.form["attachment-count"]
-    conn = get_db_connection()
-    conn.execute("insert into attachments (message_group, attachment, count) values (?, ?, ?)", (message_group, attachment, count))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("attachments").insert({"message_group": message_group, "attachment": attachment, "count": count}).execute()
     return jsonify({"status": "Attachment added successfully!"})
 
 ### Swapping
@@ -275,9 +250,7 @@ def add_attachment(message_group):
 @login_required
 @admin_required(write_required=False)
 def get_swap_prefs():
-    conn = get_db_connection()
-    swap_prefs = rows_to_dicts(conn.execute("select * from swap_prefs").fetchall())
-    conn.close()
+    swap_prefs = supabase_client.schema("lifted").table("swap_prefs").select("*").execute().data
     return jsonify({"swap_prefs": swap_prefs})
 
 @admin.post("/api/admin/update-swapping-config")
@@ -308,17 +281,14 @@ def update_theme():
 @login_required
 @admin_required(write_required=True)
 def delete_swap_pref(id):
-    conn = get_db_connection()
-
     # The below code will move all the eLifted messages back to physical, but I recommend we don't use this
     # because it can be problematic (e.g., we don't want to move eLifted messages to physical that were sent after the physical deadline)
     # swap_pref = conn.execute('select * from swap_prefs where id = ?', (id,)).fetchone()
     # conn.execute('update messages set message_group=? where message_group=? and recipient_email=?',
     #                      (swap_pref["message_group_from"], swap_pref["message_group_to"], swap_pref["recipient_email"]))
     
-    conn.execute('delete from swap_prefs where id = ?', (id,))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("swap_prefs").delete().eq("id", id).execute()
+
     return jsonify({"status": "Swap pref deleted successfully!"})
 
 ### Browse Messages
@@ -333,33 +303,21 @@ def browse_messages():
     if current_user.id != "rf377":
         helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Queried '{query}' for {message_group}")
 
-    conn = get_db_connection()
+    query_builder = supabase_client.schema("lifted").table("messages").select("*").order("created_timestamp", desc=True)
 
-    query_sql = ""
+    if message_group != "all":
+        query_builder = query_builder.eq("message_group", message_group)
 
-    if message_group == "all":
-        if query != "":
-            query_sql = "where (recipient_email like ? or sender_email like ?) "
-            bindings = (f"%{query}%", f"%{query}%",)
+    if query:
+        # 'ilike' is case-insensitive, 'or' syntax allows searching multiple columns
+        query_builder = query_builder.or_(f"recipient_email.ilike.%{query}%,sender_email.ilike.%{query}%")
 
-        sql = "select * from messages " + query_sql + "order by created_timestamp desc"
-        results = conn.execute(sql, bindings).fetchall() if query != "" else conn.execute(sql).fetchall()
-    else:
-        bindings = (message_group,)
-
-        if query != "":
-            query_sql = "(recipient_email like ? or sender_email like ?) and "
-            bindings = (f"%{query}%", f"%{query}%", message_group,)
-
-        sql = "select * from messages where " + query_sql + "message_group=? order by created_timestamp desc"
-        results = conn.execute(sql, bindings).fetchall()
-    
-    conn.close()
+    results = query_builder.execute().data
 
     if len(results) == 0:
         return jsonify({"results": "none"})
     
-    return jsonify({"results": rows_to_dicts(results)})
+    return jsonify({"results": results})
 
 ### Process Cards
 
@@ -426,22 +384,14 @@ def process_all_cards(message_group):
     print("Starting task")
     
     # Get the Google Slides presentation ID
-    conn = get_db_connection()
-    presentation_result = conn.execute("select presentation_id from google_slides_ids where message_group=?", 
-                                      (message_group,)).fetchone()
+    presentation_result = supabase_client.schema("lifted").table("google_slides_ids").select("presentation_id").eq("message_group", message_group).maybe_single().execute()
     
     if not presentation_result:
-        conn.close()
         return jsonify({"status": "error", "message": "No Google Slides template found for this message group"}), 404
     
-    presentation_id = presentation_result["presentation_id"]
+    presentation_id = presentation_result.data["presentation_id"]
     
-    sql = """select messages.*, attachment_prefs.attachment_id, attachments.attachment from messages
-             left join attachment_prefs on messages.recipient_email = attachment_prefs.recipient_email and messages.message_group = attachment_prefs.message_group
-             left join attachments on attachment_prefs.attachment_id = attachments.id
-             where messages.message_group=?"""
-    
-    cards = conn.execute(sql, (message_group,)).fetchall()
+    cards = supabase_client.schema("lifted").rpc("get_cards_with_attachments", {"p_message_group": message_group}).execute().data
     
     # Sort alphabetically by netid (letters then numbers) if requested
     if request.args.get('alphabetical') == "true":
@@ -455,7 +405,6 @@ def process_all_cards(message_group):
                 return (letters, int(numbers))
             return (email, 0)  # fallback for non-standard format
         cards = sorted(cards, key=netid_sort_key)
-    conn.close()
     
     if len(cards) == 0:
         return jsonify({"status": "error", "message": "No cards found"}), 404
@@ -496,9 +445,7 @@ def end_impersonate():
 ### Admins
 
 def fetch_admins_from_db():
-    conn = get_db_connection()
-    admins = rows_to_dicts(reversed(conn.execute("select * from admins").fetchall()))
-    conn.close()
+    admins = list(reversed(supabase_client.schema("lifted").table("admins").select("*").execute().data))
     return admins
 
 @admin.route("/api/admin/get-admins")
@@ -514,11 +461,10 @@ def get_admins():
 def add_admin():
     netID = request.form["admin_netid"]
     write_perm = True if request.form.get("admin_write_perm") else False
-    conn = get_db_connection()
-    conn.execute("insert into admins (id, write) values (?, ?)",
-                 (netID, write_perm))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("admins").insert({
+        "id": netID,
+        "write": write_perm
+    }).execute()
     admins = fetch_admins_from_db()
     return jsonify({"admins": admins})
 
@@ -526,19 +472,19 @@ def add_admin():
 @login_required
 @admin_required(write_required=True)
 def remove_admin(id):
-    conn = get_db_connection()
-    conn.execute('delete from admins where id = ?', (id,))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("admins").delete().eq("id", id).execute()
     admins = fetch_admins_from_db()
     return jsonify({"admins": admins})
 
 ### Hidden Card Overrides
 
 def fetch_hidden_card_overrides_from_db():
-    conn = get_db_connection()
-    hidden_card_overrides = rows_to_dicts(conn.execute("select * from hidden_card_overrides order by id desc").fetchall())
-    conn.close()
+    response = supabase_client.schema("lifted").table("hidden_card_overrides") \
+    .select("*") \
+    .order("id", desc=True) \
+    .execute()
+
+    hidden_card_overrides = response.data
     return hidden_card_overrides
 
 @admin.route("/api/admin/get-hidden-card-overrides")
@@ -554,11 +500,10 @@ def get_hidden_card_overrides():
 def add_hidden_card_override():
     message_group = request.form["hidden-card-message-group-input"]
     recipient_email = request.form["hidden-card-email-input"]
-    conn = get_db_connection()
-    conn.execute("insert into hidden_card_overrides (recipient_email, message_group) values (?, ?)",
-                 (recipient_email, message_group))
-    conn.commit()
-    conn.close()
+    response = supabase_client.schema("lifted").table("hidden_card_overrides").insert({
+        "recipient_email": recipient_email,
+        "message_group": message_group
+    }).execute()
     hidden_card_overrides = fetch_hidden_card_overrides_from_db()
     return jsonify({"hidden_card_overrides": hidden_card_overrides})
 
@@ -566,9 +511,6 @@ def add_hidden_card_override():
 @login_required
 @admin_required(write_required=True)
 def remove_hidden_card_override(id):
-    conn = get_db_connection()
-    conn.execute('delete from hidden_card_overrides where id = ?', (id,))
-    conn.commit()
-    conn.close()
+    response = supabase_client.schema("lifted").table("hidden_card_overrides").delete().eq("id", id).execute()
     hidden_card_overrides = fetch_hidden_card_overrides_from_db()
     return jsonify({"hidden_card_overrides": hidden_card_overrides})

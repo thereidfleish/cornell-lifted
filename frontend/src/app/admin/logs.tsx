@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Table, { TableHeader } from "@/components/Table";
+import FormattedTimestamp from "@/components/FormattedTimestamp";
 
 export default function AdminLogsPage() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -16,8 +17,19 @@ export default function AdminLogsPage() {
         const res = await fetch("/api/admin/logs");
         if (!res.ok) throw new Error("Failed to fetch logs");
         const data = await res.json();
-        setLogs(data.logs || []);
-        setRecentlyDeleted(data.recently_deleted_messages || []);
+        setLogs(
+          (data.logs || []).map((log: any) => ({
+            ...log,
+            log_timestamp: <FormattedTimestamp timestamp={log.log_timestamp} />,
+          }))
+        );
+        setRecentlyDeleted(
+          (data.recently_deleted_messages || []).map((msg: any) => ({
+            ...msg,
+            created_timestamp: <FormattedTimestamp timestamp={msg.created_timestamp} />,
+            deleted_timestamp: <FormattedTimestamp timestamp={msg.deleted_timestamp} />,
+          }))
+        );
       } catch (err: any) {
         setError(err.message || "Unknown error");
       }

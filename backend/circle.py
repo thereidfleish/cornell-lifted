@@ -1,15 +1,13 @@
 from flask import redirect, send_file, render_template, abort, jsonify, request, url_for, Blueprint, current_app
 from flask_login import login_required, current_user
 import ldap3
-from datetime import datetime
 from pathlib import Path
 from wtforms import Form, BooleanField, StringField, HiddenField, TextAreaField, RadioField, validators
 
 import os
 import helpers
 
-from app import is_admin, get_db_connection, get_logs_connection, admin_required
-from core import rows_to_dicts
+from app import is_admin, admin_required, supabase_client
 
 circle = Blueprint('circle', __name__, template_folder='templates', static_folder='static')
 
@@ -17,9 +15,7 @@ def validate_user_is_tapped_or_admin():
     helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Tried to access the Tap Page!")
 
     # Taps Table
-    conn = get_db_connection()
-    user = conn.execute("select * from cp_taps where netid=?", (current_user.id,)).fetchone()
-    conn.close()
+    user = supabase_client.schema("lifted").table("cp_taps").select("*").eq("netid", current_user.id).maybe_single().execute()
 
     # If the user was not tapped, abort
     if not user and not is_admin(write_required=False):
@@ -32,7 +28,7 @@ def validate_user_is_tapped_or_admin():
 def get_user():
     user = validate_user_is_tapped_or_admin()
     if user:
-        return jsonify(dict(user))
+        return jsonify(dict(user.data))
     return jsonify("user not tapped")
 
 @circle.route("/api/circle/get-taps")
@@ -40,9 +36,7 @@ def get_user():
 @admin_required(write_required=False)
 def get_taps():
     validate_user_is_tapped_or_admin()
-    conn = get_db_connection()
-    taps = rows_to_dicts(conn.execute("select * from cp_taps").fetchall())
-    conn.close()
+    taps = supabase_client.schema("lifted").table("cp_taps").select("*").execute().data
     return jsonify(taps)
 
 @circle.post("/api/circle/update-tap-response")
@@ -63,15 +57,17 @@ def update_tap_response():
     pronouns = form["pronouns"]
     notes = form["notes"]
 
-    timestamp = datetime.now().replace(microsecond=0)
-
-    conn = get_db_connection()
-    conn.execute('update cp_taps set responded_timestamp=?, accept_tap=?, clear_schedule=?, wear_clothing=?, monitor_inbox=?, pronouns=?, phonetic_spelling=?, allergens=?, physical_accommodations=?, notes=?  where netid=?',
-                    (timestamp, accept_tap, clear_schedule, wear_clothing, monitor_inbox, pronouns, phonetic_spelling, allergens, physical_accommodations, notes, netid))
-    # conn.execute('insert into cp_taps (netid, tap_name, created_timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                    # (netid, current_user.name, timestamp, accept_tap, clear_schedule, wear_clothing, phonetic_spelling, monitor_inbox, notes))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("cp_taps").update({
+        "accept_tap": accept_tap,
+        "clear_schedule": clear_schedule,
+        "wear_clothing": wear_clothing,
+        "monitor_inbox": monitor_inbox,
+        "pronouns": pronouns,
+        "phonetic_spelling": phonetic_spelling,
+        "allergens": allergens,
+        "physical_accommodations": physical_accommodations,
+        "notes": notes
+    }).eq("netid", netid).execute()
 
     return jsonify({"success": True})
 
@@ -95,11 +91,10 @@ def add_tap():
     netID = request.form['netID-input'].strip().lower()
     name = request.form['name-input'].strip()
 
-    conn = get_db_connection()
-    conn.execute('insert into cp_taps (netid, tap_name) VALUES (?, ?)',
-                            (netID, name))
-    conn.commit()
-    conn.close()
+    supabase_client.schema("lifted").table("cp_taps").insert({
+        "netid": netID, 
+        "tap_name": name
+    }).execute()
 
     return jsonify({"success": True})
 
@@ -107,9 +102,5 @@ def add_tap():
 @login_required
 @admin_required(write_required=True)
 def delete_tap(netID):
-    conn = get_db_connection()
-    conn.execute('delete from cp_taps where netid = ?', (netID,))
-    conn.commit()
-    conn.close()
-
+    supabase_client.schema("lifted").table("cp_taps").delete().eq("netid", netID).execute()
     return jsonify({"success": True})

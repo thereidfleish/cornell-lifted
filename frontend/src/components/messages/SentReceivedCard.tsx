@@ -19,6 +19,7 @@ export default function SentReceivedCard({ details, year_name, season_name, late
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCardId, setSelectedCardId] = useState<number | string | null>(null);
     const [overrideHiddenMessage, setOverrideHiddenMessage] = useState(false);
+    const [currentAttachment, setCurrentAttachment] = useState<string | null>(details.chosen_attachment?.attachment_name || null);
     const { config, isWinter } = useGlobal();
 
     const isELifted = details.type === "e";
@@ -48,7 +49,7 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                     <ul className="mb-3 flex gap-2" role="tablist">
                         <li role="presentation">
                             <button
-                                className={`px-4 py-2 rounded-3xl cursor-pointer transition-colors duration-200 ${activeTab === 'received' ? 'bg-cornell-blue text-white' : 'hover:bg-gray-100'}`}
+                                className={`px-4 py-2 rounded-3xl cursor-pointer transition-colors duration-200 inline-flex items-center ${activeTab === 'received' ? 'bg-cornell-blue text-white' : 'hover:bg-gray-100'}`}
                                 onClick={() => setActiveTab('received')}
                                 type="button"
                                 role="tab"
@@ -56,13 +57,13 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                             >
                                 Received
                                 {details.received_count > 0 && (
-                                    <span className="ml-2 py-1 px-2 bg-blue-100 text-black font-bold rounded-full text-xs">{details.received_count}</span>
+                                    <span className="ml-2 inline-flex items-center justify-center py-1 px-2 bg-blue-100 text-black font-bold rounded-full text-xs leading-none">{details.received_count}</span>
                                 )}
                             </button>
                         </li>
                         <li role="presentation">
                             <button
-                                className={`px-4 py-2 rounded-3xl cursor-pointer transition-colors duration-200 ${activeTab === 'sent' ? 'bg-cornell-blue text-white' : 'hover:bg-gray-100'}`}
+                                className={`px-4 py-2 rounded-3xl cursor-pointer transition-colors duration-200 inline-flex items-center ${activeTab === 'sent' ? 'bg-cornell-blue text-white' : 'hover:bg-gray-100'}`}
                                 onClick={() => setActiveTab('sent')}
                                 type="button"
                                 role="tab"
@@ -70,7 +71,7 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                             >
                                 Sent
                                 {details.sent_count > 0 && (
-                                    <span className="ml-2 py-1 px-2 bg-blue-100 text-black font-bold rounded-full text-xs">{details.sent_count}</span>
+                                    <span className="ml-2 inline-flex items-center justify-center py-1 px-2 bg-blue-100 text-black font-bold rounded-full text-xs leading-none">{details.sent_count}</span>
                                 )}
                             </button>
                         </li>
@@ -101,8 +102,8 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                                         <div className="shadow-lg rounded-lg p-4 transition-all duration-500 ease-in-out scale-100 hover:scale-102">
                                                             <h2 className="text-3xl text-cornell-red font-schoolbell mb-4">🎈 Coming Soon!</h2>
                                                             <p className="text-sm text-gray-800 mb-4">Pick up your {details.received_count} physical card{details.received_count !== 1 ? 's' : ''} in the <b>Willard Straight Hall Lobby before 7 PM</b> on the last day of classes <b>(Monday, December 8th)!</b></p>
-                                                            {details.chosen_attachment && (
-                                                                <p className="text-sm text-gray-800 mb-4">You'll also receive a <b>{details.chosen_attachment?.attachment_name}</b> alongside your cards!</p>
+                                                            {currentAttachment && (
+                                                                <p className="text-sm text-gray-800 mb-4">You'll also receive a <b>{currentAttachment}</b> alongside your cards!</p>
                                                             )}
                                                             <p className="text-sm text-gray-500">Keep an eye on your email for details!</p>
                                                         </div>
@@ -119,14 +120,14 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                                         <p className="text-sm text-gray-800 mb-4">Your {details.received_count} eLifted message{details.received_count !== 1 ? 's' : ''} will be available here on the last day of classes!</p>
                                                     </div>
                                                 )}
-                                                {details.message_group === config?.attachment_message_group && (
-                                                    <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
-                                                        <ChooseAttachment message_group={details.message_group} />
-                                                    </div>
-                                                )}
                                                 {details.message_group === config?.swap_from && (
                                                     <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
                                                         <SwapCards />
+                                                    </div>
+                                                )}
+                                                {details.message_group === config?.attachment_message_group && (
+                                                    <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
+                                                        <ChooseAttachment message_group={details.message_group} onAttachmentChange={setCurrentAttachment} />
                                                     </div>
                                                 )}
                                             </div>

@@ -29,14 +29,14 @@
         "sp_24_p",
         "sp_23_p",
         "fa_25_p",
-        "sp_25_p",
         "sp_26_p",
-        "sp_26_e"
+        "sp_26_e",
+        "sp_25_p"
     ],
     "form_message_group": "none",
     "attachment_message_group": "none",
-    "swap_from": "none",
-    "swap_to": "fa_25_e",
+    "swap_from": "sp_26_p",
+    "swap_to": "sp_26_e",
     "swap_text": "Get your cards delivered virtually on the last day of classes instead. Hard deadline to do this is <b>12/1/25 at 11:59 PM!</b>",
     "coming_soon_text": "New Lifted cards will be available soon for the Fall 2025 semester! Stay tuned for updates."
 }

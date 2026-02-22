@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, abort, jsonify, request
+from flask import Flask, render_template, session, abort, jsonify, request, send_file
 from flask_login import LoginManager, UserMixin, login_user, current_user
 from flask_oidc import OpenIDConnect, signals
 from werkzeug.exceptions import HTTPException
@@ -14,6 +14,12 @@ import helpers
 load_dotenv()
 
 login_manager = LoginManager()
+
+from supabase import create_client, Client
+
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_KEY")
+supabase_client = create_client(supabase_url, supabase_key)
 
 def create_app():
     app = Flask(__name__)
@@ -90,16 +96,6 @@ def update_lifted_config(new_config):
     with open('lifted_config.json', 'w') as file:
         json.dump(new_config, file, indent=4)
 
-def get_db_connection():
-    conn = sqlite3.connect("db/database.db")
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def get_logs_connection():
-    conn = sqlite3.connect("db/logs.db")
-    conn.row_factory = sqlite3.Row
-    return conn
-
 class User(UserMixin):
     def __init__(self, name, full_name, id):
         self.name = name
@@ -121,9 +117,11 @@ def admin_required(write_required):
     return decorator
 
 def is_admin(write_required, custom_netID=False):
-    conn = get_db_connection()
-    admins = conn.execute("select * from admins where id=?", (custom_netID if custom_netID else current_user.id,)).fetchone()
-    conn.close()
+    # Determine which ID to use
+    lookup_id = custom_netID if custom_netID else current_user.id
+
+    response = supabase_client.schema("lifted").rpc('get_admin', {'netid': lookup_id}).execute()
+    admins = response.data
 
     if write_required:
         return admins != None and admins["write"] == True

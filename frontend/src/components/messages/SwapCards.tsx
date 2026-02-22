@@ -23,7 +23,7 @@ const SwapCards: React.FC = () => {
 	};
 
 	return (
-		<div className="p-4 border rounded bg-white">
+		<div className="relative">
 			<h5 className="font-bold mb-2">Can't make it on the last day of classes?</h5>
             <div
                 className="mb-2 text-sm"

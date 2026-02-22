@@ -107,12 +107,11 @@ export default function MessagesPage() {
                             </div>
                             <a href="/send-message" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow hover:bg-cornell-blue transition mt-4 md:mt-0">Send a New Message</a>
                         </div>
-                        <h2 className="text-3xl mb-4">Your Lifted Timeline</h2>
                         {/* Timeline */}
                         <div className="space-y-8">
                             {messagesData.map((event, i) => (
                                 <div key={event.year_name + event.season} className={`${i > 2 && !showOlder ? 'hidden' : ''}`}>
-                                    <h2 className="text-3xl text-cornell-blue mb-4">{event.season_name + " " + event.year_name} Lifted</h2>
+                                    <h2 className="text-3xl text-cornell-blue mb-4">{event.season_name + " " + event.year_name}</h2>
                                     <div className="w-14 h-1 bg-cornell-red mb-4 rounded" style={{ borderBottom: "2px solid #b31b1b" }}></div>
                                     <div className="flex flex-col lg:flex-row lg:gap-6">
                                         {event.types.map((typeDetails, idx) => (

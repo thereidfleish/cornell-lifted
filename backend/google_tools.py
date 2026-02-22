@@ -6,6 +6,8 @@ import io
 import os
 import math
 
+from app import supabase_client
+
 SCOPES = [
     "https://www.googleapis.com/auth/presentations",
     "https://www.googleapis.com/auth/drive"
@@ -282,11 +284,7 @@ def cards_to_pdf(presentation_id, cards, output_filepath, message_group=None):
         message_group = cards[0].get("message_group")
     
     # Get attachments for this message group to build slide mapping
-    from app import get_db_connection
-    conn = get_db_connection()
-    attachments = conn.execute("select * from attachments where message_group=? order by id desc",
-                              (message_group,)).fetchall()
-    conn.close()
+    attachments = supabase_client.schema("lifted").table("attachments").select("*").eq("message_group", message_group).order("id", desc=True).execute().data
     
     # Build attachment_id -> slide_index mapping
     # Slide indices are 0-based: slide 0 = default, slide 1+ = attachments

@@ -5,6 +5,7 @@ import MessageGroupSelector from "@/components/MessageGroupSelector";
 import Loading from "@/components/Loading";
 import MessageModal from "@/components/messages/MessageModal";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
+import FormattedTimestamp from "@/components/FormattedTimestamp";
 
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 
@@ -95,7 +96,7 @@ export default function BrowseMessagesSection() {
   // Update columnDefs for message_content column
 const columnDefs = [
   { headerName: "Tools", field: "tools", cellRenderer: (params: any) => params.value, sortable: false, filter: false, resizable: false, maxWidth: 150 },
-  { headerName: "Timestamp", field: "created_timestamp", wrapText: true, maxWidth: 120 },
+  { headerName: "Timestamp", field: "created_timestamp", wrapText: true, maxWidth: 240, cellRenderer: (params: any) => <FormattedTimestamp timestamp={params.value} /> },
   { headerName: "Message Group", field: "message_group", wrapText: true, maxWidth: 120 },
   { headerName: "Sender Email", field: "sender_email", wrapText: true, maxWidth: 160 },
   { headerName: "Recipient Email", field: "recipient_email", wrapText: true, maxWidth: 160 },

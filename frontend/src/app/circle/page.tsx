@@ -31,7 +31,7 @@ const CirclePage: React.FC = () => {
 			jsConfettiRef.current.addConfetti({
 				emojis: ['🎉', '🎈', '✨', '🍪', '👨‍🌾', '🐏'],
 				emojiSize: 80,
-				confettiNumber: 150,
+				confettiNumber: 50,
 			});
 		}
 	};
@@ -84,7 +84,7 @@ const CirclePage: React.FC = () => {
 			return <TapAcceptanceForm tapName={user.tap_name} />;
 		}
 		
-		if (user && user.accept_tap === 1) {
+		if (user && user.accept_tap === true) {
 			// Trigger confetti for accepted taps
 			triggerAcceptanceConfetti();
 			
@@ -92,16 +92,16 @@ const CirclePage: React.FC = () => {
 				<p className="text-center text-white mb-4">
 					Welcome to the Circle, {user.tap_name?.split(" ")[0]}! We're so excited for you to join us. 
 					Keep an eye on your email for further information, coming soon...<br /><br />
-					If you have any questions in the meantime, please reach out to whoever tapped you or wrote you a letter.
+					If you have any questions in the meantime, please reach out to whomever tapped you or wrote you a letter.
 				</p>
 			);
 		}
 		
-		if (user && user.accept_tap === 0) {
+		if (user && user.accept_tap === false) {
 			return (
 				<p className="text-center text-white mb-4">
-					We're sorry you rejected the tap. Please return the parcel to whoever tapped you and maintain the society's secrecy.<br /><br />
-					If you have any questions, please reach out to whoever tapped you or wrote you a letter.
+					We're sorry you rejected the tap, {user.tap_name?.split(" ")[0]}. Please return the parcel to whomever tapped you and maintain the society's secrecy.<br /><br />
+					If you have any questions, please reach out to whomever tapped you or wrote you a letter.
 				</p>
 			);
 		}
