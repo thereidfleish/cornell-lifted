@@ -2,9 +2,9 @@ import React, { useState } from "react";
 
 const LABELS = {
     accept_tap: "Accept or Reject the Tap",
-    clear_schedule: "I will clear my schedule from 7:00 pm onward on Monday, September 29th.",
-    wear_clothing: "I will wear white/light colors from 7:00 pm onward on Monday, September 29th.",
-    monitor_inbox: "I will monitor my email inbox closely from now to September 29th.",
+    clear_schedule: "I will clear my schedule from 7:00 pm onward on Sunday, March 8th.",
+    wear_clothing: "I will wear white/light colors from 7:00 pm onward on Sunday, March 8th.",
+    monitor_inbox: "I will monitor my email inbox closely from now to March 8th.",
     notes: "If I did not check all the boxes above, explain any conflicts/concerns:",
     pronouns: "Preferred pronouns:",
     phonetic_spelling: "Phonetic pronunciation of my name:",
@@ -93,7 +93,7 @@ const TapAcceptanceForm: React.FC<TapAcceptanceFormProps> = ({ tapName, onSucces
                 }}
                 onSubmit={handleSubmit}
             >
-                <h4 className="text-center font-bold mb-2">Your response is requested by <b>Saturday, September 27th, 2025 at 11:59 PM.</b></h4>
+                <h4 className="text-center font-bold mb-2">Your response is requested by <b>Wednesday, March 4th, 2026 at 11:59 PM.</b></h4>
                 {tapName && <h3 className="text-center text-2xl font-bold mb-4">{tapName}</h3>}
                 {error && <div className="bg-red-100 text-red-700 rounded p-2 mb-2"><h5 className="font-bold">Please fix the following errors:</h5><ul><li>{error}</li></ul></div>}
                 {success && <div className="bg-green-100 text-green-700 rounded p-2 mb-2">{success}</div>}
