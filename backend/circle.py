@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 import ldap3
 from pathlib import Path
 from wtforms import Form, BooleanField, StringField, HiddenField, TextAreaField, RadioField, validators
+from datetime import datetime, timezone
 
 import os
 import helpers
@@ -66,7 +67,8 @@ def update_tap_response():
         "phonetic_spelling": phonetic_spelling,
         "allergens": allergens,
         "physical_accommodations": physical_accommodations,
-        "notes": notes
+        "notes": notes,
+        "responded_timestamp": datetime.now(timezone.utc).isoformat(),
     }).eq("netid", netid).execute()
 
     return jsonify({"success": True})
