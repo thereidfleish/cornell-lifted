@@ -159,27 +159,27 @@ const CirclePage: React.FC = () => {
 				 {/* Single Easter egg circle button - shows when not authenticated OR no access */}
 				 {(!isAuthenticated || (isAuthenticated && !isAdmin && (!user || (!user.netid || user.accept_tap !== null)))) && (
 					 <div className="text-center">
-						 <div className="mb-4 relative">
+						 <div className="mb-4 inline-block relative">
 							 <button
 								 ref={buttonRef}
-								 className="relative text-6xl transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer bg-transparent border-none group"
+								 className="relative inline-flex items-center justify-center text-6xl transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer bg-transparent border-none p-0 leading-none overflow-visible group"
 								 onMouseEnter={createSparkleConfetti}
 								 onClick={createSparkleConfetti}
 								 title="🤔"
 							 >
-								 <span className="relative z-10">⭕</span>
+								 <span className="relative z-10 block leading-none">⭕</span>
+								 {/* Sparkle container inside button so inset-0 is anchored to exact button bounds */}
+								 <div className="absolute inset-0 pointer-events-none overflow-visible" style={{ transform: "translate(0.08em, 0.08em)" }}>
+									 <div className="sparkle-up absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20">✦</div>
+									 <div className="sparkle-up-right absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '0.5s'}}>✧</div>
+									 <div className="sparkle-right absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20" style={{animationDelay: '1s'}}>✦</div>
+									 <div className="sparkle-down-right absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '1.5s'}}>✧</div>
+									 <div className="sparkle-down absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20" style={{animationDelay: '2s'}}>✦</div>
+									 <div className="sparkle-down-left absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '2.5s'}}>✧</div>
+									 <div className="sparkle-left absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20" style={{animationDelay: '3s'}}>✦</div>
+									 <div className="sparkle-up-left absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '3.5s'}}>✧</div>
+								 </div>
 							 </button>
-							 {/* Background sparkles that continuously animate - moved outside button to avoid clipping */}
-							 <div className="absolute inset-0 pointer-events-none overflow-visible">
-								 <div className="sparkle-up absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20">✦</div>
-								 <div className="sparkle-up-right absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '0.5s'}}>✧</div>
-								 <div className="sparkle-right absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20" style={{animationDelay: '1s'}}>✦</div>
-								 <div className="sparkle-down-right absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '1.5s'}}>✧</div>
-								 <div className="sparkle-down absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20" style={{animationDelay: '2s'}}>✦</div>
-								 <div className="sparkle-down-left absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '2.5s'}}>✧</div>
-								 <div className="sparkle-left absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm z-20" style={{animationDelay: '3s'}}>✦</div>
-								 <div className="sparkle-up-left absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs z-20" style={{animationDelay: '3.5s'}}>✧</div>
-							 </div>
 						 </div>
 
 						 {/* Progressive secret messages */}
