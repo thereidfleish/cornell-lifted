@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct Cornell_LiftedApp: App {
     @StateObject private var environment: AppEnvironment
+    @StateObject private var messagesViewModel: MessagesViewModel
     
     init() {
         let api = APIClient()
@@ -18,15 +19,16 @@ struct Cornell_LiftedApp: App {
         // Restore persisted cookies early so authenticated requests can reuse the session
         AuthService.restoreCookies()
         
-        _environment = StateObject(
-            wrappedValue: AppEnvironment(api: api, authService: authService)
-        )
+        let env = AppEnvironment(api: api, authService: authService)
+        _environment = StateObject(wrappedValue: env)
+        _messagesViewModel = StateObject(wrappedValue: MessagesViewModel(api: api))
     }
     
     var body: some Scene {
         WindowGroup {
             MainTabView()
                 .environmentObject(environment)
+                .environmentObject(messagesViewModel)
                 .task {
                     await environment.getStatus()
                     await environment.getConfig()
