@@ -145,11 +145,11 @@ def get_messages():
 @core.route("/api/get-attachment-pref/<message_group>")
 @login_required
 def get_attachment_pref(message_group):
-    attachment_pref = supabase_client.schema('lifted').table('attachment_prefs').select('*').eq('message_group', message_group).eq('recipient_email', current_user.email).maybe_single().execute().data
+    attachment_pref = supabase_client.schema('lifted').table('attachment_prefs').select('*').eq('message_group', message_group).eq('recipient_email', current_user.email).maybe_single().execute()
 
     if attachment_pref is None:
         return jsonify({"attachment_pref": None})
-    return jsonify({"attachment_pref": dict(attachment_pref)})
+    return jsonify({"attachment_pref": dict(attachment_pref.data)})
 
 @core.route("/api/get-attachments/<message_group>")
 @login_required
@@ -479,7 +479,7 @@ def send_message():
             "recipient_name": recipient_name,
             "message_content": message_content}).execute()
 
-        helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
+        # helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
 
         return jsonify({"message_confirmation": True, "recipient_email": recipient_email})
 
@@ -575,10 +575,10 @@ def swap_messages():
         return "Cannot swap at this time.  swap_from=none in Lifted config."
 
     # Delete attachment pref if there is one
-    attachment_pref = supabase_client.schema("lifted").table("attachment_prefs").select("*").eq("recipient_email", current_user.email).eq("message_group", current_app.config["lifted_config"]["swap_from"]).maybe_single().execute().data
+    attachment_pref = supabase_client.schema("lifted").table("attachment_prefs").select("*").eq("recipient_email", current_user.email).eq("message_group", current_app.config["lifted_config"]["swap_from"]).maybe_single().execute()
     if attachment_pref:
-        supabase_client.schema("lifted").rpc("return_attachment", {"row_id": attachment_pref["attachment_id"]}).execute()
-        supabase_client.schema("lifted").table("attachment_prefs").delete().eq("id", attachment_pref["id"]).execute()
+        supabase_client.schema("lifted").rpc("return_attachment", {"row_id": attachment_pref.data["attachment_id"]}).execute()
+        supabase_client.schema("lifted").table("attachment_prefs").delete().eq("id", attachment_pref.data["id"]).execute()
 
     supabase_client.schema("lifted").table("messages").update({"message_group": swap_to}).eq("message_group", swap_from).eq("recipient_email", current_user.email).execute()
     supabase_client.schema("lifted").table("swap_prefs").insert({"recipient_email": current_user.email, "message_group_from": swap_from, "message_group_to": swap_to}).execute()

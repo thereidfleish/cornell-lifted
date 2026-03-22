@@ -36,6 +36,10 @@ def create_app():
     "lifted_config": load_lifted_config(),
     "is_windows": is_windows,
     "SESSION_COOKIE_DOMAIN": ".cornelllifted.com"
+    # "SESSION_COOKIE_DOMAIN": ".cornelllifted.com",
+    # "SESSION_COOKIE_SAMESITE": "None",
+    # "SESSION_COOKIE_SECURE": True,
+    # "SESSION_COOKIE_HTTPONLY": True
     })
 
     app.jinja_env.globals['lifted_config'] = app.config["lifted_config"]
