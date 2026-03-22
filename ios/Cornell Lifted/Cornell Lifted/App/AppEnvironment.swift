@@ -13,7 +13,7 @@ final class AppEnvironment: ObservableObject {
     @Published var status: Status?
     @Published var config: Config?
     
-    private let api: APIClient
+    let api: APIClient
     private let authService: AuthService
     
     init(api: APIClient, authService: AuthService) {
@@ -48,22 +48,4 @@ final class AppEnvironment: ObservableObject {
             print("login failed:", error)
         }
     }
-    
-    //    func bootstrap() async {
-    //        do {
-    //            let isAuthed = try await authService.checkAuthStatus()
-    //            appState = isAuthed ? .authenticated : .unauthenticated
-    //        } catch {
-    //            appState = .unauthenticated
-    //        }
-    //    }
-    //
-    //    func loginCompleted() async {
-    //        await bootstrap()
-    //    }
-    //
-    //    func logout() async {
-    //        await authService.logout()
-    //        appState = .unauthenticated
-    //    }
 }

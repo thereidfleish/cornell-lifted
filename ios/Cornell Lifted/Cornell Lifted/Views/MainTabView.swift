@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @EnvironmentObject var environment: AppEnvironment
+    @EnvironmentObject var viewModel: MessagesViewModel
+    
     var body: some View {
         ZStack {
             Color.blue.ignoresSafeArea() // Global background
@@ -19,7 +22,7 @@ struct MainTabView: View {
                 SendMessageView()
                     .tabItem { Label("Send Message", systemImage: "paperplane.fill") }
                 
-                MessagesView(viewModel: MessagesViewModel())
+                MessagesView()
                     .tabItem { Label("View Messages", systemImage: "tray.fill") }
             }
         }

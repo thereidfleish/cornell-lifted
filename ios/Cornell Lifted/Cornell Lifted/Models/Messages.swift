@@ -11,12 +11,13 @@ struct Messages: Codable {
     let event: String
     let season: String
     let season_name: String
-    let types: [MessagesTypes]
+    let types: [MessagesType]
     let year: Int
     let year_name: Int
 }
 
-struct MessagesTypes: Codable {
+// This determines whether it is physical or eLifted
+struct MessagesType: Codable {
     let chosen_attachment: MessagesChosenAttachment?
     let hide_cards: Bool
     let message_group: String
