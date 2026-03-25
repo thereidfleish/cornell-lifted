@@ -1,4 +1,4 @@
-from flask import redirect, send_file, render_template, session, abort, jsonify, request, url_for, Blueprint, current_app
+from flask import redirect, send_file, session, abort, jsonify, request, url_for, Blueprint, current_app
 from flask_login import login_user, login_required, current_user, logout_user
 from pathlib import Path
 from datetime import datetime
@@ -7,17 +7,36 @@ import json
 import os
 import mimetypes
 import helpers
+from db.repositories import (
+    get_cards_with_attachments,
+    list_logs_desc,
+    list_recently_deleted_messages_desc,
+    get_google_slides_presentation_id,
+    upsert_google_slides_id,
+    get_attachment_prefs_with_attachment,
+    delete_attachment_by_id,
+    create_attachment,
+    list_swap_prefs,
+    delete_swap_pref_by_id,
+    browse_messages as browse_messages_repo,
+    list_admins,
+    add_admin as add_admin_repo,
+    delete_admin,
+    list_hidden_card_overrides_desc,
+    add_hidden_card_override as add_hidden_card_override_repo,
+    delete_hidden_card_override,
+)
 
-from app import admin_required, update_lifted_config, load_user, supabase_client
+from app import admin_required, update_lifted_config, load_user, sync_admin_permissions_for_session, clear_admin_permissions_from_session, db_call
 
-admin = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
+admin = Blueprint('admin', __name__, static_folder='static')
 
 @admin.route("/api/admin/logs")
 @login_required
 @admin_required(write_required=False)
 def logs_page():
-    logs = supabase_client.schema("lifted").table("logs").select("*").order("id", desc=True).execute().data
-    recently_deleted_messages = supabase_client.schema("lifted").table("recently_deleted_messages").select("*").order("id", desc=True).execute().data
+    logs = db_call(list_logs_desc)
+    recently_deleted_messages = db_call(list_recently_deleted_messages_desc)
 
     return jsonify({
         "logs": logs,
@@ -85,10 +104,10 @@ def remove_message_group(message_group):
 @login_required
 @admin_required(write_required=False)
 def get_google_slides_id(message_group):
-    result = supabase_client.schema("lifted").table("google_slides_ids").select("presentation_id").eq("message_group", message_group).maybe_single().execute()
+    presentation_id = db_call(get_google_slides_presentation_id, message_group)
 
-    if result:
-        return jsonify({"presentation_id": result.data["presentation_id"]})
+    if presentation_id:
+        return jsonify({"presentation_id": presentation_id})
     return jsonify({"presentation_id": None})
 
 @admin.post("/api/admin/save-google-slides-id/<message_group>")
@@ -110,7 +129,7 @@ def save_google_slides_id(message_group):
     else:
         return jsonify({"status": "error", "message": "Invalid Google Slides URL or ID"}), 400
     
-    supabase_client.schema("lifted").table("google_slides_ids").upsert({"message_group": message_group, "presentation_id": presentation_id}, on_conflict="message_group").execute()
+    db_call(upsert_google_slides_id, message_group, presentation_id)
 
     return jsonify({"status": "success", "presentation_id": presentation_id})
 
@@ -217,7 +236,7 @@ def preview_email_live():
 @login_required
 @admin_required(write_required=False)
 def get_attachment_prefs(message_group):
-    attachment_prefs = supabase_client.schema("lifted").table("attachment_prefs").select("*, attachments(attachment)").eq("message_group", message_group).execute().data
+    attachment_prefs = db_call(get_attachment_prefs_with_attachment, message_group)
     return jsonify({"attachment_prefs": attachment_prefs})
 
 @admin.post("/api/admin/update-attachment-message-group")
@@ -232,7 +251,7 @@ def update_attachment_message_group():
 @login_required
 @admin_required(write_required=True)
 def delete_attachment(id):
-    supabase_client.schema("lifted").table("attachments").delete().eq("id", id).execute()
+    db_call(delete_attachment_by_id, id)
     return jsonify({"status": "Attachment deleted successfully!"})
 
 @admin.post("/api/admin/add-attachment/<message_group>")
@@ -241,7 +260,7 @@ def delete_attachment(id):
 def add_attachment(message_group):
     attachment = request.form["attachment-name"]
     count = request.form["attachment-count"]
-    supabase_client.schema("lifted").table("attachments").insert({"message_group": message_group, "attachment": attachment, "count": count}).execute()
+    db_call(create_attachment, message_group, attachment, count)
     return jsonify({"status": "Attachment added successfully!"})
 
 ### Swapping
@@ -250,7 +269,7 @@ def add_attachment(message_group):
 @login_required
 @admin_required(write_required=False)
 def get_swap_prefs():
-    swap_prefs = supabase_client.schema("lifted").table("swap_prefs").select("*").execute().data
+    swap_prefs = db_call(list_swap_prefs)
     return jsonify({"swap_prefs": swap_prefs})
 
 @admin.post("/api/admin/update-swapping-config")
@@ -287,7 +306,7 @@ def delete_swap_pref(id):
     # conn.execute('update messages set message_group=? where message_group=? and recipient_email=?',
     #                      (swap_pref["message_group_from"], swap_pref["message_group_to"], swap_pref["recipient_email"]))
     
-    supabase_client.schema("lifted").table("swap_prefs").delete().eq("id", id).execute()
+    db_call(delete_swap_pref_by_id, id)
 
     return jsonify({"status": "Swap pref deleted successfully!"})
 
@@ -303,16 +322,7 @@ def browse_messages():
     if current_user.id != "rf377":
         helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Queried '{query}' for {message_group}")
 
-    query_builder = supabase_client.schema("lifted").table("messages").select("*").order("created_timestamp", desc=True)
-
-    if message_group != "all":
-        query_builder = query_builder.eq("message_group", message_group)
-
-    if query:
-        # 'ilike' is case-insensitive, 'or' syntax allows searching multiple columns
-        query_builder = query_builder.or_(f"recipient_email.ilike.%{query}%,sender_email.ilike.%{query}%")
-
-    results = query_builder.execute().data
+    results = db_call(browse_messages_repo, message_group, query)
 
     if len(results) == 0:
         return jsonify({"results": "none"})
@@ -384,14 +394,12 @@ def process_all_cards(message_group):
     print("Starting task")
     
     # Get the Google Slides presentation ID
-    presentation_result = supabase_client.schema("lifted").table("google_slides_ids").select("presentation_id").eq("message_group", message_group).maybe_single().execute()
-    
-    if not presentation_result:
+    presentation_id = db_call(get_google_slides_presentation_id, message_group)
+
+    if not presentation_id:
         return jsonify({"status": "error", "message": "No Google Slides template found for this message group"}), 404
     
-    presentation_id = presentation_result.data["presentation_id"]
-    
-    cards = supabase_client.schema("lifted").rpc("get_cards_with_attachments", {"p_message_group": message_group}).execute().data
+    cards = db_call(get_cards_with_attachments, message_group)
     
     # Sort alphabetically by netid (letters then numbers) if requested
     if request.args.get('alphabetical') == "true":
@@ -431,6 +439,7 @@ def process_all_cards(message_group):
 @admin_required(write_required=True)
 def impersonate():
     netID = request.form.get("impersonate_netid")
+    sync_admin_permissions_for_session(netID)
     user = load_user(netID)
     login_user(user)
     session["impersonating"] = True
@@ -440,12 +449,13 @@ def impersonate():
 def end_impersonate():
     logout_user()
     session["impersonating"] = False
+    clear_admin_permissions_from_session()
     return jsonify({"status": "No longer impersonating."})
 
 ### Admins
 
 def fetch_admins_from_db():
-    admins = list(reversed(supabase_client.schema("lifted").table("admins").select("*").execute().data))
+    admins = list(reversed(db_call(list_admins)))
     return admins
 
 @admin.route("/api/admin/get-admins")
@@ -461,10 +471,7 @@ def get_admins():
 def add_admin():
     netID = request.form["admin_netid"]
     write_perm = True if request.form.get("admin_write_perm") else False
-    supabase_client.schema("lifted").table("admins").insert({
-        "id": netID,
-        "write": write_perm
-    }).execute()
+    db_call(add_admin_repo, netID, write_perm)
     admins = fetch_admins_from_db()
     return jsonify({"admins": admins})
 
@@ -472,19 +479,14 @@ def add_admin():
 @login_required
 @admin_required(write_required=True)
 def remove_admin(id):
-    supabase_client.schema("lifted").table("admins").delete().eq("id", id).execute()
+    db_call(delete_admin, id)
     admins = fetch_admins_from_db()
     return jsonify({"admins": admins})
 
 ### Hidden Card Overrides
 
 def fetch_hidden_card_overrides_from_db():
-    response = supabase_client.schema("lifted").table("hidden_card_overrides") \
-    .select("*") \
-    .order("id", desc=True) \
-    .execute()
-
-    hidden_card_overrides = response.data
+    hidden_card_overrides = db_call(list_hidden_card_overrides_desc)
     return hidden_card_overrides
 
 @admin.route("/api/admin/get-hidden-card-overrides")
@@ -500,10 +502,7 @@ def get_hidden_card_overrides():
 def add_hidden_card_override():
     message_group = request.form["hidden-card-message-group-input"]
     recipient_email = request.form["hidden-card-email-input"]
-    response = supabase_client.schema("lifted").table("hidden_card_overrides").insert({
-        "recipient_email": recipient_email,
-        "message_group": message_group
-    }).execute()
+    db_call(add_hidden_card_override_repo, recipient_email, message_group)
     hidden_card_overrides = fetch_hidden_card_overrides_from_db()
     return jsonify({"hidden_card_overrides": hidden_card_overrides})
 
@@ -511,6 +510,6 @@ def add_hidden_card_override():
 @login_required
 @admin_required(write_required=True)
 def remove_hidden_card_override(id):
-    response = supabase_client.schema("lifted").table("hidden_card_overrides").delete().eq("id", id).execute()
+    db_call(delete_hidden_card_override, id)
     hidden_card_overrides = fetch_hidden_card_overrides_from_db()
     return jsonify({"hidden_card_overrides": hidden_card_overrides})

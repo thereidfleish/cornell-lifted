@@ -5,8 +5,9 @@ from datetime import datetime
 import io
 import os
 import math
+from db.repositories import list_attachments_for_message_group
 
-from app import supabase_client
+from app import SessionLocal
 
 SCOPES = [
     "https://www.googleapis.com/auth/presentations",
@@ -284,7 +285,8 @@ def cards_to_pdf(presentation_id, cards, output_filepath, message_group=None):
         message_group = cards[0].get("message_group")
     
     # Get attachments for this message group to build slide mapping
-    attachments = supabase_client.schema("lifted").table("attachments").select("*").eq("message_group", message_group).order("id", desc=True).execute().data
+    with SessionLocal() as db_session:
+        attachments = list_attachments_for_message_group(message_group, db_session)
     
     # Build attachment_id -> slide_index mapping
     # Slide indices are 0-based: slide 0 = default, slide 1+ = attachments

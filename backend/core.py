@@ -1,4 +1,4 @@
-from flask import redirect, send_file, render_template, abort, jsonify, request, url_for, Blueprint, current_app, session
+from flask import redirect, send_file, abort, jsonify, request, url_for, Blueprint, current_app, session
 from flask_login import login_required, current_user
 import ldap3
 from pathlib import Path
@@ -6,11 +6,32 @@ from pathlib import Path
 import os
 import helpers
 import google_tools
+from db.repositories import (
+    get_messages_payload,
+    get_card_payload,
+    claim_attachment,
+    return_attachment,
+    get_analytics_payload,
+    get_attachment_pref as get_attachment_pref_repo,
+    list_attachments_for_message_group,
+    update_attachment_pref,
+    create_attachment_pref,
+    get_attachment_pref_by_id,
+    delete_attachment_pref_by_id,
+    get_google_slides_presentation_id,
+    update_message_by_id,
+    delete_message_by_id,
+    insert_recently_deleted_message,
+    get_swap_pref,
+    insert_message,
+    update_messages_group_for_recipient,
+    create_swap_pref,
+)
 
-from app import is_admin, supabase_client
+from app import get_admin_permissions_for_netid, db_call
 import json
 
-core = Blueprint('core', __name__, template_folder='templates', static_folder='static')
+core = Blueprint('core', __name__, static_folder='static')
 
 @core.get("/api/auth/status")
 def auth_status():
@@ -19,15 +40,15 @@ def auth_status():
             session["impersonating"]
         except KeyError:
             session["impersonating"] = False
-        
+
         return jsonify({
             "authenticated": True,
             "impersonating": session["impersonating"],
             "user": {"id": current_user.id,
                      "email": current_user.email,
                      "name": current_user.full_name,
-                     "is_admin": is_admin(write_required=False),
-                     "admin_write_perm": is_admin(write_required=True)}
+                     "is_admin": current_user.is_admin,
+                     "admin_write_perm": current_user.admin_write_perm}
         })
     return jsonify({"authenticated": False})
 
@@ -74,12 +95,11 @@ def get_messages():
     if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"
         current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
-        response = supabase_client.schema("lifted").rpc('get_messages', {
-            'target_email': current_user.email,
-            'message_group_filter': current_attachment_message_group
-        }).execute()
-
-        data = response.data
+        data = db_call(
+            get_messages_payload,
+            target_email=current_user.email,
+            message_group_filter=current_attachment_message_group,
+        )
 
         received_cards = data['received_cards']
         sent_cards = data['sent_cards']
@@ -145,16 +165,16 @@ def get_messages():
 @core.route("/api/get-attachment-pref/<message_group>")
 @login_required
 def get_attachment_pref(message_group):
-    attachment_pref = supabase_client.schema('lifted').table('attachment_prefs').select('*').eq('message_group', message_group).eq('recipient_email', current_user.email).maybe_single().execute()
+    attachment_pref = db_call(get_attachment_pref_repo, current_user.email, message_group)
 
     if attachment_pref is None:
         return jsonify({"attachment_pref": None})
-    return jsonify({"attachment_pref": dict(attachment_pref.data)})
+    return jsonify({"attachment_pref": attachment_pref})
 
 @core.route("/api/get-attachments/<message_group>")
 @login_required
 def get_attachments(message_group):
-    attachments = supabase_client.schema("lifted").table("attachments").select("*").eq("message_group", message_group).order("id", desc=True).execute().data
+    attachments = db_call(list_attachments_for_message_group, message_group)
 
     return jsonify({"attachments": attachments})
 
@@ -165,64 +185,54 @@ def set_attachment():
     message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
     # 2. Try to CLAIM the attachment atomically
-    claim_response = supabase_client.schema("lifted").rpc("claim_attachment", {"row_id": attachment_id}).execute()
+    claim_success = db_call(claim_attachment, attachment_id)
 
     # claim_response.data will be True if successful, False if count was 0
-    if not claim_response.data:
+    if not claim_success:
         return f"Sorry, there are no more of this attachment left :("
 
     # 3. Check for existing preference (to swap)
-    prev_attachment = supabase_client.schema("lifted").table("attachment_prefs") \
-        .select("*") \
-        .eq("recipient_email", current_user.email) \
-        .eq("message_group", message_group) \
-        .maybe_single() \
-        .execute()
+    prev_attachment = db_call(get_attachment_pref_repo, current_user.email, message_group)
 
     if prev_attachment:
         # 4A. SWAP: Update existing preference
-        supabase_client.schema("lifted").table("attachment_prefs") \
-            .update({"attachment_id": attachment_id}) \
-            .eq("recipient_email", current_user.email) \
-            .eq("message_group", message_group) \
-            .execute()
+        db_call(update_attachment_pref, current_user.email, message_group, attachment_id)
 
         # 4B. RESTOCK: Return the old attachment to inventory
-        old_attachment_id = prev_attachment.data["attachment_id"]
-        supabase_client.schema("lifted").rpc("return_attachment", {"row_id": old_attachment_id}).execute()
+        old_attachment_id = prev_attachment["attachment_id"]
+        db_call(return_attachment, old_attachment_id)
 
     else:
         # 5. INSERT: New preference
         config_msg_group = current_app.config["lifted_config"]["attachment_message_group"]
         
-        supabase_client.schema("lifted").table("attachment_prefs").insert({
-            "recipient_email": current_user.email,
-            "message_group": config_msg_group,
-            "attachment_id": attachment_id
-        }).execute()
+        db_call(create_attachment_pref, current_user.email, config_msg_group, attachment_id)
 
     return jsonify({"status": "success"})
 
 @core.route("/api/delete-attachment-pref/<id>")
 @login_required
 def delete_attachment_pref(id):
-    attachment_pref = supabase_client.schema("lifted").table("attachment_prefs").select("*").eq("id", id).maybe_single().execute().data
+    attachment_pref = db_call(get_attachment_pref_by_id, id)
 
-    if attachment_pref["recipient_email"] == current_user.email or is_admin(write_required=True):
-        supabase_client.schema("lifted").rpc("return_attachment", {"row_id": attachment_pref["attachment_id"]}).execute()
-        supabase_client.schema("lifted").table("attachment_prefs").delete().eq("id", id).execute()
+    if attachment_pref is None:
+        abort(404, "Attachment preference DNE")
+
+    if attachment_pref["recipient_email"] == current_user.email or current_user.admin_write_perm:
+        db_call(return_attachment, attachment_pref["attachment_id"])
+        db_call(delete_attachment_pref_by_id, id)
 
         return jsonify({"status": "success"})
 
     abort(401, "Not your account")
 
 def get_card(id):
-    response = supabase_client.schema("lifted").rpc('get_card', {
-        'card_id': id, 
-        'lookup_email': current_user.email
-    }).execute()
+    data = db_call(
+        get_card_payload,
+        card_id=id,
+        lookup_email=current_user.email,
+    )
 
-    data = response.data
     card = data['card']
     # This will automatically be None if the row doesn't exist
     hidden_card_overrides = data['overrides']
@@ -238,7 +248,7 @@ def get_card_json(id):
     card, hidden_card_overrides = get_card(id)
 
     # First check if the user is an admin.  If so, they can bypass all the remaining checks
-    if is_admin(write_required=False) == False:
+    if current_user.is_admin == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
             abort(401, "Not your card")
@@ -250,7 +260,7 @@ def get_card_json(id):
         "id": card["id"],
         "created_timestamp": card["created_timestamp"],
         "message_group": card["message_group"],
-        "sender_email": card["sender_email"] if current_user.email == card["sender_email"] or is_admin(write_required=False) else "nice try :)",
+        "sender_email": card["sender_email"] if current_user.email == card["sender_email"] or current_user.is_admin else "nice try :)",
         "sender_name": card["sender_name"],
         "recipient_email": card["recipient_email"],
         "recipient_name": card["recipient_name"],
@@ -268,7 +278,7 @@ def get_card_pdf(id):
     card, hidden_card_overrides = get_card(id)
     
     # note: THE LOGIC HERE IS SLIGHTLY DIFFERENT THAN FOR HTML, since we don't want anyone downloading a PDF before its unhidden
-    if is_admin(write_required=False) == False:
+    if current_user.is_admin == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not either a sender or a recipient of the message, abort
         if card["sender_email"] != current_user.email and card["recipient_email"] != current_user.email:
             abort(401, "Not your card")
@@ -280,19 +290,17 @@ def get_card_pdf(id):
     message_group = override_template if override_template else card['message_group']
 
     # Get the Google Slides presentation ID for this message group
-    presentation_result = supabase_client.schema("lifted").table("google_slides_ids").select("presentation_id").eq("message_group", message_group).maybe_single().execute().data
+    presentation_id = db_call(get_google_slides_presentation_id, message_group)
     
-    if not presentation_result:
+    if not presentation_id:
         abort(404, "No Google Slides template found for this message group")
-    
-    presentation_id = presentation_result["presentation_id"]
     
     # Check if this is a test card (IDs 12870 or 16193) and we need to generate for all attachment templates
     is_test_card = id in ["12870", "16193"]
     
     if is_test_card and override_template:
         # Fetch all attachments for this message group
-        attachments = supabase_client.schema("lifted").table("attachments").select("*").eq("message_group", message_group).order("id", desc=True).execute().data
+        attachments = db_call(list_attachments_for_message_group, message_group)
         
         # Create test cards for default + each attachment
         test_cards = []
@@ -344,7 +352,7 @@ def get_card_pdf(id):
     return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
 
 def check_if_can_edit_or_delete(card):
-    if is_admin(write_required=True) == False:
+    if current_user.admin_write_perm == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not a sender of the message, abort
         if card["sender_email"] != current_user.email:
             abort(401, "Not your card")
@@ -361,7 +369,7 @@ def edit_message(id):
     form = json.loads(request.data)
 
     show_admin_overrides = False
-    if current_user.is_authenticated and is_admin(write_required=True) and request.args.get("show_admin_overrides") == "true":
+    if current_user.is_authenticated and current_user.admin_write_perm and request.args.get("show_admin_overrides") == "true":
         show_admin_overrides = True
 
     # (Disable validation for editing...due to complications with NetID validation, and also, if someone is savvy enough to bypass server-side validation, well, they can have their way)
@@ -379,13 +387,14 @@ def edit_message(id):
         recipient_email = form["recipient_email"].strip()
         send_ybl_email = form["send_ybl_email"]
 
-        supabase_client.schema("lifted").table("messages").update({
+        db_call(update_message_by_id, card["id"], {
             "message_group": message_group,
             "sender_email": sender_email,
             "sender_name": sender_name,
             "recipient_email": recipient_email,
             "recipient_name": recipient_name,
-            "message_content": message_content}).eq("id", card["id"]).execute()
+            "message_content": message_content,
+        })
         
         if send_ybl_email:
             helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
@@ -394,10 +403,11 @@ def edit_message(id):
         if message_group == "none":
             return "Sorry - the form is closed!"
         
-        supabase_client.schema("lifted").table("messages").update({
+        db_call(update_message_by_id, card["id"], {
             "sender_name": sender_name,
             "recipient_name": recipient_name,
-            "message_content": message_content}).eq("id", card["id"]).execute()
+            "message_content": message_content,
+        })
 
     helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Edited Card ID {id}") 
 
@@ -410,17 +420,8 @@ def delete_message(id):
 
     check_if_can_edit_or_delete(card)
 
-    supabase_client.schema("lifted").table("messages").delete().eq("id", id).execute()
-
-    result = supabase_client.schema("lifted").table("recently_deleted_messages").insert({
-        "created_timestamp": card["created_timestamp"],
-        "message_group": card["message_group"],
-        "sender_email": card["sender_email"],
-        "sender_name": card["sender_name"],
-        "recipient_email": card["recipient_email"],
-        "recipient_name": card["recipient_name"],
-        "message_content": card["message_content"]
-    }).execute().data
+    db_call(delete_message_by_id, id)
+    db_call(insert_recently_deleted_message, card)
 
     helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Deleted Card ID {id}")
 
@@ -435,7 +436,7 @@ def send_message():
     form = json.loads(request.data)
 
     show_admin_overrides = False
-    if current_user.is_authenticated and is_admin(write_required=True) and request.args.get("show_admin_overrides") == "true":
+    if current_user.is_authenticated and current_user.admin_write_perm and request.args.get("show_admin_overrides") == "true":
         show_admin_overrides = True
 
                         # (Disable validation for admin overrides)
@@ -465,19 +466,20 @@ def send_message():
 
         if current_app.config["lifted_config"]["swap_from"] == message_group:
             # Check to see if the user wants their messages in a different message group
-            swap_prefs = supabase_client.schema("lifted").table("swap_prefs").select("*").eq("recipient_email", recipient_email).eq("message_group_from", message_group).execute().data
+            swap_pref = db_call(get_swap_pref, recipient_email, message_group)
 
             # If there is a swap pref, honor it
-            if len(swap_prefs) > 0:
-                message_group = swap_prefs[0]["message_group_to"]
+            if swap_pref:
+                message_group = swap_pref["message_group_to"]
 
-        supabase_client.schema("lifted").table("messages").insert({
+        db_call(insert_message, {
             "message_group": message_group,
             "sender_email": sender_email,
             "sender_name": sender_name,
             "recipient_email": recipient_email,
             "recipient_name": recipient_name,
-            "message_content": message_content}).execute()
+            "message_content": message_content,
+        })
 
         # helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
 
@@ -558,9 +560,11 @@ def get_person_info():
 def easter_egg(netID):
     result = ""
 
-    if is_admin(write_required=True, custom_netID=netID):
+    permissions = get_admin_permissions_for_netid(netID)
+
+    if permissions["admin_write_perm"]:
         result = " 🎈🌸"
-    elif is_admin(write_required=False, custom_netID=netID):
+    elif permissions["is_admin"]:
         result = " 🎈"
 
     return jsonify({"result": result})
@@ -575,13 +579,13 @@ def swap_messages():
         return "Cannot swap at this time.  swap_from=none in Lifted config."
 
     # Delete attachment pref if there is one
-    attachment_pref = supabase_client.schema("lifted").table("attachment_prefs").select("*").eq("recipient_email", current_user.email).eq("message_group", current_app.config["lifted_config"]["swap_from"]).maybe_single().execute()
+    attachment_pref = db_call(get_attachment_pref_repo, current_user.email, current_app.config["lifted_config"]["swap_from"])
     if attachment_pref:
-        supabase_client.schema("lifted").rpc("return_attachment", {"row_id": attachment_pref.data["attachment_id"]}).execute()
-        supabase_client.schema("lifted").table("attachment_prefs").delete().eq("id", attachment_pref.data["id"]).execute()
+        db_call(return_attachment, attachment_pref["attachment_id"])
+        db_call(delete_attachment_pref_by_id, attachment_pref["id"])
 
-    supabase_client.schema("lifted").table("messages").update({"message_group": swap_to}).eq("message_group", swap_from).eq("recipient_email", current_user.email).execute()
-    supabase_client.schema("lifted").table("swap_prefs").insert({"recipient_email": current_user.email, "message_group_from": swap_from, "message_group_to": swap_to}).execute()
+    db_call(update_messages_group_for_recipient, current_user.email, swap_from, swap_to)
+    db_call(create_swap_pref, current_user.email, swap_from, swap_to)
 
     helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Swapped Cards to eLifted")
     
@@ -591,5 +595,5 @@ def swap_messages():
 def get_analytics():
     """Get analytics data for Lifted messages"""
     semester = request.args.get("semester", "all")
-    analytics_data = supabase_client.schema("lifted").rpc("get_analytics", {"semester_param": semester}).execute().data
+    analytics_data = db_call(get_analytics_payload, semester)
     return jsonify(analytics_data)

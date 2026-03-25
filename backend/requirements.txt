@@ -8,4 +8,5 @@ authlib
 requests
 Flask-WTF
 google-api-python-client
-supabase
+SQLAlchemy
+psycopg2

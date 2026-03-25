@@ -1,25 +1,31 @@
-from flask import Flask, render_template, session, abort, jsonify, request, send_file
+from flask import Flask, session, abort, jsonify, request, send_file
 from flask_login import LoginManager, UserMixin, login_user, current_user
 from flask_oidc import OpenIDConnect, signals
 from werkzeug.exceptions import HTTPException
 from waitress import serve
 from functools import wraps
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 import json
 import sqlite3
 import os
 import helpers
+from db.repositories import get_admin_by_netid
 
 load_dotenv()
 
 login_manager = LoginManager()
 
-from supabase import create_client, Client
+database_url = os.environ.get("POSTGRES_URL")
+engine = create_engine(database_url, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine)
 
-supabase_url = os.environ.get("SUPABASE_URL")
-supabase_key = os.environ.get("SUPABASE_KEY")
-supabase_client = create_client(supabase_url, supabase_key)
+
+def db_call(repo_fn, *args, **kwargs):
+    with SessionLocal() as db_session:
+        return repo_fn(*args, db_session=db_session, **kwargs)
 
 def create_app():
     app = Flask(__name__)
@@ -41,11 +47,6 @@ def create_app():
     # "SESSION_COOKIE_SECURE": True,
     # "SESSION_COOKIE_HTTPONLY": True
     })
-
-    app.jinja_env.globals['lifted_config'] = app.config["lifted_config"]
-    app.jinja_env.globals.update(zip=zip)
-    app.jinja_env.globals.update(is_admin=is_admin)
-    app.jinja_env.globals.update(get_impersonating_status=get_impersonating_status)
 
     oidc = OpenIDConnect(app)
     login_manager.init_app(app)
@@ -101,11 +102,13 @@ def update_lifted_config(new_config):
         json.dump(new_config, file, indent=4)
 
 class User(UserMixin):
-    def __init__(self, name, full_name, id):
+    def __init__(self, name, full_name, id, is_admin=False, admin_write_perm=False):
         self.name = name
         self.full_name = full_name
         self.id = id
         self.email = id + "@cornell.edu"
+        self.is_admin = bool(is_admin)
+        self.admin_write_perm = bool(admin_write_perm)
 
     def is_authenticated(self):
         return True
@@ -114,23 +117,31 @@ def admin_required(write_required):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if is_admin(write_required) == False:
+            has_access = current_user.admin_write_perm if write_required else current_user.is_admin
+            if has_access == False:
                 abort(401, "Not an admin!" + " Also, write is required." if write_required else "")
             return f(*args, **kwargs)
         return decorated_function
     return decorator
 
-def is_admin(write_required, custom_netID=False):
-    # Determine which ID to use
-    lookup_id = custom_netID if custom_netID else current_user.id
+def get_admin_permissions_for_netid(netid):
+    with SessionLocal() as db_session:
+        admin = get_admin_by_netid(db_session, netid)
 
-    response = supabase_client.schema("lifted").rpc('get_admin', {'netid': lookup_id}).execute()
-    admins = response.data
+    return {
+        "is_admin": admin is not None,
+        "admin_write_perm": (admin.write is True) if admin is not None else False
+    }
 
-    if write_required:
-        return admins != None and admins["write"] == True
+def sync_admin_permissions_for_session(netid):
+    permissions = get_admin_permissions_for_netid(netid)
+    session["is_admin"] = permissions["is_admin"]
+    session["admin_write_perm"] = permissions["admin_write_perm"]
+    return permissions
 
-    return admins != None
+def clear_admin_permissions_from_session():
+    session.pop("is_admin", None)
+    session.pop("admin_write_perm", None)
 
 def get_impersonating_status():
     return session.get("impersonating")
@@ -138,15 +149,23 @@ def get_impersonating_status():
 @login_manager.user_loader
 def load_user(user_id):
     # user_id = "atn45" # use to TEST a user!
-    user = User(name=session["given_name"], full_name=session["full_name"], id=user_id)
+    user = User(
+        name=session["given_name"],
+        full_name=session["full_name"],
+        id=user_id,
+        is_admin=session.get("is_admin", False),
+        admin_write_perm=session.get("admin_write_perm", False)
+    )
     return user
 
 def after_oidc_authorize(sender, **extras):
     oidc_profile = session["oidc_auth_profile"]
     session["given_name"] = oidc_profile["given_name"]
     session["full_name"] = oidc_profile["name"]
+    sync_admin_permissions_for_session(oidc_profile["sub"])
     user = load_user(oidc_profile["sub"])
     login_user(user)
+    session["impersonating"] = False
     # app.logger.info(current_user.id, ' logged in successfully')
     # print(current_user.id, ' logged in successfully')
 

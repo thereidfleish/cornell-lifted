@@ -19,6 +19,12 @@ export default function AboutThisWebsitePage() {
         <h5 className="text-lg font-semibold my-2">Changelog</h5>
         <div className="space-y-4">
           <div>
+            <b>Version 4.5 (3/24/26)</b>
+            <ul className="list-disc ml-6">
+              <li>Directly using the Supabase API was quite slow, so we've implemented a direct Postgres connection via SQLAlchemy to speed things up!</li>
+            </ul>
+          </div>
+          <div>
             <b>Version 4.4 (2/21/26)</b>
             <ul className="list-disc ml-6">
               <li>We've migrated our backend database from a local SQLite DB to Supabase!  If you don't know what this means, you can stop reading.  If you do, then feel free to email us to geek out about databases!  Fun fact - as of right now, the Lifted database of about 30,000 cards is about 25 MB.  The more you know!</li>

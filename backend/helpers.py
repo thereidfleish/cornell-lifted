@@ -4,16 +4,20 @@ import csv
 import os
 from datetime import datetime
 from flask import current_app
-from app import supabase_client
+from app import SessionLocal
+from db.repositories import get_lifted_stats as get_lifted_stats_repo
+from db.repositories import insert_log
 
 def log(user_email, user_name, log_type, error_code, log_content):
-    supabase_client.schema("lifted").table("logs").insert({
-        "user_email": user_email,
-        "user_name": user_name,
-        "log_type": log_type,
-        "error_code": error_code,
-        "log_content": log_content
-    }).execute()
+    with SessionLocal() as db_session:
+        insert_log(
+            user_email=user_email,
+            user_name=user_name,
+            log_type=log_type,
+            error_code=error_code,
+            log_content=log_content,
+            db_session=db_session,
+        )
 
 def process_cards_to_dict(cards):
     dict = {}
@@ -53,17 +57,8 @@ def create_csv(cards, output_path):
         writer.writerows(cards)
 
 def get_lifted_stats():
-    stats = supabase_client.schema("lifted").rpc('get_lifted_stats', {}).execute().data
-
-    total_received = stats['total_received']
-    unique_received = stats['unique_received']
-    unique_sent = stats['unique_sent']
-
-    return {
-        "total_received": total_received,
-        "unique_received": unique_received,
-        "unique_sent": unique_sent
-    }
+    with SessionLocal() as db_session:
+        return get_lifted_stats_repo(db_session)
 
 def process_html_for_email(html_content, message_group=None):
     """
