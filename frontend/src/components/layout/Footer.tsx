@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { latestChangelogEntry } from "@/data/changelog";
 
 const footerLinkClass = "underline text-gray-300 hover:no-underline hover:text-white transition-all duration-200";
 
@@ -36,7 +37,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="border-t border-gray-800 pt-6 text-center text-sm text-gray-300 space-y-4">
-                    <p>Version 4.4 (2/21/26) | <a href="https://reidserver.statuspage.io" target="_blank" className={footerLinkClass}>System Status</a> | <Link href="/about-this-website" className={footerLinkClass}>About this Website</Link></p>
+                    <p>Version {latestChangelogEntry.version} ({latestChangelogEntry.date}) | <a href="https://reidserver.statuspage.io" target="_blank" className={footerLinkClass}>System Status</a> | <Link href="/about-this-website" className={footerLinkClass}>About this Website</Link></p>
                     <p className="mt-2">© 2026 Lifted at Cornell</p>
                     <p className="mt-2">This organization is a registered student organization of Cornell University.</p>
                     <p className="mt-2"><a href="https://hr.cornell.edu/about/workplace-rights/equal-education-and-employment" target="_blank" className={footerLinkClass}>Equal Education and Employment Opportunity (EEEO) Statement</a></p>
