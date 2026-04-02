@@ -1,9 +1,8 @@
-# from comtypes import client, CoInitialize, CoUninitialize
-# import win32com.client
 import csv
 import os
 from datetime import datetime
 from flask import current_app
+from postmarker.core import PostmarkClient
 from app import SessionLocal
 from db.repositories import get_lifted_stats as get_lifted_stats_repo
 from db.repositories import insert_log
@@ -212,65 +211,31 @@ def process_html_for_email(html_content, message_group=None):
     return email_template
 
 def send_email(message_group, type, to, cc=None, bcc=None):
-    if current_app.config["is_windows"]:
-        CoInitialize()
-        o = win32com.client.Dispatch("Outlook.Application")
-        oacctouse = None
-        for oacc in o.Session.Accounts:
-            if oacc.SmtpAddress == "lifted@cornell.edu":
-                oacctouse = oacc
-                break
-        Msg = o.CreateItem(0)
-        if oacctouse:
-            Msg._oleobj_.Invoke(*(64209, 0, 8, 0, oacctouse))  # Msg.SendUsingAccount = oacctouse
+    token = os.getenv("SENDGRID_KEY")
 
-        Msg.To = ";".join(to)
-        if cc is not None:
-            Msg.CC = ";".join(cc)
-        if bcc is not None:
-            Msg.BCC = ";".join(bcc)
-        
-        dir_path = f"templates/rich_text/{message_group}/{type}"
+    dir_path = f"templates/rich_text/{message_group}/{type}"
 
-        with open(f'{dir_path}.txt', 'r', encoding='utf-8') as file:
-            Msg.Subject = file.read()
+    with open(f"{dir_path}.txt", "r", encoding="utf-8") as file:
+        subject = file.read()
 
-        with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
-            raw_html_content = file.read()
-            # Process the HTML content with the beautiful email template
-            html_content = process_html_for_email(raw_html_content, message_group)
-            Msg.HTMLBody = html_content
+    with open(f"{dir_path}.html", "r", encoding="utf-8") as file:
+        raw_html_content = file.read()
+        html_content = process_html_for_email(raw_html_content, message_group)
 
-        Msg.Send()
-    else:
-        """
-        Mac-compatible version - just logs email that would be sent
-        For development/testing purposes only
-        """
-        print(f"Mac-compatible version: Would send email from 'lifted@cornell.edu'")
-        print(f"To: {'; '.join(to)}")
-        if cc is not None:
-            print(f"CC: {'; '.join(cc)}")
-        if bcc is not None:
-            print(f"BCC: {'; '.join(bcc)}")
-        
-        dir_path = f"templates/rich_text/{message_group}/{type}"
-        
-        try:
-            with open(f'{dir_path}.txt', 'r', encoding='utf-8') as file:
-                subject = file.read()
-                print(f"Subject: {subject}")
-        except FileNotFoundError:
-            print(f"Subject template not found: {dir_path}.txt")
-        
-        try:
-            with open(f'{dir_path}.html', 'r', encoding='utf-8') as file:
-                body = file.read()
-                print(f"Email body length: {len(body)} characters")
-        except FileNotFoundError:
-            print(f"Email body template not found: {dir_path}.html")
-        
-        print("Email would be sent!")
+    postmark = PostmarkClient(server_token=token)
+    payload = {
+        "From": "lifted@cornell.edu",
+        "To": ",".join(to),
+        "Subject": subject,
+        "HtmlBody": html_content,
+    }
+
+    if cc:
+        payload["Cc"] = ",".join(cc)
+    if bcc:
+        payload["Bcc"] = ",".join(bcc)
+
+    postmark.emails.send(**payload)
 
 college_dict = {
         "AG": "CALS",

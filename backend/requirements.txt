@@ -10,3 +10,4 @@ Flask-WTF
 google-api-python-client
 SQLAlchemy
 psycopg2
+postmarker
