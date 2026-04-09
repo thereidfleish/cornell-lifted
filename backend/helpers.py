@@ -59,6 +59,9 @@ def get_lifted_stats():
     with SessionLocal() as db_session:
         return get_lifted_stats_repo(db_session)
 
+def normalize_rich_text_html(html_content):
+    return html_content.replace("<p><br></p>", "<p>&nbsp;</p>").replace("<p></p>", "<p>&nbsp;</p>")
+
 def process_html_for_email(html_content, message_group=None):
     """
     Process HTML content and wrap it in a beautiful email template
@@ -66,6 +69,9 @@ def process_html_for_email(html_content, message_group=None):
     """
     from flask import current_app
     
+    # Preserve intentional blank lines from the editor while keeping normal paragraph spacing tight
+    html_content = normalize_rich_text_html(html_content)
+
     # Get current stats for the email
     stats = get_lifted_stats()
     
@@ -79,128 +85,85 @@ def process_html_for_email(html_content, message_group=None):
     # Select the appropriate logo and background colors
     logo_url = "https://cornelllifted.com/images/logo_winter.png" if is_winter else "https://cornelllifted.com/images/logo.png"
     bg_color = "#e3eeff" if is_winter else "#f4fbf3"
-    
-    # Add line spacing for email content
-    # processed_html = html_content.replace("<p>", "<p style='margin: 0px 0px 12px 0px; line-height: 1.6;'>")
-    
-    # Create the email template with Cornell Lifted branding
+
     email_template = f"""
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Cornell Lifted</title>
         <style>
             body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: {bg_color};
                 margin: 0;
                 padding: 0;
+            }}
+            .email-wrapper {{
+                width: 100%;
                 background-color: {bg_color};
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                line-height: 1.4;
-                color: #374151;
+                padding: 20px 0;
             }}
             .email-container {{
-                max-width: 800px;
+                max-width: 700px;
                 margin: 0 auto;
-                background-color: {bg_color};
-                padding: 20px;
+                padding: 0 20px;
             }}
-            .email-container p {{
-                margin: 0 0 2px 0;
+            .email-content {{
+                background-color: #ffffff;
+                border-radius: 8px;
+                padding: 30px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }}
-            .header {{
+            .logo-container {{
                 text-align: center;
-                padding: 30px 20px;
-                background-color: {bg_color};
+                margin-bottom: 20px;
             }}
-            .logo {{
-                max-width: 200px;
-                height: auto;
-            }}
-            .content-card {{
-                background-color: white;
-                border-radius: 16px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
-                padding: 20px;
-                margin: 20px 0;
-                border: 1px solid #e5e7eb;
+            .logo-container img {{
+                max-height: 60px;
             }}
             .footer {{
                 text-align: center;
-                padding: 5px 20px;
-                background-color: {bg_color};
-                font-size: 14px;
+                margin-top: 30px;
+                font-size: 13px;
                 color: #6b7280;
             }}
-            .footer p {{
-                margin: 15px 0;
-                line-height: 1.6;
-            }}
-            .footer-links {{
-                margin-top: 20px;
-            }}
-            .footer-links a {{
+            .footer a {{
                 color: #b31b1b;
                 text-decoration: none;
-                margin: 0 10px;
             }}
-            .footer-links a:hover {{
+            .footer a:hover {{
                 text-decoration: underline;
             }}
-            .chronicle-link {{
-                color: #b31b1b !important;
-                text-decoration: none;
+            .rich-text-content {{
+                word-wrap: break-word;
             }}
-            .chronicle-link:hover {{
-                text-decoration: underline;
-            }}
-            .cornell-blue {{
-                color: #003d82;
-            }}
-            .cornell-red {{
-                color: #b31b1b;
-            }}
-            .highlight-box {{
-                background-color: #dbeafe;
-                border-left: 4px solid #003d82;
-                padding: 15px;
-                margin: 20px 0;
-                border-radius: 0 8px 8px 0;
+            .rich-text-content p {{
+                margin: 0;
             }}
         </style>
     </head>
     <body>
-        <div class="email-container">
-            <!-- Header -->
-            <div class="header">
-                <img src="{logo_url}" alt="Cornell Lifted Logo" class="logo">
-            </div>
-            
-            <!-- Main Content -->
-            <div class="content-card">
-                <div class="content-body">
-                    {html_content}
+        <div class="email-wrapper">
+            <div class="email-container">
+                <div class="logo-container">
+                    <img src="{logo_url}" alt="Cornell Lifted Logo">
                 </div>
-            </div>
-            
-            <!-- Footer -->
-            <div class="footer">
-                <p style="margin-bottom: 20px;">
-                    <strong class="cornell-red">Made with 💌 by the Lifted Team</strong>
-                </p>
-                <p>
-                    Join {stats['unique_sent']:,} others in writing {stats['total_received']:,} messages of gratitude across the Cornell community since 2016.
-                </p>
-                <p>
-                    <a class="chronicle-link" href="https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals">Read more about Lifted on the Cornell Chronicle</a>
-                </p>
-                <div class="footer-links">
-                    <a href="https://cornelllifted.com">Website</a>
-                    <span style="color: #d1d5db;">|</span>
-                    <a href="https://cornelllifted.com/faqs">FAQs</a>
-                    <span style="color: #d1d5db;">|</span>
-                    <a href="https://www.instagram.com/cornelllifted">Instagram - @cornelllifted</a>
+                
+                <div class="email-content">
+                    <div class="rich-text-content">
+                        {html_content}
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p><strong style="color: #b31b1b">Made with 💌 by the Lifted Team</strong></p>
+                    <p>Join {stats['unique_sent']:,} others in writing {stats['total_received']:,} messages of gratitude across the Cornell community since 2016.</p>
+                    <p><a href="https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals">Read more about Lifted on the Cornell Chronicle</a></p>
+                    <p style="margin-top: 15px;">
+                        <a href="https://cornelllifted.com">Website</a> | 
+                        <a href="https://cornelllifted.com/faqs">FAQs</a> | 
+                        <a href="https://www.instagram.com/cornelllifted">Instagram - @cornelllifted</a>
+                    </p>
                 </div>
             </div>
         </div>

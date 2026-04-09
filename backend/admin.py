@@ -149,7 +149,6 @@ def update_form_message_group():
 def save_rich_text(message_group, type):
     data = request.get_json()
     html_content = data["html"]
-    # delta = data["delta"]
     subject = data["subject"]
 
     if type == "form":
@@ -161,10 +160,6 @@ def save_rich_text(message_group, type):
     # Save the raw HTML to a file (without email template wrapper)
     with open(f'{dir_path}/{type}.html', 'w', encoding='utf-8') as file:
         file.write(html_content)
-    
-    # Save the Quill delta to a file
-    # with open(f'{dir_path}/{type}.json', 'w') as file:
-    #     json.dump(delta, file, indent=4)
 
     with open(f'{dir_path}/{type}.txt', 'w', encoding='utf-8') as file:
         file.write(subject)
@@ -178,20 +173,17 @@ def save_rich_text(message_group, type):
 @login_required
 @admin_required(write_required=False)
 def get_rich_text(message_group, type):
-    # dir_path_delta = f"templates/rich_text/{message_group}/{type}.json"
     dir_path_html = f"templates/rich_text/{message_group}/{type}.html"
     dir_path_subject = f"templates/rich_text/{message_group}/{type}.txt"
 
     if Path(dir_path_html).exists() and Path(dir_path_subject).exists():
-        # with open(dir_path_delta, 'r') as file:
-        #     delta = file.read()
         with open(dir_path_html, 'r', encoding='utf-8') as file:
             html = file.read()
         with open(dir_path_subject, 'r', encoding='utf-8') as file:
             subject = file.read()
 
         return jsonify({'status': 'found',
-                        # 'delta': delta,
+                        'json': None,
                         'html': html,
                         'subject': subject})
     else:

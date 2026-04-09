@@ -5,7 +5,8 @@ import { withPostHogConfig } from "@posthog/nextjs-config";
 const nextConfig: NextConfig = {
   /* config options here */
   allowedDevOrigins: [
-    "https://cornelllifted.com"
+    "https://cornelllifted.com",
+    "cornelllifted.com",
   ],
   async rewrites() {
     return [

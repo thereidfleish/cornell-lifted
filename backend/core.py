@@ -493,6 +493,7 @@ def get_form_description():
             form_description = file.read()
     else:
         form_description = "<p>Admin needs to set form description in Admin Dashboard!</p>"
+
     return jsonify({"form_description": form_description})
 
 @core.route("/api/people-search")

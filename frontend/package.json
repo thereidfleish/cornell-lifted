@@ -11,6 +11,16 @@
   },
   "dependencies": {
     "@posthog/nextjs-config": "^1.4.0",
+    "@tiptap/extension-color": "^3.22.0",
+    "@tiptap/extension-font-family": "^3.22.0",
+    "@tiptap/extension-highlight": "^3.22.0",
+    "@tiptap/extension-link": "^3.22.0",
+    "@tiptap/extension-text-align": "^3.22.0",
+    "@tiptap/extension-text-style": "^3.22.0",
+    "@tiptap/extension-underline": "^3.22.0",
+    "@tiptap/pm": "^3.22.0",
+    "@tiptap/react": "^3.22.0",
+    "@tiptap/starter-kit": "^3.22.0",
     "ag-grid-community": "^34.1.2",
     "ag-grid-react": "^34.1.2",
     "chart.js": "^4.5.1",
@@ -24,7 +34,6 @@
     "react": "19.2.3",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.3",
-    "react-quill-new": "^3.6.0",
     "react-snowfall": "^2.3.0"
   },
   "devDependencies": {

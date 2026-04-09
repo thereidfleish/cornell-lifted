@@ -1,78 +1,23 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import "react-quill-new/dist/quill.snow.css";
 
-// Dynamically import ReactQuill so it never runs during SSR
-const ReactQuill = dynamic(async () => (await import("react-quill-new")).default, {
+const TiptapEditor = dynamic(async () => (await import("./TiptapEditor")).default, {
   ssr: false,
   loading: () => <div>Loading editor…</div>,
 });
 
 type Props = { messageGroup: string; type: string };
 
-const toolbarOptions = [
-  [{ 'font': ['georgia', 'arial', 'verdana', 'schoolbell', 'tenor-sans'] }],
-  [{ 'size': ['10px', '11px', '12px', '14px', '16px', '18px', '20px'] }],
-  ['bold', 'italic', 'underline', 'strike'],
-  [{ 'align': [] }],
-  ['link'],
-  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-  [{ 'color': [] }, { 'background': [] }],
-  ['clean']
-];
-
-const formats = [
-  "header",
-  "font",
-  "size",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "list",
-  "bullet",
-  "indent",
-  "align",
-  "link",
-  "image",
-  "color",
-  "background",
-];
-
 export default function RichTextEditor({ messageGroup, type }: Props) {
-  const [ready, setReady] = useState(false);
   const [html, setHtml] = useState("");
+  const [jsonContent, setJsonContent] = useState<any>("");
   const [subject, setSubject] = useState("");
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
   const [previewHtml, setPreviewHtml] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
-  const quillRef = useRef<any>(null);
   const previewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Register Quill attributors **on the client** before mounting the editor
-  useEffect(() => {
-    (async () => {
-      const { Quill } = await import("react-quill-new");
-
-      // Prefer class-based fonts (easier CSS + no spaces in tokens)
-      const Font = Quill.import("attributors/class/font") as any;
-      Font.whitelist = ["georgia", "arial", "verdana", "schoolbell", "tenor-sans"];
-      Quill.register(Font, true);
-
-      // Use style-based sizes to get pixel values
-      const Size = Quill.import("attributors/style/size") as any;
-      Size.whitelist = ["10px", "11px", "12px", "14px", "16px", "18px", "20px"];
-      Quill.register(Size, true);
-
-      const Align = Quill.import("attributors/style/align") as any;
-      Quill.register(Align, true);
-
-      setReady(true);
-    })();
-  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -80,6 +25,8 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
       .then((r) => (r.ok ? r.json() : Promise.reject(r)))
       .then((data) => {
         const htmlContent = data.html || "";
+        const loadedJsonContent = data.json ?? htmlContent;
+        setJsonContent(loadedJsonContent);
         setHtml(htmlContent);
         setSubject(data.subject || "");
         
@@ -92,8 +39,7 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
   }, [messageGroup, type]);
 
   const handleSave = async (sendEmail = false) => {
-    const editor = quillRef.current?.getEditor?.();
-    const currentHtml = editor ? editor.root.innerHTML : html;
+    const currentHtml = html;
     setStatus("Saving…");
     const res = await fetch(
       `/api/admin/save-rich-text/${messageGroup}/${type}?send_email=${sendEmail}`,
@@ -156,8 +102,6 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
     };
   }, [html, type]);
 
-  if (!ready) return null; // wait until Quill attributors are registered
-
   return (
     <div className="w-full">
       {/* Show a Subject input for any email-like editor (recipient/sender/etc.), not only when type === 'email' */}
@@ -183,17 +127,7 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
           {loading ? (
             <div>Loading…</div>
           ) : (
-            <>
-              <ReactQuill
-                // ref={quillRef}
-                value={html}
-                onChange={setHtml}
-                formats={formats}
-                modules={{ toolbar: toolbarOptions }}
-                theme="snow"
-                className="bg-white"
-              />
-            </>
+            <TiptapEditor value={jsonContent} onChange={setJsonContent} onHtmlChange={setHtml} />
           )}
 
           <div className="flex gap-2 mt-4">
@@ -222,7 +156,6 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
           <div className="flex-1 lg:max-w-[50%]">
             <div className="sticky top-4">
               <h4 className="font-semibold mb-2 text-gray-700 flex items-center gap-2">
-                Live Preview
                 {previewLoading && (
                   <span className="text-xs text-gray-500">(updating...)</span>
                 )}
@@ -241,9 +174,6 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
                   </div>
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Preview updates automatically as you type (with 1 second delay)
-              </p>
             </div>
           </div>
         )}
