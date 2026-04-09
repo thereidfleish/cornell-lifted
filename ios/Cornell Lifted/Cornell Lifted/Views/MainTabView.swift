@@ -10,20 +10,28 @@ import SwiftUI
 struct MainTabView: View {
     @EnvironmentObject var environment: AppEnvironment
     @EnvironmentObject var viewModel: MessagesViewModel
+    @State private var selectedTab = 0
     
     var body: some View {
         ZStack {
-            Color.blue.ignoresSafeArea() // Global background
+            Color.cornellBlue.ignoresSafeArea() // Global background
             
-            TabView {
+            TabView(selection: $selectedTab) {
                 HomeView()
                     .tabItem { Label("Home", systemImage: "balloon.fill") }
+                    .tag(0)
 
-                SendMessageView()
+                SendMessageView(selectedTab: $selectedTab)
                     .tabItem { Label("Send Message", systemImage: "paperplane.fill") }
+                    .tag(1)
                 
-                MessagesView()
+                MessagesView(selectedTab: $selectedTab)
                     .tabItem { Label("View Messages", systemImage: "tray.fill") }
+                    .tag(2)
+                
+                MoreView()
+                    .tabItem { Label("More", systemImage: "ellipsis.circle.fill") }
+                    .tag(3)
             }
         }
     }

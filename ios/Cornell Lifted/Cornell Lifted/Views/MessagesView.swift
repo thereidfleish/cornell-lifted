@@ -10,38 +10,23 @@ import SwiftUI
 struct MessagesView: View {
     @EnvironmentObject var environment: AppEnvironment
     @EnvironmentObject var viewModel: MessagesViewModel
+    @Binding var selectedTab: Int
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading) {
-                    Text("Explore the gratitude you've shared and received throughout your Cornell experience")
-                        .multilineTextAlignment(.center)
-                        .font(.tenorSans(size: 18))
-                        .padding(.bottom, 10)
+                    PageHeaderView(
+                        title: nil,
+                        description: "Explore the gratitude you've shared and received throughout your Cornell experience",
+                        user: environment.status?.user,
+                        actionButton: .init(title: "Send a Message") {
+                            selectedTab = 1
+                        }
+                    )
                     
                     if let user = environment.status?.user {
                         // Logged In State
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text("Welcome, \(user.name.split(separator: " ")[0])!")
-                                    .font(.schoolbell(size: 25))
-                                    .foregroundStyle(.cornellRed)
-                                
-                                Text(user.email)
-                                    .font(.tenorSans(size: 15))
-                            }
-                            
-                            Spacer()
-                            
-                            Button("Send a Message") {
-                                // Action
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.cornellRed)
-                        }
-                        .frame(maxWidth: .infinity)
-                        
                         if viewModel.isLoading {
                             LoadingView()
                                 .padding(.top, 40)
@@ -81,39 +66,14 @@ struct MessagesView: View {
                             .padding(.top, 40)
                     } else {
                         // Not Logged In
-                        VStack(spacing: 20) {
-                            Text("🔑")
-                                .font(.system(size: 50))
-                            
-                            Text("Sign In to View Your Messages")
-                                .font(.tenorSans(size: 20))
-                                .fontWeight(.bold)
-                            
-                            Text("Sign in with your Cornell NetID to view and manage Lifted messages you've sent and received!")
-                                .font(.tenorSans(size: 16))
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(.gray)
-                            
-                            Button("Sign in with NetID") {
-                                Task {
-                                    do {
-                                        try await environment.login()
-                                        await environment.getStatus()
-                                        await viewModel.getMessages()
-                                    } catch {
-                                        print(error)
-                                    }
-                                }
+                        AuthPromptView(
+                            title: "Sign In to View Your Messages",
+                            description: "Sign in with your Cornell NetID to view and manage Lifted messages you've sent and received!",
+                            loginAction: {
+                                await environment.login()
+                                await viewModel.getMessages()
                             }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.cornellRed)
-                            .controlSize(.large)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white)
-                        .cornerRadius(20)
-                        .shadow(color: .black.opacity(0.05), radius: 10)
+                        )
                         .padding(.top, 20)
                     }
                 }
@@ -144,7 +104,3 @@ struct MessagesView: View {
         }
     }
 }
-
-//#Preview {
-//    MessagesView()
-//}

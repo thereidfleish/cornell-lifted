@@ -48,4 +48,20 @@ final class AppEnvironment: ObservableObject {
             print("login failed:", error)
         }
     }
+    
+    func logout() {
+        // Clear cookies from storage
+        if let cookies = HTTPCookieStorage.shared.cookies {
+            for cookie in cookies {
+                HTTPCookieStorage.shared.deleteCookie(cookie)
+            }
+        }
+        
+        // Clear persisted cookies
+        UserDefaults.standard.removeObject(forKey: "SavedCookies_cornelllifted")
+        UserDefaults.standard.synchronize()
+        
+        // Reset status
+        status = nil
+    }
 }

@@ -26,16 +26,10 @@ struct MessageModalView: View {
                 Color.white.ignoresSafeArea()
                 
                 if loading {
-                    ProgressView()
+                    LoadingView()
                 } else if let error = error {
-                    VStack {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                        Button("Close") {
-                            dismiss()
-                        }
+                    ErrorView(error: error) {
+                        loadCard()
                     }
                 } else if let card = card {
                     ScrollView {

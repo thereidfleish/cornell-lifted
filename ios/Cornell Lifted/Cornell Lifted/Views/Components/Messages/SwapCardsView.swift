@@ -19,9 +19,7 @@ struct SwapCardsView: View {
                 .font(.tenorSans(size: 18))
                 .fontWeight(.bold)
             
-            Text(swapText.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression))
-                .font(.tenorSans(size: 14))
-                .foregroundColor(.gray)
+            HTMLText(html: swapText)
             
             if let statusMsg = statusMsg {
                 Text(statusMsg)
