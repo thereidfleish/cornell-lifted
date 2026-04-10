@@ -187,10 +187,11 @@ def send_email(message_group, type, to, cc=None, bcc=None):
 
     postmark = PostmarkClient(server_token=token)
     payload = {
-        "From": "lifted@cornell.edu",
+        "From": "Cornell Lifted <hello@cornelllifted.com>",
         "To": ",".join(to),
         "Subject": subject,
         "HtmlBody": html_content,
+        "MessageStream": "outbound"
     }
 
     if cc:
