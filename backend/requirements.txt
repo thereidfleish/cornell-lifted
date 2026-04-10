@@ -9,5 +9,5 @@ requests
 Flask-WTF
 google-api-python-client
 SQLAlchemy
-psycopg2
+psycopg2-binary
 postmarker
