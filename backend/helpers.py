@@ -1,11 +1,12 @@
 import csv
 import os
+from urllib.parse import quote_plus
 from datetime import datetime
 from flask import current_app
 from postmarker.core import PostmarkClient
 from app import SessionLocal
 from db.repositories import get_lifted_stats as get_lifted_stats_repo
-from db.repositories import insert_log
+from db.repositories import insert_log, create_email_open_record
 
 def log(user_email, user_name, log_type, error_code, log_content):
     with SessionLocal() as db_session:
@@ -62,7 +63,7 @@ def get_lifted_stats():
 def normalize_rich_text_html(html_content):
     return html_content.replace("<p><br></p>", "<p>&nbsp;</p>").replace("<p></p>", "<p>&nbsp;</p>")
 
-def process_html_for_email(html_content, message_group=None):
+def process_html_for_email(html_content, message_group=None, tracking_url=None):
     """
     Process HTML content and wrap it in a beautiful email template
     similar to the Cornell Lifted website design
@@ -157,7 +158,7 @@ def process_html_for_email(html_content, message_group=None):
                 
                 <div class="footer">
                     <p><strong style="color: #b31b1b">Made with 💌 by the Lifted Team</strong></p>
-                    <p>Join {stats['unique_sent']:,} others in writing {stats['total_received']:,} messages of gratitude across the Cornell community since 2016.</p>
+                    <p>This year, we're celebrating our 10th anniversary!  Join {stats['unique_sent']:,} others in writing {stats['total_received']:,} messages of gratitude across the Cornell community since 2016.</p>
                     <p><a href="https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals">Read more about Lifted on the Cornell Chronicle</a></p>
                     <p style="margin-top: 15px;">
                         <a href="https://cornelllifted.com">Website</a> | 
@@ -171,6 +172,13 @@ def process_html_for_email(html_content, message_group=None):
     </html>
     """
     
+    if tracking_url:
+        tracking_pixel = f'<img src="{tracking_url}" alt="" width="1" height="1" style="display:none !important; opacity:0; visibility:hidden; mso-hide:all; border:0;" />'
+        if "</body>" in email_template:
+            email_template = email_template.replace("</body>", f"{tracking_pixel}</body>")
+        else:
+            email_template += tracking_pixel
+
     return email_template
 
 def send_email(message_group, type, to, cc=None, bcc=None, user=None):
@@ -183,9 +191,11 @@ def send_email(message_group, type, to, cc=None, bcc=None, user=None):
 
     given_name = "there"
     user_uuid = None
+    user_email = None
     if user:
-        given_name = user.get("given_name")
+        given_name = user.get("given_name") or "there"
         user_uuid = user.get("id")
+        user_email = user.get("email")
 
     with open(f"{dir_path}.html", "r", encoding="utf-8") as file:
         raw_html_content = file.read()
@@ -195,7 +205,15 @@ def send_email(message_group, type, to, cc=None, bcc=None, user=None):
 
         raw_html_content = raw_html_content.replace("{{name}}", given_name)
 
-        html_content = process_html_for_email(raw_html_content, message_group)
+        tracking_url = None
+        if user_email:
+            with SessionLocal() as db_session:
+                email_open_record = create_email_open_record(user_email, subject, db_session)
+            if email_open_record:
+                encoded_open_id = quote_plus(str(email_open_record["id"]))
+                tracking_url = f"https://cornelllifted.com/api/email-open?email_open_id={encoded_open_id}"
+
+        html_content = process_html_for_email(raw_html_content, message_group, tracking_url=tracking_url)
 
     postmark = PostmarkClient(server_token=token)
     payload = {
@@ -212,6 +230,7 @@ def send_email(message_group, type, to, cc=None, bcc=None, user=None):
         payload["Bcc"] = ",".join(bcc)
 
     postmark.emails.send(**payload)
+
 
 college_dict = {
         "AG": "CALS",

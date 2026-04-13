@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select, func, distinct, update, text, insert, delete, or_
 from db.models import (
     Admin,
+    Emails,
     Message,
     LiftedUser,
     HiddenCardOverride,
@@ -41,6 +42,19 @@ def get_user_by_uuid(db_session, user_uuid):
     ).mappings().first()
 
     return dict(user) if user is not None else None
+
+
+def increment_clicked_quick_link_count(user_uuid, db_session):
+    if not user_uuid:
+        return False
+
+    result = db_session.execute(
+        update(LiftedUser)
+        .where(LiftedUser.id == user_uuid)
+        .values(clicked_quick_link_count=func.coalesce(LiftedUser.clicked_quick_link_count, 0) + 1)
+    )
+    db_session.commit()
+    return result.rowcount > 0
 
 
 def _upsert_lifted_user(email, given_name, full_name, affiliation, db_session):
@@ -628,6 +642,68 @@ def insert_log(user_email, user_name, log_type, error_code, log_content, db_sess
         )
     )
     db_session.commit()
+
+
+def record_email_open(email_open_id, db_session):
+    if email_open_id is None:
+        return None
+
+    try:
+        email_open_id_int = int(email_open_id)
+    except (TypeError, ValueError):
+        return None
+
+    existing_open = db_session.execute(
+        select(
+            Emails.id,
+            Emails.open_count,
+        )
+        .where(Emails.id == email_open_id_int)
+        .limit(1)
+    ).mappings().first()
+
+    if existing_open is None:
+        return None
+
+    open_count = int(existing_open["open_count"] or 0) + 1
+
+    db_session.execute(
+        update(Emails)
+        .where(Emails.id == existing_open["id"])
+        .values(open_count=open_count)
+    )
+
+    db_session.commit()
+    return {
+        "id": email_open_id_int,
+        "open_count": open_count,
+    }
+
+
+def create_email_open_record(to_email, subject, db_session):
+    normalized_email = (to_email or "").strip().lower()
+    normalized_subject = (subject or "").strip()
+
+    if not normalized_email or not normalized_subject:
+        return None
+
+    inserted_open = db_session.execute(
+        insert(Emails)
+        .values(
+            created_at=datetime.now(timezone.utc),
+            to_email=normalized_email,
+            subject=normalized_subject,
+            open_count=0,
+        )
+        .returning(Emails.id)
+    ).scalar_one()
+    db_session.commit()
+
+    return {
+        "id": int(inserted_open),
+        "to_email": normalized_email,
+        "subject": normalized_subject,
+    }
 
 
 def list_admins(db_session):

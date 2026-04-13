@@ -28,6 +28,17 @@ class Message(Base):
     message_content: Mapped[str] = mapped_column(Text, nullable=False)
 
 
+class Emails(Base):
+    __tablename__ = "emails"
+    __table_args__ = {"schema": "lifted"}
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
+    to_email: Mapped[str] = mapped_column(Text, nullable=False)
+    subject: Mapped[str] = mapped_column(Text, nullable=False)
+    open_count: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
 class LiftedUser(Base):
     __tablename__ = "users"
     __table_args__ = {"schema": "lifted"}
@@ -37,6 +48,7 @@ class LiftedUser(Base):
     given_name: Mapped[str | None] = mapped_column(Text, nullable=True)
     full_name: Mapped[str | None] = mapped_column(Text, nullable=True)
     affiliation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    clicked_quick_link_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     updated_at: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
 
 

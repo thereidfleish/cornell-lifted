@@ -26,6 +26,10 @@ export default function MessagesPage() {
     console.log("User from context:", user);
 
     useEffect(() => {
+        if (loading) {
+            return;
+        }
+
         if (!user?.authenticated && !requestedUserUuid) {
             setMessagesLoading(false);
             return;
@@ -55,7 +59,7 @@ export default function MessagesPage() {
                 setMessagesError("We could not load messages for this link. Please try again or contact lifted@cornell.edu.");
                 setMessagesLoading(false);
             });
-    }, [user?.authenticated, requestedUserUuid]);
+    }, [loading, user?.authenticated, requestedUserUuid]);
 
     const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
     const greetingName = viewMode === "limited"

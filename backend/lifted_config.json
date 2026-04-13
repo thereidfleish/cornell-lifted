@@ -34,7 +34,7 @@
         "sp_26_e"
     ],
     "coming_soon_text_p": "on the <b>Arts Quad before 7 PM on the last day of classes (Tuesday, May 5th)</b>!",
-    "form_message_group": "none",
+    "form_message_group": "sp_26_e",
     "attachment_message_group": "sp_26_p",
     "attachment_text": "You'll receive this alongside your cards! If you only want your cards, leave this blank.",
     "attachment_deadline": "Sunday, April 26th at 11:59 PM",

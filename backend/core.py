@@ -1,4 +1,4 @@
-from flask import redirect, send_file, abort, jsonify, request, url_for, Blueprint, current_app, session
+from flask import redirect, send_file, abort, jsonify, request, url_for, Blueprint, current_app, session, make_response
 from flask_login import login_required, current_user
 import ldap3
 from pathlib import Path
@@ -28,6 +28,8 @@ from db.repositories import (
     update_messages_group_for_recipient,
     create_swap_pref,
     upsert_user_by_email,
+    record_email_open,
+    increment_clicked_quick_link_count,
 )
 
 from app import get_admin_permissions_for_netid, db_call
@@ -36,6 +38,17 @@ import uuid
 
 core = Blueprint('core', __name__, static_folder='static')
 PREVIEW_USER_UUID_SESSION_KEY = "preview_user_uuid"
+IGNORED_TRACKING_USER_AGENT_SUBSTRINGS = (
+    "Chrome/109.0.0.0",
+)
+
+
+def should_ignore_tracking_for_user_agent(user_agent):
+    normalized_user_agent = user_agent or ""
+    return any(
+        ignored_ua in normalized_user_agent
+        for ignored_ua in IGNORED_TRACKING_USER_AGENT_SUBSTRINGS
+    )
 
 @core.get("/api/auth/status")
 def auth_status():
@@ -119,6 +132,56 @@ def resolve_target_email_for_actions():
     abort(401, "User not authenticated")
 
 
+@core.get("/api/email-open")
+def email_open():
+    email_open_id = request.args.get("email_open_id", "")
+
+    request_info = {
+        "request_url": request.url,
+        "request_base_url": request.base_url,
+        "remote_addr": request.headers.get("X-Forwarded-For", request.remote_addr),
+        "referrer": request.referrer,
+        "user_agent": request.headers.get("User-Agent", ""),
+        "ua_browser": request.user_agent.browser,
+        "ua_version": request.user_agent.version,
+        "ua_platform": request.user_agent.platform,
+        "ua_language": request.user_agent.language,
+    }
+
+    # print(
+    #     "email-open hit:",
+    #     {
+    #         "email_open_id": email_open_id,
+    #         **request_info,
+    #     },
+    # )
+
+    if not should_ignore_tracking_for_user_agent(request_info["user_agent"]):
+        db_call(record_email_open, email_open_id)
+
+    transparent_gif = (
+        b"GIF89a"
+        b"\x01\x00\x01\x00"
+        b"\x80"
+        b"\x00"
+        b"\x00"
+        b"\x00\x00\x00"
+        b"\xff\xff\xff"
+        b"!\xf9\x04\x01\x00\x00\x00\x00"
+        b","
+        b"\x00\x00\x00\x00\x01\x00\x01\x00"
+        b"\x00"
+        b"\x02\x02D\x01\x00;"
+    )
+
+    response = make_response(transparent_gif)
+    response.headers["Content-Type"] = "image/gif"
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 def get_swap_entry_for_group(message_group):
     swapping = current_app.config["lifted_config"].get("swapping", [])
     for entry in swapping:
@@ -158,6 +221,11 @@ def list_images():
 @core.get("/api/messages")
 def get_messages():
     preview_user = None
+    requested_user_uuid = request.args.get("user")
+    request_user_agent = request.headers.get("User-Agent", "")
+
+    if requested_user_uuid and not should_ignore_tracking_for_user_agent(request_user_agent):
+        db_call(increment_clicked_quick_link_count, requested_user_uuid)
 
     if current_user.is_authenticated:
         clear_preview_context_session()
