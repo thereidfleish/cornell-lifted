@@ -101,6 +101,13 @@ export default function MessageModal({
         }
     }
 
+    const isSender = !!card && user?.user?.email === card.sender_email;
+    const isFormMessageGroup = !!card && card.message_group === config?.form_message_group;
+    const isEnabledSwapTarget = !!card && !!config?.swapping?.some(
+        (entry) => entry.to === card.message_group && entry.enabled !== false
+    );
+    const canEditOrDelete = isSender && (isFormMessageGroup || isEnabledSwapTarget);
+
     return (
         <div
             className={`fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${animating ? "opacity-100" : "opacity-0"}`}
@@ -138,7 +145,7 @@ export default function MessageModal({
                             Message written at <FormattedTimestamp timestamp={card.created_timestamp} />
                         </p>
                         {/* Edit/Delete options */}
-                        {user?.user?.email === card.sender_email && card.message_group === config?.form_message_group && (
+                        {canEditOrDelete && (
                             <div className="flex justify-center gap-4 mt-4">
                                 <a
                                     href={`/edit-message/${card.id}`}

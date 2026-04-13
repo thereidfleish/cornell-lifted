@@ -495,12 +495,17 @@ def get_card_pdf(id):
     return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
 
 def check_if_can_edit_or_delete(card):
+    editable_message_groups = {current_app.config["lifted_config"]["form_message_group"]}
+    for entry in current_app.config["lifted_config"].get("swapping", []):
+        if entry.get("enabled", True) and entry.get("to"):
+            editable_message_groups.add(entry.get("to"))
+
     if current_user.admin_write_perm == False:
         # Ok, so we know the user is not an admin.  Now, if the user is not a sender of the message, abort
         if card["sender_email"] != current_user.email:
             abort(401, "Not your card")
         # So now we know the user is a sender of the message.  However, if the form is closed, abort
-        elif card["message_group"] != current_app.config["lifted_config"]["form_message_group"]:
+        elif card["message_group"] not in editable_message_groups:
             abort(401, "Form is closed")
 
 @core.route("/api/edit-message/<id>", methods=["POST"])

@@ -195,9 +195,9 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                                 </strong> most messages out of all Cornellians!
                                             </div>
                                         )}
-                                        {isELifted && (
+                                        {/* {isELifted && (
                                             <p className="text-sm text-gray-500 mb-2">If a physical card you sent ends up here, it's because your recipient requested their physical cards to be delivered virtually instead. See <a href="/faqs" className="text-cornell-blue underline">FAQs</a>.</p>
-                                        )}
+                                        )} */}
                                         {limitedView ? (
                                             <div className="text-gray-500 text-center py-4">
                                                 <p>Sign in to view message details.</p>
