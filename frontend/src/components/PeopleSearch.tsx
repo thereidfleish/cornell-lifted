@@ -10,7 +10,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface Person {
   NetID: string;
-  Name: string;
+  "Given Name"?: string;
+  "Full Name": string;
   "Primary Affiliation": string;
   College: string;
   "Primary Dept": string;
@@ -84,7 +85,7 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
   // AG Grid column definitions
   const columnDefs: ColDef<Person>[] = [
     { headerName: "NetID", field: "NetID", width: 90 },
-    { headerName: "Name", field: "Name", width: 200 },
+    { headerName: "Name", field: "Full Name", width: 200 },
     { headerName: "Affiliation", field: "Primary Affiliation", width: 120 },
     { headerName: "College", field: "College", width: 150 },
     { headerName: "Department", field: "Primary Dept", width: 200 },
@@ -131,7 +132,7 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
       <p className="text-sm text-gray-500">Search for a name or NetID above, then select it in the table below.</p>
       {selectedPerson && (
         <div className={`mt-3 p-2 rounded text-sm ${statusBg}`}>
-          Selected: <b>{selectedPerson.NetID}</b> ({selectedPerson.Name}, {selectedPerson["Primary Affiliation"]}) {easterEgg}
+          Selected: <b>{selectedPerson.NetID}</b> ({selectedPerson["Full Name"]}, {selectedPerson["Primary Affiliation"]}) {easterEgg}
           {user?.user?.email === `${selectedPerson.NetID}@cornell.edu` && <span> - Wait, that's you! While you can <i>technically</i> send a Lifted message to yourself, we encourage you to also spread the love to those around you :)</span>}
           {statusMsg}
         </div>

@@ -7,6 +7,8 @@ export default function AttachmentOptions() {
     const { config, refreshConfig } = useGlobal() as any;
     // Current Message Group (updates config)
     const [selectedGroup, setSelectedGroup] = useState<string>(config?.attachment_message_group || "none");
+    const [attachmentText, setAttachmentText] = useState<string>(config?.attachment_text || "");
+    const [attachmentDeadline, setAttachmentDeadline] = useState<string>(config?.attachment_deadline || "");
     // Attachments table filter
     const [attachmentsFilterGroup, setAttachmentsFilterGroup] = useState<string>(config?.attachment_message_group || "none");
     const [attachments, setAttachments] = useState<any[]>([]);
@@ -20,6 +22,26 @@ export default function AttachmentOptions() {
     const [attachmentPrefs, setAttachmentPrefs] = useState<any[]>([]);
     const [prefsLoading, setPrefsLoading] = useState(false);
     const [prefsStatusMsg, setPrefsStatusMsg] = useState("");
+
+    useEffect(() => {
+        setSelectedGroup(config?.attachment_message_group || "none");
+        setAttachmentText(config?.attachment_text || "");
+        setAttachmentDeadline(config?.attachment_deadline || "");
+    }, [config]);
+
+    async function handleAttachmentConfigSave(e: React.FormEvent) {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("attachment-message-group", selectedGroup);
+        formData.append("attachment-text", attachmentText);
+        formData.append("attachment-deadline", attachmentDeadline);
+        await fetch("/api/admin/update-attachment-message-group", {
+            method: "POST",
+            body: formData,
+        });
+        setStatusMsg("Attachment config updated!");
+        refreshConfig();
+    }
 
     // Fetch attachment prefs for selected prefsFilterGroup
     useEffect(() => {
@@ -44,18 +66,6 @@ export default function AttachmentOptions() {
         }
         fetchAttachments();
     }, [attachmentsFilterGroup, statusMsg, config]);
-
-    async function handleGroupChange(option: { key: string; label: string }) {
-        setSelectedGroup(option.key);
-        const formData = new FormData();
-        formData.append("attachment-message-group", option.key);
-        await fetch("/api/admin/update-attachment-message-group", {
-            method: "POST",
-            body: formData,
-        });
-        setStatusMsg("Attachment message group updated!");
-        refreshConfig();
-    }
 
     function handleAttachmentsFilterGroupChange(option: { key: string; label: string }) {
         setAttachmentsFilterGroup(option.key);
@@ -118,15 +128,43 @@ export default function AttachmentOptions() {
             <h2 className="text-xl font-bold">Attachment Options</h2>
             <p>Add, remove, and edit attachments for the selected message group.</p>
             <p><b>Current Message Group:</b> Set this to the message group that people will pick an attachment for. Set this to <b>None</b> to not allow any choosing attachments.</p>
-            <div>
-                <b>Current Message Group:</b>
-                <MessageGroupSelector
-                    initialValue={selectedGroup}
-                    showNoneOption={true}
-                    onChange={handleGroupChange}
-                    className="max-w-md mt-2"
-                />
-            </div>
+            <form onSubmit={handleAttachmentConfigSave} className="space-y-3">
+                <div>
+                    <b>Current Message Group:</b>
+                    <MessageGroupSelector
+                        initialValue={selectedGroup}
+                        showNoneOption={true}
+                        onChange={(option) => setSelectedGroup(option.key)}
+                        className="max-w-md mt-2"
+                    />
+                </div>
+                <div>
+                    <label htmlFor="attachment-text" className="font-medium text-gray-700 block mb-1">Attachment Card Text</label>
+                    <input
+                        id="attachment-text"
+                        type="text"
+                        className="border rounded px-3 py-2 w-full max-w-2xl"
+                        value={attachmentText}
+                        onChange={(e) => setAttachmentText(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="attachment-deadline" className="font-medium text-gray-700 block mb-1">Attachment Deadline</label>
+                    <input
+                        id="attachment-deadline"
+                        type="text"
+                        className="border rounded px-3 py-2 w-full max-w-md"
+                        value={attachmentDeadline}
+                        onChange={(e) => setAttachmentDeadline(e.target.value)}
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className="bg-cornell-blue text-white rounded px-4 py-2 font-semibold shadow hover:bg-cornell-red transition"
+                >
+                    Save Attachment Config
+                </button>
+            </form>
 
 
             <p className="mt-4 mb-1"><b>Add Attachments and Counts:</b> This will add for the message group selected in the filter below.</p>

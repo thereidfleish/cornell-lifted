@@ -4,7 +4,8 @@ export type User = {
   user?: {
     id: string;
     email: string;
-    name: string;
+    given_name: string;
+    full_name: string;
     is_admin: boolean;
     admin_write_perm: boolean;
   };
@@ -16,11 +17,21 @@ export type LiftedConfig = {
     [key: string]: string;
   };
   hidden_cards: string[];
+  coming_soon_text_p: string;
   form_message_group: string;
   attachment_message_group: string;
-  swap_from: string;
-  swap_to: string;
-  swap_text: string;
+  swapping: {
+    from: string;
+    to: string;
+    enabled: boolean;
+    text: string;
+    title: string;
+    button_text: string;
+    deadline: string;
+    dialog_text: string;
+  }[];
+  attachment_text: string;
+  attachment_deadline: string;
   rich_text_types: {
     form: string;
     sender: string;

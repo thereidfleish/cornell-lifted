@@ -35,7 +35,7 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             if (statusRes?.authenticated && statusRes.user) {
                 posthog.identify(statusRes.user.id, {
                     email: statusRes.user.id,
-                    name: statusRes.user.name,
+                    name: statusRes.user.full_name,
                     is_admin: statusRes.user.is_admin,
                 });
             } else if (!statusRes?.authenticated) {

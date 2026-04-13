@@ -29,14 +29,35 @@
         "sp_24_p",
         "sp_23_p",
         "fa_25_p",
+        "sp_25_p",
         "sp_26_p",
-        "sp_26_e",
-        "sp_25_p"
+        "sp_26_e"
     ],
+    "coming_soon_text_p": "on the <b>Arts Quad before 7 PM on the last day of classes (Tuesday, May 5th)</b>!",
     "form_message_group": "none",
-    "attachment_message_group": "none",
-    "swap_from": "sp_26_p",
-    "swap_to": "sp_26_e",
-    "swap_text": "Get your cards delivered virtually on the last day of classes instead. Hard deadline to do this is <b>12/1/25 at 11:59 PM!</b>",
-    "coming_soon_text": "New Lifted cards will be available soon for the Fall 2025 semester! Stay tuned for updates."
+    "attachment_message_group": "sp_26_p",
+    "attachment_text": "You'll receive this alongside your cards! If you only want your cards, leave this blank.",
+    "attachment_deadline": "Sunday, April 26th at 11:59 PM",
+    "swapping": [
+        {
+            "from": "sp_26_p",
+            "to": "sp_26_e",
+            "enabled": true,
+            "text": "You can receive virtual cards as a PDF on the last day of classes instead. If you're not sure you'll make it on the last day of classes, please choose this option. Otherwise, if you don't pick up your physical cards, you won't be able to view them virtually.",
+            "title": "Can't make it before 7 PM on the last day of classes?",
+            "button_text": "Request Virtual Cards",
+            "deadline": "Sunday, April 26th at 11:59 PM",
+            "dialog_text": "By continuing, all of your messages will only be available virtually as a PDF.  Please choose this option if you're not sure you'll make it on the last day of classes.\n\nThis will affect your existing cards and any new ones you receive.  You can change your mind anytime until the deadline."
+        },
+        {
+            "from": "sp_26_e",
+            "to": "sp_26_p",
+            "enabled": true,
+            "text": "You can receive physical cards instead, which will be available for pick up on the <b>Arts Quad until 7 PM on the last day of classes (Tuesday, May 5th)</b>.  You can also choose to receive a balloon, flower, or pinwheel alongside your cards!",
+            "title": "Want to receive physical cards?",
+            "button_text": "Request Physical Cards",
+            "deadline": "Sunday, April 26th at 11:59 PM",
+            "dialog_text": "Please only chose this option if you are certain that you can pick up your cards on the Arts Quad before 7 PM on the last day of classes.  If you don't pick up your cards, you won't be able to view them virtually.\n\nThis will affect your existing cards and any new ones you receive.  You can change your mind anytime until the deadline."
+        }
+    ]
 }

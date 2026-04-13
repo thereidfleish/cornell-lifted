@@ -8,6 +8,7 @@ import helpers
 import google_tools
 from db.repositories import (
     get_messages_payload,
+    get_user_by_uuid,
     get_card_payload,
     claim_attachment,
     return_attachment,
@@ -26,12 +27,15 @@ from db.repositories import (
     insert_message,
     update_messages_group_for_recipient,
     create_swap_pref,
+    upsert_user_by_email,
 )
 
 from app import get_admin_permissions_for_netid, db_call
 import json
+import uuid
 
 core = Blueprint('core', __name__, static_folder='static')
+PREVIEW_USER_UUID_SESSION_KEY = "preview_user_uuid"
 
 @core.get("/api/auth/status")
 def auth_status():
@@ -46,7 +50,8 @@ def auth_status():
             "impersonating": session["impersonating"],
             "user": {"id": current_user.id,
                      "email": current_user.email,
-                     "name": current_user.full_name,
+                     "given_name": current_user.given_name,
+                     "full_name": current_user.full_name,
                      "is_admin": current_user.is_admin,
                      "admin_write_perm": current_user.admin_write_perm}
         })
@@ -59,6 +64,67 @@ def config():
         json.dumps(current_app.config["lifted_config"], ensure_ascii=False),
         mimetype='application/json'
     )
+
+def get_preview_context(user_uuid_param):
+    requested_user = db_call(get_user_by_uuid, user_uuid=user_uuid_param)
+    if requested_user is None:
+        abort(404, "User DNE")
+
+    target_email = requested_user["email"]
+
+    return {
+        "requested_user_uuid": user_uuid_param,
+        "target_email": target_email,
+        "requested_user": {
+            "given_name": requested_user.get("given_name"),
+            "email": requested_user.get("email"),
+        },
+    }
+
+
+def clear_preview_context_session():
+    session.pop(PREVIEW_USER_UUID_SESSION_KEY, None)
+
+
+def get_preview_context_from_session():
+    stored_uuid = session.get(PREVIEW_USER_UUID_SESSION_KEY)
+    if not stored_uuid:
+        return None
+
+    return get_preview_context(stored_uuid)
+
+
+def get_preview_context_from_request_or_session():
+    if current_user.is_authenticated:
+        clear_preview_context_session()
+        return None
+
+    requested_user_uuid = request.args.get("user")
+    if requested_user_uuid:
+        preview_context = get_preview_context(requested_user_uuid)
+        session[PREVIEW_USER_UUID_SESSION_KEY] = preview_context["requested_user_uuid"]
+        return preview_context
+
+    return get_preview_context_from_session()
+
+
+def resolve_target_email_for_actions():
+    if current_user.is_authenticated:
+        return current_user.email
+
+    preview_context = get_preview_context_from_request_or_session()
+    if preview_context is not None:
+        return preview_context["target_email"]
+
+    abort(401, "User not authenticated")
+
+
+def get_swap_entry_for_group(message_group):
+    swapping = current_app.config["lifted_config"].get("swapping", [])
+    for entry in swapping:
+        if entry.get("from") == message_group and entry.get("enabled", True):
+            return entry
+    return None
 
 @core.get("/api/stats/lifted")
 def stats_lifted():
@@ -90,58 +156,70 @@ def list_images():
     return jsonify({"images": images})
 
 @core.get("/api/messages")
-@login_required
 def get_messages():
-    if current_user.is_authenticated: # changed from "g.oidc_user.logged_in"
-        current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
+    preview_user = None
 
-        data = db_call(
-            get_messages_payload,
-            target_email=current_user.email,
-            message_group_filter=current_attachment_message_group,
-        )
+    if current_user.is_authenticated:
+        clear_preview_context_session()
+        target_email = current_user.email
+        limited_view = False
+        response_requested_uuid = None
+    else:
+        preview_context = get_preview_context_from_request_or_session()
+        if preview_context is None:
+            abort(401, "User not authenticated")
+        target_email = preview_context["target_email"]
+        preview_user = preview_context["requested_user"]
+        limited_view = True
+        response_requested_uuid = preview_context["requested_user_uuid"]
 
-        received_cards = data['received_cards']
-        sent_cards = data['sent_cards']
-        received_ranks = data['received_ranks']
-        sent_ranks = data['sent_ranks']
-        hidden_card_overrides = data['hidden_card_overrides'] # Already a list of strings
-        attachments = data['attachments']
-        attachment_prefs = data['attachment_prefs']
+    current_attachment_message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
-        events = set(["_".join(message_group.split("_")[0:2]) for message_group in current_app.config["lifted_config"]["message_group_list_map"].keys()])
-        # Order events: year descending, then fa before sp for same year
-        def event_sort_key(event):
-            season, year = event.split("_")
-            # For sorting: year descending, fa before sp
-            season_order = {"fa": 0, "sp": 1}
-            return (-int(year), season_order.get(season, 2))
-        events = sorted(events, key=event_sort_key)
+    data = db_call(
+        get_messages_payload,
+        target_email=target_email,
+        message_group_filter=current_attachment_message_group,
+    )
 
-        output = []
-        for event in events:
-            build = {}
+    received_cards = data['received_cards']
+    sent_cards = data['sent_cards']
+    received_ranks = data['received_ranks']
+    sent_ranks = data['sent_ranks']
+    hidden_card_overrides = data['hidden_card_overrides']
+    attachment_prefs = data['attachment_prefs']
 
-            build["year"] = int(event.split("_")[1])
-            build["year_name"] = int(str(20) + str(build["year"]))
-            build["season"] = event.split("_")[0]
-            build["season_name"] = "Fall" if build["season"] == "fa" else "Spring"
-            build["event"] = event
+    events = set(["_".join(message_group.split("_")[0:2]) for message_group in current_app.config["lifted_config"]["message_group_list_map"].keys()])
 
-            build["types"] = []
-            for message_group in current_app.config["lifted_config"]["message_group_list_map"].keys():
-                if event in message_group:
-                    received_cards_in_current_message_group = [card for card in received_cards if card["message_group"] == message_group]
-                    sent_cards_in_current_message_group = [card for card in sent_cards if card["message_group"] == message_group]
+    # Order events: year descending, then fa before sp for same year
+    def event_sort_key(event):
+        season, year = event.split("_")
+        season_order = {"fa": 0, "sp": 1}
+        return (-int(year), season_order.get(season, 2))
 
-                    attachments_in_current_message_group = [{"id": attachment["id"],
-                                                             "attachment_name": attachment["attachment"],
-                                                             "attachment_count": int(attachment["count"])}
-                                                             for attachment in attachments if attachment["message_group"] == message_group]
+    events = sorted(events, key=event_sort_key)
 
-                    build["types"].append({
+    if limited_view:
+        events = events[:1]  # Show only the most recent event for limited view
+
+    output = []
+    for event in events:
+        build = {}
+
+        build["year"] = int(event.split("_")[1])
+        build["year_name"] = int(str(20) + str(build["year"]))
+        build["season"] = event.split("_")[0]
+        build["season_name"] = "Fall" if build["season"] == "fa" else "Spring"
+        build["event"] = event
+
+        build["types"] = []
+        for message_group in current_app.config["lifted_config"]["message_group_list_map"].keys():
+            if event in message_group:
+                received_cards_in_current_message_group = [card for card in received_cards if card["message_group"] == message_group]
+                sent_cards_in_current_message_group = [card for card in sent_cards if card["message_group"] == message_group]
+
+                build["types"].append({
                     "message_group": message_group,
-                    "type":  message_group.split("_")[2],
+                    "type": message_group.split("_")[2],
                     "type_name": "eLifted" if "e" in message_group else "Physical Lifted",
                     "hide_cards": False if message_group not in current_app.config["lifted_config"]["hidden_cards"] or message_group in hidden_card_overrides else True,
                     "received_count": len(received_cards_in_current_message_group),
@@ -150,37 +228,36 @@ def get_messages():
                     "sent_card_ids": [card["id"] for card in sent_cards_in_current_message_group],
                     "received_rank": next((item["rank"] for item in received_ranks if item["message_group"] == message_group), None),
                     "sent_rank": next((item["rank"] for item in sent_ranks if item["message_group"] == message_group), None),
-                    # "allow_choosing_attachments": True if current_attachment_message_group == message_group else False,
-                    # "allow_swapping"
-                    # "available_attachments": attachments_in_current_message_group,
                     "chosen_attachment": next(({"id": pref["attachment_id"], "attachment_name": pref["attachment"]} for pref in attachment_prefs if pref["message_group"] == message_group), None)
                 })
 
-            output.append(build)
+        output.append(build)
 
-        return jsonify(output)
-    else:
-        return {"error": "User not authenticated"}
+    return jsonify({
+        "events": output,
+        "view_mode": "limited" if limited_view else "full",
+        "requested_user_uuid": response_requested_uuid,
+        "preview_user": preview_user,
+    })
 
 @core.route("/api/get-attachment-pref/<message_group>")
-@login_required
 def get_attachment_pref(message_group):
-    attachment_pref = db_call(get_attachment_pref_repo, current_user.email, message_group)
+    target_email = resolve_target_email_for_actions()
+    attachment_pref = db_call(get_attachment_pref_repo, target_email, message_group)
 
     if attachment_pref is None:
         return jsonify({"attachment_pref": None})
     return jsonify({"attachment_pref": attachment_pref})
 
 @core.route("/api/get-attachments/<message_group>")
-@login_required
 def get_attachments(message_group):
     attachments = db_call(list_attachments_for_message_group, message_group)
 
     return jsonify({"attachments": attachments})
 
 @core.post("/api/set-attachment-pref")
-@login_required
 def set_attachment():
+    target_email = resolve_target_email_for_actions()
     attachment_id = request.form["id"]
     message_group = current_app.config["lifted_config"]["attachment_message_group"]
 
@@ -192,11 +269,11 @@ def set_attachment():
         return f"Sorry, there are no more of this attachment left :("
 
     # 3. Check for existing preference (to swap)
-    prev_attachment = db_call(get_attachment_pref_repo, current_user.email, message_group)
+    prev_attachment = db_call(get_attachment_pref_repo, target_email, message_group)
 
     if prev_attachment:
         # 4A. SWAP: Update existing preference
-        db_call(update_attachment_pref, current_user.email, message_group, attachment_id)
+        db_call(update_attachment_pref, target_email, message_group, attachment_id)
 
         # 4B. RESTOCK: Return the old attachment to inventory
         old_attachment_id = prev_attachment["attachment_id"]
@@ -206,19 +283,19 @@ def set_attachment():
         # 5. INSERT: New preference
         config_msg_group = current_app.config["lifted_config"]["attachment_message_group"]
         
-        db_call(create_attachment_pref, current_user.email, config_msg_group, attachment_id)
+        db_call(create_attachment_pref, target_email, config_msg_group, attachment_id)
 
     return jsonify({"status": "success"})
 
 @core.route("/api/delete-attachment-pref/<id>")
-@login_required
 def delete_attachment_pref(id):
+    target_email = resolve_target_email_for_actions()
     attachment_pref = db_call(get_attachment_pref_by_id, id)
 
     if attachment_pref is None:
         abort(404, "Attachment preference DNE")
 
-    if attachment_pref["recipient_email"] == current_user.email or current_user.admin_write_perm:
+    if attachment_pref["recipient_email"] == target_email or current_user.admin_write_perm:
         db_call(return_attachment, attachment_pref["attachment_id"])
         db_call(delete_attachment_pref_by_id, id)
 
@@ -347,8 +424,6 @@ def get_card_pdf(id):
         output_filepath=filepath
     )
 
-    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Viewed PDF Card ID {id}")
-
     return send_file(filepath + ".pdf", download_name=download_name, mimetype='application/pdf')
 
 def check_if_can_edit_or_delete(card):
@@ -423,8 +498,6 @@ def delete_message(id):
     db_call(delete_message_by_id, id)
     db_call(insert_recently_deleted_message, card)
 
-    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Deleted Card ID {id}")
-
     return jsonify({"deleted": True})
 
 
@@ -447,6 +520,8 @@ def send_message():
         recipient_name = form["recipient_name"].strip()
         message_content = form["message_content"].strip()
 
+        recipient_person = form.get("recipient_person") or {}
+
         if show_admin_overrides:
             message_group = form["message_group"].strip()
             # return message_group
@@ -464,7 +539,19 @@ def send_message():
                 abort(400, "Haha nice try...it must be a valid NetID.  If you want to send something to a non-NetID, email us at lifted@cornell.edu :)")
             recipient_email = recipient_netID + "@cornell.edu"
 
-        if current_app.config["lifted_config"]["swap_from"] == message_group:
+        person_full_name = recipient_person.get("Full Name")
+        person_given_name = recipient_person.get("Given Name")
+        person_affiliation = recipient_person.get("Primary Affiliation")
+
+        recipient_user = db_call(
+            upsert_user_by_email,
+            email=recipient_email,
+            given_name=person_given_name,
+            full_name=person_full_name,
+            affiliation=person_affiliation,
+        )
+
+        if get_swap_entry_for_group(message_group):
             # Check to see if the user wants their messages in a different message group
             swap_pref = db_call(get_swap_pref, recipient_email, message_group)
 
@@ -481,7 +568,12 @@ def send_message():
             "message_content": message_content,
         })
 
-        # helpers.send_email(message_group=message_group, type="recipient", to=[recipient_email])
+        helpers.send_email(
+            message_group=message_group,
+            type="recipient",
+            to=[recipient_email],
+            user=recipient_user,
+        )
 
         return jsonify({"message_confirmation": True, "recipient_email": recipient_email})
 
@@ -490,7 +582,7 @@ def get_form_description():
     dir_path = f'templates/rich_text/{current_app.config["lifted_config"]["form_message_group"]}/form.html'
     if Path(dir_path).exists():
         with open(dir_path, 'r', encoding='utf-8') as file:
-            form_description = file.read()
+            form_description = helpers.normalize_rich_text_html(file.read())
     else:
         form_description = "<p>Admin needs to set form description in Admin Dashboard!</p>"
 
@@ -528,6 +620,7 @@ def get_person_info():
     conn.search('ou=People,o=Cornell University,c=us', search_filter, attributes=[
         "uid",
         "cn",
+        "givenName",
         "cornelleduacadcollege",
         "cornelleduactivateddt",
         "cornelleduprimaryaffiliation",
@@ -545,7 +638,8 @@ def get_person_info():
     for result in results:
         dict = {
             "NetID": str(result.uid.value),
-            "Name": str(result.cn.value),
+            "Full Name": str(result.cn.value),
+            "Given Name": str(result.givenName.value),
             "Primary Affiliation": str(result.cornelleduprimaryaffiliation.value),
             "College": helpers.college_dict.get(result.cornelleduacadcollege.value, str(result.cornelleduacadcollege.value)),
             "Primary Dept": str("" if len(result.cornelledudeptname1) == 0 else result.cornelledudeptname1),
@@ -571,24 +665,29 @@ def easter_egg(netID):
     return jsonify({"result": result})
 
 @core.post("/api/swap-messages")
-@login_required
 def swap_messages():
-    swap_from = current_app.config["lifted_config"]["swap_from"]
-    swap_to = current_app.config["lifted_config"]["swap_to"]
+    target_email = resolve_target_email_for_actions()
+    request_data = json.loads(request.data) if request.data else {}
+    current_message_group = request_data.get("message_group", "")
 
-    if swap_from == "none":
-        return "Cannot swap at this time.  swap_from=none in Lifted config."
+    swap_entry = get_swap_entry_for_group(current_message_group)
+    if swap_entry is None:
+        return jsonify({"swapped": False, "error": "Swapping is not enabled for this message group."}), 400
+
+    swap_from = swap_entry.get("from")
+    swap_to = swap_entry.get("to")
+
+    if not swap_from or not swap_to:
+        return jsonify({"swapped": False, "error": "Invalid swapping configuration."}), 400
 
     # Delete attachment pref if there is one
-    attachment_pref = db_call(get_attachment_pref_repo, current_user.email, current_app.config["lifted_config"]["swap_from"])
+    attachment_pref = db_call(get_attachment_pref_repo, target_email, swap_from)
     if attachment_pref:
         db_call(return_attachment, attachment_pref["attachment_id"])
         db_call(delete_attachment_pref_by_id, attachment_pref["id"])
 
-    db_call(update_messages_group_for_recipient, current_user.email, swap_from, swap_to)
-    db_call(create_swap_pref, current_user.email, swap_from, swap_to)
-
-    helpers.log(current_user.id, current_user.full_name, "INFO", None, f"Swapped Cards to eLifted")
+    db_call(update_messages_group_for_recipient, target_email, swap_from, swap_to)
+    db_call(create_swap_pref, target_email, swap_from, swap_to)
     
     return jsonify({"swapped": True})
 

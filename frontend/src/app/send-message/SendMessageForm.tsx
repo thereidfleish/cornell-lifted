@@ -87,6 +87,9 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                 payload.recipient_netid = recipientNetID;
             } else {
                 payload.recipient_netid = recipientNetID;
+                if (selectedPerson) {
+                    payload.recipient_person = selectedPerson;
+                }
             }
             let apiUrl = "/api/send-message";
             if (editMode) {
@@ -195,7 +198,7 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
                 {/* User Banner */}
                 {user && (
                     <div className="w-full bg-blue-100 text-cornell-blue rounded-lg p-2 mb-4 font-sm shadow-sm border border-blue-200">
-                        Hi, {user.user?.name?.split(' ')[0]}! You are signed in as {user.user?.email}
+                        Hi, {user.user?.given_name}! You are signed in as {user.user?.email}
                     </div>
                 )}
                 {/* Admin Override Button */}

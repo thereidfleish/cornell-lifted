@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useGlobal } from "@/utils/GlobalContext";
 
 interface Attachment {
 	id: number;
@@ -18,6 +19,7 @@ type Props = {
 };
 
 const ChooseAttachment: React.FC<Props> = ({ message_group, onAttachmentChange }) => {
+	const { config } = useGlobal() as any;
 	const [attachments, setAttachments] = useState<Attachment[]>([]);
 	const [chosenPref, setChosenPref] = useState<AttachmentPref | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -76,11 +78,20 @@ const ChooseAttachment: React.FC<Props> = ({ message_group, onAttachmentChange }
 	return (
 		<div>
 			<h4 className="font-bold mb-2">Choose Your Card Attachment!</h4>
-			<p className="text-sm mb-2">You'll receive this alongside your cards! If you only want your cards, leave this blank. Hard deadline to select an attachment is <b>Sunday 4/27/25 at 11:59 PM!</b></p>
+			{config?.attachment_deadline && (
+				<div className="mb-2 inline-flex items-center rounded-full bg-cornell-red px-3 py-1 text-xs font-semibold text-white">
+					Deadline: {config.attachment_deadline}
+				</div>
+			)}
+			<div
+				className="text-sm mb-2"
+				dangerouslySetInnerHTML={{ __html: config?.attachment_text }}
+			/>
 			{statusMsg && <div className="text-green-600 font-semibold mb-2">{statusMsg}</div>}
+			{loading && <div className="text-sm font-semibold text-cornell-blue mb-2">Loading...</div>}
 			{chosenPref ? (
 				<div className="mb-2">
-					<span className="font-semibold">Current Attachment:</span> {attachments.find(a => a.id === chosenPref.attachment_id)?.attachment || "Unknown"}
+					<span className="font-semibold">Selected Attachment:</span> {attachments.find(a => a.id === chosenPref.attachment_id)?.attachment || "Unknown"}
 					<button
 						className="ml-2 px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300"
 						onClick={handleClear}
@@ -92,25 +103,21 @@ const ChooseAttachment: React.FC<Props> = ({ message_group, onAttachmentChange }
 			) : (
 				<div className="mb-2 text-gray-700">No attachment chosen yet.</div>
 			)}
-			{loading ? (
-				<div className="flex items-center justify-center py-8">
-					<div className="text-sm font-semibold text-cornell-blue">Loading...</div>
-				</div>
-			) : (
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-					{attachments.map(att => (
-						<button
-							key={att.id}
-							className={`border rounded p-3 flex flex-col items-start ${chosenPref && chosenPref.attachment_id === att.id ? "bg-cornell-blue text-white" : "bg-white"} ${att.count < 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-100"}`}
-							onClick={() => att.count > 0 && handleChoose(att.id)}
-							disabled={att.count < 1}
-						>
-							<span className="font-semibold text-lg">{att.attachment}</span>
-							<span className="text-sm">Available: {att.count}</span>
-						</button>
-					))}
-				</div>
-			)}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+				{attachments.map(att => (
+					<button
+						key={att.id}
+						className={`border-2 rounded-lg p-3 pr-16 relative min-h-[56px] flex items-center text-left transition-all ${chosenPref && chosenPref.attachment_id === att.id ? "border-cornell-blue bg-blue-50 text-cornell-blue font-semibold" : "border-gray-300 hover:border-cornell-blue hover:bg-gray-50"} ${att.count < 1 || loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+						onClick={() => att.count > 0 && !loading && handleChoose(att.id)}
+						disabled={att.count < 1 || loading}
+					>
+						<span className="font-semibold text-md">{att.attachment}</span>
+						<span className={`absolute right-3 top-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-xs font-semibold ${chosenPref && chosenPref.attachment_id === att.id ? "bg-cornell-blue text-white" : "bg-gray-200 text-gray-700"}`}>
+							{att.count} left
+						</span>
+					</button>
+				))}
+			</div>
 		</div>
 	);
 };

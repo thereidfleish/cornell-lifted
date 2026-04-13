@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Text, Boolean, Integer, DateTime
+from sqlalchemy import Text, Boolean, Integer, DateTime, text
 
 
 class Base(DeclarativeBase):
@@ -26,6 +26,18 @@ class Message(Base):
     recipient_email: Mapped[str] = mapped_column(Text, nullable=False)
     recipient_name: Mapped[str | None] = mapped_column(Text, nullable=True)
     message_content: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class LiftedUser(Base):
+    __tablename__ = "users"
+    __table_args__ = {"schema": "lifted"}
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True, server_default=text("gen_random_uuid()::text"))
+    email: Mapped[str] = mapped_column(Text, primary_key=True)
+    given_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    full_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    affiliation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
 
 
 class HiddenCardOverride(Base):
@@ -72,6 +84,7 @@ class SwapPref(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     recipient_email: Mapped[str] = mapped_column(Text, nullable=False)
+    event: Mapped[str] = mapped_column(Text, nullable=False)
     message_group_from: Mapped[str] = mapped_column(Text, nullable=False)
     message_group_to: Mapped[str] = mapped_column(Text, nullable=False)
 

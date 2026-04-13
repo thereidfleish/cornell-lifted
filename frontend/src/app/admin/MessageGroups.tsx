@@ -19,6 +19,7 @@ export default function Essentials() {
     const [adding, setAdding] = useState(false);
     const [error, setError] = useState("");
     const [statusMsg, setStatusMsg] = useState<string>("");
+    const [comingSoonTextP, setComingSoonTextP] = useState<string>(config?.coming_soon_text_p || "");
 
     // Remove latest year logic
     const [semester, setSemester] = useState<string>("sp");
@@ -40,6 +41,10 @@ export default function Essentials() {
             });
             setGoogleSlidesIds(ids);
         });
+    }, [config]);
+
+    useEffect(() => {
+        setComingSoonTextP(config?.coming_soon_text_p || "");
     }, [config]);
 
     // Add new message group
@@ -80,6 +85,18 @@ export default function Essentials() {
     // Delete message group
     async function handleDelete(group: string) {
         const res = await fetch(`/api/admin/remove-message-group/${group}`);
+        const data = await res.json();
+        setStatusMsg(data.status || "");
+        refreshConfig();
+    }
+
+    async function handleSaveComingSoonTextP(e: React.FormEvent) {
+        e.preventDefault();
+        const res = await fetch("/api/admin/update-coming-soon-text?type=p", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ coming_soon_text_p: comingSoonTextP }),
+        });
         const data = await res.json();
         setStatusMsg(data.status || "");
         refreshConfig();
@@ -235,6 +252,7 @@ export default function Essentials() {
                 </button>
                 {error && <div className="text-red-600">{error}</div>}
             </form>
+
             <ul className="list-disc ml-6">
                 <li>
                     <b>Hide Cards</b>: Prevent users from seeing cards on the website until Lifted Day. Usually, only unhide the eLifted cards on Lifted Day.
@@ -255,6 +273,26 @@ export default function Essentials() {
                 <div className="text-green-700 font-semibold mb-2">{statusMsg}</div>
             )}
             <Table headers={tableHeaders} data={rows} maxHeight={400} />
+
+            <div className="max-w-2xl mt-8">
+                <h3 className="font-semibold mb-2">Coming Soon Text</h3>
+                <p className="text-sm text-gray-700 mb-2">This text appears below the dynamic "Pick up your &lt;count&gt; physical card(s)." line on the physical Coming Soon card.</p>
+                <form onSubmit={handleSaveComingSoonTextP} className="flex flex-col gap-2">
+                    <input
+                        type="text"
+                        value={comingSoonTextP}
+                        onChange={(e) => setComingSoonTextP(e.target.value)}
+                        className="border rounded p-2"
+                        placeholder="Enter coming soon text for physical Lifted"
+                    />
+                    <button
+                        type="submit"
+                        className="bg-cornell-blue text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-cornell-red transition w-fit"
+                    >
+                        Save Coming Soon Text
+                    </button>
+                </form>
+            </div>
             
             {/* Modal for Google Slides URL */}
             {showModal && (

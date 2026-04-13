@@ -173,7 +173,7 @@ def process_html_for_email(html_content, message_group=None):
     
     return email_template
 
-def send_email(message_group, type, to, cc=None, bcc=None):
+def send_email(message_group, type, to, cc=None, bcc=None, user=None):
     token = os.getenv("SENDGRID_KEY")
 
     dir_path = f"templates/rich_text/{message_group}/{type}"
@@ -181,8 +181,20 @@ def send_email(message_group, type, to, cc=None, bcc=None):
     with open(f"{dir_path}.txt", "r", encoding="utf-8") as file:
         subject = file.read()
 
+    given_name = "there"
+    user_uuid = None
+    if user:
+        given_name = user.get("given_name")
+        user_uuid = user.get("id")
+
     with open(f"{dir_path}.html", "r", encoding="utf-8") as file:
         raw_html_content = file.read()
+
+        if user_uuid:
+            raw_html_content = raw_html_content.replace("?user=", f"?user={user_uuid}")
+
+        raw_html_content = raw_html_content.replace("{{name}}", given_name)
+
         html_content = process_html_for_email(raw_html_content, message_group)
 
     postmark = PostmarkClient(server_token=token)

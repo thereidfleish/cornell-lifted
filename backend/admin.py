@@ -86,6 +86,18 @@ def update_hidden_cards(message_group):
 
     return jsonify({"status": "Hidden cards updated successfully!"})
 
+@admin.post("/api/admin/update-coming-soon-text")
+@login_required
+@admin_required(write_required=True)
+def update_coming_soon_text():
+    request_data = json.loads(request.data)
+    text_type = request.args.get("type")
+    
+    key = f"coming_soon_text_{text_type}"
+    current_app.config["lifted_config"][key] = request_data.get(key, "")
+    update_lifted_config(current_app.config["lifted_config"])
+    return jsonify({"status": "Coming soon text updated successfully!"})
+
 # NEED TO IMPLEMENT MESSAGE DELETING!!!!
 @admin.route("/api/admin/remove-message-group/<message_group>")
 @login_required
@@ -151,8 +163,8 @@ def save_rich_text(message_group, type):
     html_content = data["html"]
     subject = data["subject"]
 
-    if type == "form":
-        html_content = html_content.replace("<p>", "<p style='margin: 0px'>")
+    # if type == "form":
+    #     html_content = html_content.replace("<p>", "<p style='margin: 10px'>")
 
     dir_path = f"templates/rich_text/{message_group}"
     os.makedirs(dir_path, exist_ok=True)
@@ -235,7 +247,10 @@ def get_attachment_prefs(message_group):
 @login_required
 @admin_required(write_required=True)
 def update_attachment_message_group():
-    current_app.config["lifted_config"]["attachment_message_group"] = request.form.get("attachment-message-group")
+    current_app.config["lifted_config"]["attachment_message_group"] = attachment_message_group
+    current_app.config["lifted_config"]["attachment_text"] = attachment_text
+    current_app.config["lifted_config"]["attachment_deadline"] = attachment_deadline
+
     update_lifted_config(current_app.config["lifted_config"])
     return jsonify({"status": "Attachment message group updated successfully!"})
 
@@ -268,9 +283,24 @@ def get_swap_prefs():
 @login_required
 @admin_required(write_required=True)
 def update_swapping_config():
-    current_app.config["lifted_config"]["swap_from"] = request.form.get("swap-from")
-    current_app.config["lifted_config"]["swap_to"] = request.form.get("swap-to")
-    current_app.config["lifted_config"]["swap_text"] = request.form.get("swap-text")
+    request_data = json.loads(request.data)
+    swapping = request_data.get("swapping", [])
+
+    normalized_swapping = []
+    for entry in swapping:
+        normalized_swapping.append({
+            "from": entry["from"],
+            "to": entry["to"],
+            "enabled": entry["enabled"],
+            "text": entry["text"],
+            "title": entry["title"],
+            "button_text": entry["button_text"],
+            "deadline": entry.get("deadline", ""),
+            "dialog_text": entry.get("dialog_text", ""),
+        })
+
+    current_app.config["lifted_config"]["swapping"] = normalized_swapping
+
     update_lifted_config(current_app.config["lifted_config"])
     return jsonify({"status": "Swapping config updated successfully!"})
 

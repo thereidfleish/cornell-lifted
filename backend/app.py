@@ -12,7 +12,7 @@ import json
 import sqlite3
 import os
 import helpers
-from db.repositories import get_admin_by_netid
+from db.repositories import get_admin_by_netid, upsert_user_from_oidc
 
 load_dotenv()
 
@@ -64,7 +64,6 @@ def after_setup(app):
         error_message_body = "[ " + request.url + " ] " + e.description
         
         if hasattr(current_user, "id"):
-            # print(current_user.id, "(", current_user.name, ")", "had an error", e.code)
             helpers.log(current_user.id, current_user.full_name, "ERROR", str(error_code), error_message_body)
 
         if error_code == 400:
@@ -98,8 +97,8 @@ def update_lifted_config(new_config):
         json.dump(new_config, file, indent=4)
 
 class User(UserMixin):
-    def __init__(self, name, full_name, id, is_admin=False, admin_write_perm=False):
-        self.name = name
+    def __init__(self, given_name, full_name, id, is_admin=False, admin_write_perm=False):
+        self.given_name = given_name
         self.full_name = full_name
         self.id = id
         self.email = id + "@cornell.edu"
@@ -146,7 +145,7 @@ def get_impersonating_status():
 def load_user(user_id):
     # user_id = "atn45" # use to TEST a user!
     user = User(
-        name=session["given_name"],
+        given_name=session["given_name"],
         full_name=session["full_name"],
         id=user_id,
         is_admin=session.get("is_admin", False),
@@ -156,6 +155,7 @@ def load_user(user_id):
 
 def after_oidc_authorize(sender, **extras):
     oidc_profile = session["oidc_auth_profile"]
+    db_call(upsert_user_from_oidc, oidc_profile)
     session["given_name"] = oidc_profile["given_name"]
     session["full_name"] = oidc_profile["name"]
     sync_admin_permissions_for_session(oidc_profile["sub"])

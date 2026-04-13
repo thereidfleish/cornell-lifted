@@ -1,8 +1,10 @@
 import json
+from datetime import datetime, timezone
 from sqlalchemy import select, func, distinct, update, text, insert, delete, or_
 from db.models import (
     Admin,
     Message,
+    LiftedUser,
     HiddenCardOverride,
     Attachment,
     AttachmentPref,
@@ -22,6 +24,103 @@ def get_admin_by_netid(db_session, netid):
     return db_session.execute(
         select(Admin).where(Admin.id == netid).limit(1)
     ).scalar_one_or_none()
+
+
+def get_user_by_uuid(db_session, user_uuid):
+    user = db_session.execute(
+        select(
+            LiftedUser.id,
+            LiftedUser.email,
+            LiftedUser.given_name,
+            LiftedUser.full_name,
+            LiftedUser.affiliation,
+            LiftedUser.updated_at,
+        )
+        .where(LiftedUser.id == user_uuid)
+        .limit(1)
+    ).mappings().first()
+
+    return dict(user) if user is not None else None
+
+
+def _upsert_lifted_user(email, given_name, full_name, affiliation, db_session):
+    normalized_email = (email or "").strip().lower()
+    now_utc = datetime.now(timezone.utc)
+
+    if not normalized_email:
+        return None
+
+    existing_user = db_session.execute(
+        select(
+            LiftedUser.id,
+            LiftedUser.given_name,
+            LiftedUser.full_name,
+            LiftedUser.affiliation,
+        )
+        .where(LiftedUser.email == normalized_email)
+        .limit(1)
+    ).mappings().first()
+
+    resolved_given_name = given_name or (existing_user["given_name"] if existing_user else None)
+    resolved_full_name = full_name or (existing_user["full_name"] if existing_user else None)
+    resolved_affiliation = affiliation or (existing_user["affiliation"] if existing_user else None)
+
+    if existing_user is not None:
+        db_session.execute(
+            update(LiftedUser)
+            .where(LiftedUser.email == normalized_email)
+            .values(
+                given_name=resolved_given_name,
+                full_name=resolved_full_name,
+                affiliation=resolved_affiliation,
+                updated_at=now_utc
+            )
+        )
+        user_uuid = existing_user["id"]
+    else:
+        user_uuid = db_session.execute(
+            insert(LiftedUser)
+            .values(
+                email=normalized_email,
+                given_name=resolved_given_name,
+                full_name=resolved_full_name,
+                affiliation=resolved_affiliation,
+                updated_at=now_utc,
+            )
+            .returning(LiftedUser.id)
+        ).scalar_one()
+
+    db_session.commit()
+    return {
+        "id": user_uuid,
+        "email": normalized_email,
+        "given_name": resolved_given_name,
+        "full_name": resolved_full_name,
+        "affiliation": resolved_affiliation,
+        "updated_at": now_utc,
+    }
+
+
+def upsert_user_from_oidc(oidc_profile, db_session):
+    email = oidc_profile.get("email")
+    given_name = oidc_profile.get("given_name")
+    full_name = oidc_profile.get("name")
+    affiliation = oidc_profile.get("eduPersonPrimaryAffiliation")
+    user = _upsert_lifted_user(email, given_name, full_name, affiliation, db_session)
+    if user is None:
+        return None
+
+    return {
+        "email": user["email"],
+        "given_name": user["given_name"],
+        "full_name": user["full_name"],
+        "affiliation": user["affiliation"],
+        "updated_at": user["updated_at"],
+    }
+
+
+def upsert_user_by_email(email, given_name, full_name, affiliation, db_session):
+    return _upsert_lifted_user(email, given_name, full_name, affiliation, db_session)
 
 
 def get_lifted_stats(db_session):
@@ -167,7 +266,7 @@ def get_card_payload(db_session, card_id, lookup_email):
     }
 
 
-def claim_attachment(db_session, row_id):
+def claim_attachment(row_id, db_session):
     try:
         row_id_int = int(row_id)
     except (TypeError, ValueError):
@@ -182,7 +281,7 @@ def claim_attachment(db_session, row_id):
     return result.rowcount > 0
 
 
-def return_attachment(db_session, row_id):
+def return_attachment(row_id, db_session):
     try:
         row_id_int = int(row_id)
     except (TypeError, ValueError):
@@ -197,7 +296,7 @@ def return_attachment(db_session, row_id):
     return result.rowcount > 0
 
 
-def get_cards_with_attachments(db_session, message_group):
+def get_cards_with_attachments(message_group, db_session):
     return rows_to_dicts(db_session.execute(
         select(
             Message.id,
@@ -408,18 +507,38 @@ def list_swap_prefs(db_session):
             SwapPref.recipient_email,
             SwapPref.message_group_from,
             SwapPref.message_group_to,
+            SwapPref.event,
         )
     ))
 
 
 def create_swap_pref(recipient_email, message_group_from, message_group_to, db_session):
-    db_session.execute(
-        insert(SwapPref).values(
-            recipient_email=recipient_email,
+    # Derive event from message_group_from by removing trailing _e or _p
+    event = message_group_from.rsplit('_', 1)[0]
+    
+    updated_rows = db_session.execute(
+        update(SwapPref)
+        .where(
+            (SwapPref.recipient_email == recipient_email)
+            & (SwapPref.event == event)
+        )
+        .values(
             message_group_from=message_group_from,
             message_group_to=message_group_to,
+            event=event,
         )
-    )
+    ).rowcount
+
+    if updated_rows == 0:
+        db_session.execute(
+            insert(SwapPref).values(
+                recipient_email=recipient_email,
+                message_group_from=message_group_from,
+                message_group_to=message_group_to,
+                event=event,
+            )
+        )
+
     db_session.commit()
 
 

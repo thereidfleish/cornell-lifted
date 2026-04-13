@@ -1,4 +1,4 @@
-import { LiftedEventTypeDetails } from "@/app/messages/page";
+import type { LiftedEventTypeDetails } from "@/app/messages/types";
 import MessageModal from "@/components/messages/MessageModal";
 import React, { useState } from "react";
 import { useGlobal } from "@/utils/GlobalContext";
@@ -11,10 +11,11 @@ type SentReceivedCardProps = {
     details: LiftedEventTypeDetails;
     year_name: string;
     season_name: string;
-    latest_physical_event: boolean
+    latest_physical_event: boolean;
+    limitedView?: boolean;
 };
 
-export default function SentReceivedCard({ details, year_name, season_name, latest_physical_event }: SentReceivedCardProps) {
+export default function SentReceivedCard({ details, year_name, season_name, latest_physical_event, limitedView = false }: SentReceivedCardProps) {
     const [activeTab, setActiveTab] = useState<'received' | 'sent'>('received');
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCardId, setSelectedCardId] = useState<number | string | null>(null);
@@ -24,6 +25,9 @@ export default function SentReceivedCard({ details, year_name, season_name, late
 
     const isELifted = details.type === "e";
     const isPhysical = details.type === "p";
+    const canSwapForMessageGroup = !!config?.swapping?.some(
+        (entry) => entry.from === details.message_group && entry.enabled !== false
+    );
 
     const handleCardClick = (cardId: number | string, overrideHiddenMessage: boolean) => {
         setSelectedCardId(cardId);
@@ -101,7 +105,15 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                                     latest_physical_event ? (
                                                         <div className="shadow-lg rounded-lg p-4 transition-all duration-500 ease-in-out scale-100 hover:scale-102">
                                                             <h2 className="text-3xl text-cornell-red font-schoolbell mb-4">🎈 Coming Soon!</h2>
-                                                            <p className="text-sm text-gray-800 mb-4">Pick up your {details.received_count} physical card{details.received_count !== 1 ? 's' : ''} in the <b>Willard Straight Hall Lobby before 7 PM</b> on the last day of classes <b>(Monday, December 8th)!</b></p>
+                                                            <p className="text-sm text-gray-800 mb-4">
+                                                                Pick up your {details.received_count} physical card{details.received_count !== 1 ? 's' : ''}{' '}
+                                                                {config?.coming_soon_text_p && (
+                                                                    <span
+                                                                        className="inline"
+                                                                        dangerouslySetInnerHTML={{ __html: config.coming_soon_text_p }}
+                                                                    />
+                                                                )}
+                                                            </p>
                                                             {currentAttachment && (
                                                                 <p className="text-sm text-gray-800 mb-4">You'll also receive a <b>{currentAttachment}</b> alongside your cards!</p>
                                                             )}
@@ -120,40 +132,46 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                                         <p className="text-sm text-gray-800 mb-4">Your {details.received_count} eLifted message{details.received_count !== 1 ? 's' : ''} will be available here on the last day of classes!</p>
                                                     </div>
                                                 )}
-                                                {details.message_group === config?.swap_from && (
-                                                    <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
-                                                        <SwapCards />
-                                                    </div>
-                                                )}
                                                 {details.message_group === config?.attachment_message_group && (
                                                     <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
                                                         <ChooseAttachment message_group={details.message_group} onAttachmentChange={setCurrentAttachment} />
                                                     </div>
                                                 )}
+                                                {canSwapForMessageGroup && (
+                                                    <div className="shadow-lg rounded-lg p-4 mt-4 border border-dashed border-blue-200">
+                                                        <SwapCards message_group={details.message_group} />
+                                                    </div>
+                                                )}
                                             </div>
                                         ) : (
-                                            <div className="grid grid-cols-4 gap-8 p-2">
-                                                {details.received_card_ids.map((id: number, idx: number) => (
-                                                    <button
-                                                        key={id}
-                                                        type="button"
-                                                        className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer"
-                                                        onClick={() => handleCardClick(id, !details.hide_cards)}
-                                                    >
-                                                        <div className="flex flex-col items-center">
-                                                            <div className="text-3xl mb-2">💌</div>
-                                                            <span className="relative">
-                                                                <span
-                                                                    className="absolute left-1/2 -bottom-6 -translate-x-1/2 w-6 h-6 bg-cornell-red rounded-full flex items-center justify-center text-white text-xs font-bold"
-                                                                    style={{ zIndex: 1 }}
-                                                                >
-                                                                    {idx + 1}
+                                            limitedView ? (
+                                                <div className="text-gray-500 text-center py-4">
+                                                    <p>Sign in to view message details.</p>
+                                                </div>
+                                            ) : (
+                                                <div className="grid grid-cols-4 gap-8 p-2">
+                                                    {details.received_card_ids.map((id: number, idx: number) => (
+                                                        <button
+                                                            key={id}
+                                                            type="button"
+                                                            className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer"
+                                                            onClick={() => handleCardClick(id, !details.hide_cards)}
+                                                        >
+                                                            <div className="flex flex-col items-center">
+                                                                <div className="text-3xl mb-2">💌</div>
+                                                                <span className="relative">
+                                                                    <span
+                                                                        className="absolute left-1/2 -bottom-6 -translate-x-1/2 w-6 h-6 bg-cornell-red rounded-full flex items-center justify-center text-white text-xs font-bold"
+                                                                        style={{ zIndex: 1 }}
+                                                                    >
+                                                                        {idx + 1}
+                                                                    </span>
                                                                 </span>
-                                                            </span>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )
                                         )}
                                     </>
                                 )}
@@ -180,28 +198,34 @@ export default function SentReceivedCard({ details, year_name, season_name, late
                                         {isELifted && (
                                             <p className="text-sm text-gray-500 mb-2">If a physical card you sent ends up here, it's because your recipient requested their physical cards to be delivered virtually instead. See <a href="/faqs" className="text-cornell-blue underline">FAQs</a>.</p>
                                         )}
-                                        <div className="grid grid-cols-4 gap-8 p-2">
-                                            {details.sent_card_ids.map((id: number, idx: number) => (
-                                                <button
-                                                    key={id}
-                                                    type="button"
-                                                    className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer"
-                                                    onClick={() => handleCardClick(id, !details.hide_cards)}
-                                                >
-                                                    <div className="flex flex-col items-center">
-                                                        <div className="text-3xl mb-2">💌</div>
-                                                        <span className="relative">
-                                                            <span
-                                                                className="absolute left-1/2 -bottom-6 -translate-x-1/2 w-6 h-6 bg-cornell-red rounded-full flex items-center justify-center text-white text-xs font-bold"
-                                                                style={{ zIndex: 1 }}
-                                                            >
-                                                                {idx + 1}
+                                        {limitedView ? (
+                                            <div className="text-gray-500 text-center py-4">
+                                                <p>Sign in to view message details.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="grid grid-cols-4 gap-8 p-2">
+                                                {details.sent_card_ids.map((id: number, idx: number) => (
+                                                    <button
+                                                        key={id}
+                                                        type="button"
+                                                        className="bg-white rounded-lg shadow inset-shadow-2xs p-3 flex flex-col items-center hover:scale-105 transition relative cursor-pointer"
+                                                        onClick={() => handleCardClick(id, !details.hide_cards)}
+                                                    >
+                                                        <div className="flex flex-col items-center">
+                                                            <div className="text-3xl mb-2">💌</div>
+                                                            <span className="relative">
+                                                                <span
+                                                                    className="absolute left-1/2 -bottom-6 -translate-x-1/2 w-6 h-6 bg-cornell-red rounded-full flex items-center justify-center text-white text-xs font-bold"
+                                                                    style={{ zIndex: 1 }}
+                                                                >
+                                                                    {idx + 1}
+                                                                </span>
                                                             </span>
-                                                        </span>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </>
                                 )}
                             </div>

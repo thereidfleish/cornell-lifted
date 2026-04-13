@@ -13,7 +13,7 @@ const AddCandidateForm: React.FC<AddCandidateFormProps> = ({ onRefresh }) => {
 
 	const handleSelectPerson = (person: Person) => {
 		setSelectedPerson(person);
-		setName(person.Name); // Auto-fill the name but allow editing
+		setName(person["Full Name"]); // Auto-fill the name but allow editing
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
