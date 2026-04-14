@@ -12,8 +12,6 @@ export default function Home() {
   const [loadingStats, setLoadingStats] = useState(true);
   const { user, config, loading, isWinter } = useGlobal();
 
-  const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
-
   useEffect(() => {
     fetch("/api/stats/lifted")
       .then((res) => res.json())
@@ -54,31 +52,28 @@ export default function Home() {
     <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#fffefa]'} font-tenor`}>
       {/* Hero Section */}
       <section className={`flex flex-col lg:flex-row items-center justify-center px-4 py-10 ${isWinter ? 'bg-[#e3eeff]' : 'bg-gray-100'}`}>
-        <div className="flex-2 flex flex-col justify-center items-center lg:items-start lg:pl-20">
-          <img
-            src={logoSrc}
-            width={250}
-            alt="Cornell Lifted Logo"
-            className="block mx-auto lg:mx-0 lg:self-start mb-8 transition-transform duration-300 hover:scale-105"
-          />
-          <h1 className="text-cornell-red font-schoolbell text-5xl font-bold mb-4">Spread Gratitude Across Cornell</h1>
+        <div className="flex-2 flex flex-col justify-center items-center lg:items-start lg:pl-20 text-center lg:text-left">
+          <h1 className="text-cornell-red font-schoolbell text-4xl font-bold mb-4">Spread Gratitude Across Cornell</h1>
           <p className="text-xl text-gray-700 mb-6">Join Cornell's gratitude movement that transforms campus with thousands of thank-you messages.</p>
           <p className="text-xl font-bold mb-6">Tuesday, May 5th, 2026 on the Arts Quad</p>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-row flex-wrap items-center justify-center gap-3 text-center">
             {formOpen && (
               <a className="bg-cornell-red text-white text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center" href="/send-message">Send a Lifted Message</a>
             )}
             <a className="bg-white border border-gray-200 text-gray-800 text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center" href="/messages">View My Messages</a>
-            
           </div>
           {!formOpen && (
               <p className="mt-3 text-cornell-red">The Lifted submission form is now closed. Keep an eye out for the next semester's Lifted event!</p>
             )}
+          {formOpen && (
+            <p className="mt-3 text-cornell-red">The form will close on <strong>Thursday, April 23rd at 11:59 PM</strong>! Any messages submitted after will only be sent virtually to your recipient.</p>
+          )}
+
         </div>
 
         <div className="flex-1 flex justify-center items-center relative mt-10 lg:mt-0">
           <div className="relative">
-            <div className="w-[450px] rounded-[25px] overflow-hidden shadow-lg bg-white p-3.5 animate-float">
+            <div className="w-[320px] sm:w-[380px] lg:w-[450px] rounded-[25px] overflow-hidden shadow-lg bg-white p-3.5 animate-float">
               <img src="../images/home_spring/1.jpg" alt="Cornell Lifted" className="object-cover w-full h-full rounded-[18px]" />
             </div>
           </div>

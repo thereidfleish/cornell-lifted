@@ -84,7 +84,7 @@ def process_html_for_email(html_content, message_group=None, tracking_url=None):
         is_winter = theme == "fall"
     
     # Select the appropriate logo and background colors
-    logo_url = "https://cornelllifted.com/images/logo_winter.png" if is_winter else "https://cornelllifted.com/images/logo.png"
+    logo_url = "https://cornelllifted.com/images/logo_winter.png" if is_winter else "https://cornelllifted.com/images/logo_spring.png"
     bg_color = "#e3eeff" if is_winter else "#f4fbf3"
 
     email_template = f"""
@@ -158,7 +158,7 @@ def process_html_for_email(html_content, message_group=None, tracking_url=None):
                 
                 <div class="footer">
                     <p><strong style="color: #b31b1b">Made with 💌 by the Lifted Team</strong></p>
-                    <p>This year, we're celebrating our 10th anniversary!  Join {stats['unique_sent']:,} others in writing {stats['total_received']:,} messages of gratitude across the Cornell community since 2016.</p>
+                    <p>This year, we're <a href="https://cornelllifted.com/blog/celebrating-our-10th-anniversary">celebrating our 10th anniversary</a>!  Join {stats['unique_sent']:,} others in writing {stats['total_received']:,} messages of gratitude across the Cornell community since 2016.</p>
                     <p><a href="https://news.cornell.edu/stories/2021/05/cornell-lifted-raises-spirits-prior-finals">Read more about Lifted on the Cornell Chronicle</a></p>
                     <p style="margin-top: 15px;">
                         <a href="https://cornelllifted.com">Website</a> | 

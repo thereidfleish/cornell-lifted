@@ -10,7 +10,7 @@ const faqs = {
     "How does Lifted work?": "Write a thank-you card to a friend, professor, or staff member at Cornell who has uplifted you!  We will deliver it your recipient virtually or by printing it out and displaying it amongst thousands of other cards on the last day of classes!",
     "When does the Lifted submission form open?  When does it close?": "The form usually opens 3-4 weeks before the last day of classes.  The last day to send a physical Lifted card is usually about 1-2 weeks before the last day of classes, and the last day to send an eLifted card is usually the day before.  Keep an eye on our website and Instagram for updates!",
     "What is the difference between a physical Lifted card and an eLifted card?": "Physical Lifted cards will be printed and displayed (for recipients to pick up and keep!) on the last day of classes.  eLifted cards are virtual cards that recipients will receive as a PDF on the last day of classes (you can still print them out to create a physical card!).  Whether a recipient gets a physical or eLifted card depends on when the sender wrote their message and whether the you choose to receive a physical copy.",
-    "What changed for Lifted Spring 2026?": "Previously, recipients received physical cards by default.  This semester, recipients will receive eLifted (virtual) cards by default.  However, recipients have the option to request a physical copy to be displayed on the Arts Quad as before!  The deadline to request physical cards is stated in the email recipients receive when they are sent a message.<br><br>We made this change to reduce the number of unclaimed physical Lifted cards.  Historically, about 25% of Lifted cards are not picked up, which creates unnecessary waste and extra work for our volunteers.  We're trying this out this year, and will see how it goes!"
+    "What changed for Lifted Spring 2026?": "Previously, recipients received physical cards by default.  This semester, recipients will receive eLifted (virtual) cards by default.  However, recipients have the option to request a physical copy to be displayed on the Arts Quad as before!  The deadline to request physical cards is stated in the email recipients receive when they are sent a message.<br><br>We made this change to reduce the number of unclaimed physical Lifted cards.  Historically, about 25% of Lifted cards are not picked up, which creates unnecessary waste and extra work for our volunteers.  We're trying this out this year, and will see how it goes!  Read our <a href='/blog/spring-2026-changes'>blog post</a> for more info!",
   },
   "Receiving Messages": {
     "I'd like to receive a physical Lifted card!  How do I do that?": "When you receive an email that someone wrote you a Lifted card, you'll have the option to choose whether you'd like to receive a physical card .  If you want to receive a physical card, make sure to select this option by the stated deadline in the email you receive!  You'll only need to do this once and all future cards you receive in that semester will be physical as well.",
@@ -77,18 +77,11 @@ function Accordion({ question, answer }: { question: string; answer: string }) {
 
 export default function FaqPage() {
   const { isWinter } = useGlobal();
-  const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
 
   return (
     <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor`}>
       <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="flex flex-col items-center mb-8">
-            <img
-            src={logoSrc}
-            width={250}
-            alt="Cornell Lifted Logo"
-            className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
-          />
+        <div className="flex flex-col items-center mb-4">
           <h2 className="text-cornell-red font-schoolbell text-4xl mb-2 font-bold text-center">Frequently Asked Questions</h2>
           <p className="text-lg text-center text-gray-700 mb-6">Find answers to common questions about Lifted</p>
         </div>

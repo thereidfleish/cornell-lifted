@@ -63,18 +63,11 @@ const semesters = [
 
 export default function PoppedPage() {
   const { isWinter } = useGlobal();
-  const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
 
   return (
     <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor`}>
       <div className="mx-auto px-4 py-10">
-        <div className="flex flex-col items-center mb-8 max-w-3xl mx-auto">
-            <img
-            src={logoSrc}
-            width={250}
-            alt="Cornell Lifted Logo"
-            className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
-          />
+        <div className="flex flex-col items-center mb-4 max-w-3xl mx-auto">
           <h2 className="text-cornell-red font-schoolbell text-4xl mb-2 font-bold text-center">Lifted Popped</h2>
           <p className="text-lg text-center text-gray-700 mb-6">Stats and fun facts from each semester's Lifted</p>
         </div>

@@ -11,6 +11,7 @@ function NavLinks({ user, className = "", onClick }: { user: User; className?: s
         <>
             <Link href="/faqs" className={navLinkClass} onClick={onClick}>FAQs</Link>
             <Link href="/popped" className={navLinkClass} onClick={onClick}>Popped</Link>
+            <Link href="/blog" className={navLinkClass} onClick={onClick}>Blog</Link>
             { user?.user?.is_admin && (
                 <Link href="/admin" className={navLinkClass} onClick={onClick}>Admin</Link>
             )}
@@ -57,7 +58,7 @@ export default function NavBar() {
         }
     };
 
-    const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
+    const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo_spring.png";
 
     return (
         <nav className="sticky top-0 z-50 bg-white shadow">

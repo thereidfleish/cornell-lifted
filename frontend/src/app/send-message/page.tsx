@@ -10,17 +10,17 @@ export default function SendMessagePage() {
 
     if (!config) {
         return (
-            <main className="flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] py-10">
                 <div className="flex flex-col items-center justify-center">
                     <Loading />
                 </div>
-            </main>
+            </div>
         );
     }
 
     if (config.form_message_group === "none") {
         return (
-            <main className="flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] py-10">
                 <div className="bg-white rounded-xl shadow-lg p-8 max-w-lg w-full text-center border border-gray-200">
                     <h2 className="text-2xl font-bold text-cornell-red mb-4">The message form isn't open right now</h2>
                     <p className="mb-6 text-gray-700">You can't send a Lifted message at this time. Please check back later!</p>
@@ -29,7 +29,7 @@ export default function SendMessagePage() {
                         <a href="/messages" className="bg-gray-100 text-cornell-blue rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-blue hover:text-white transition">View Your Sent Messages</a>
                     </div>
                 </div>
-            </main>
+            </div>
         );
     }
     return <SendMessageForm />;

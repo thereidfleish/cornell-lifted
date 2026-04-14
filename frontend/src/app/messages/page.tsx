@@ -61,7 +61,6 @@ export default function MessagesPage() {
             });
     }, [loading, user?.authenticated, requestedUserUuid]);
 
-    const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
     const greetingName = viewMode === "limited"
         ? previewUser?.given_name
         : user?.user?.given_name;
@@ -70,16 +69,10 @@ export default function MessagesPage() {
         : user?.user?.email;
 
     return (
-        <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor px-4`}>
+        <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor px-4 py-10`}>
             {/* Hero Section */}
-            <section className="relative pt-16 flex flex-col items-center">
+            <section className="relative flex flex-col items-center">
                 <div className="flex flex-col items-center">
-                    <img
-                        src={logoSrc}
-                        width={250}
-                        alt="Cornell Lifted Logo"
-                        className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
-                    />
                     <h2 className="text-cornell-red font-schoolbell text-4xl mb-2 font-bold text-center">Your Lifted Journey</h2>
                     <p className="text-lg text-center text-gray-700 mb-6">Explore the gratitude you've shared and received throughout your Cornell experience</p>
                 </div>
@@ -103,7 +96,7 @@ export default function MessagesPage() {
                     </div>
                 </section>
             ) : (
-                <section id="messages-dashboard" className="py-8">
+                <section id="messages-dashboard" className="py-4">
                     <div className="max-w-6xl mx-auto">
                         <div className="bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between mb-6 p-6 relative" style={{ overflow: 'visible' }}>
                             <StringLights />

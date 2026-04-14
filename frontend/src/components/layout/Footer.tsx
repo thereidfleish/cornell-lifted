@@ -22,6 +22,8 @@ export default function Footer() {
                             <li><Link href="/send-message" className={footerLinkClass}>Send a Message</Link></li>
                             <li><Link href="/messages" className={footerLinkClass}>View Messages</Link></li>
                             <li><Link href="/faqs" className={footerLinkClass}>FAQs</Link></li>
+                            <li><Link href="/popped" className={footerLinkClass}>Popped</Link></li>
+                            <li><Link href="/blog" className={footerLinkClass}>Blog</Link></li>
                         </ul>
                     </div>
                     <div>

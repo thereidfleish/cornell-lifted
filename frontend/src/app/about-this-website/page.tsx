@@ -11,8 +11,8 @@ export default function AboutThisWebsitePage() {
         <p className="mb-6">Lifted is a really special project to work on, and this web app is one small part of the entire Lifted experience.  We hope you've enjoyed!</p>
 
         <h5 className="text-lg font-semibold my-2">Web App Credits</h5>
-        <p className="mb-2">Special thanks to Cornell IT for working with us on implementing NetID authentication and LDAP querying!</p>
-        <p className="mb-2">Powered by Next.js, React, Flask, Supabase, Google Slides, Outlook, and a trusted mini Windows PC hosting the whole thing :)</p>
+        <p className="mb-2">Special thanks to Cornell IT for working with us on implementing NetID authentication and LDAP querying, and for advising on email sending options!</p>
+        <p className="mb-2">Powered by Next.js, React, Flask, Supabase, Google Slides, Postmark, and a trusted iMac hosting the whole thing :)</p>
         <p className="mb-2">To report any bugs or issues, please email <a href="mailto:lifted@cornell.edu">lifted@cornell.edu</a> or <a href="mailto:rf377@cornell.edu">rf377@cornell.edu</a>.</p>
         <p className="mb-6">~ RF '25, NS '25, VW '25</p>
 

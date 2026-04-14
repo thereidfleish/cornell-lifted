@@ -6,6 +6,16 @@ export interface ChangelogEntry {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    version: "4.6",
+    date: "4/13/26",
+    changes: [
+      "Changes for Spring 2026 Lifted, including magic link sign-in, bi-directional swapping, email analytics, and more!",
+      "Migrated email sending from Outlook to Postmark",
+      "Added Blog page",
+      "Miscellaneous content updates and improvements across the web app",
+    ],
+  },
+  {
     version: "4.5",
     date: "3/24/26",
     changes: [

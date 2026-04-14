@@ -128,280 +128,272 @@ export default function SendMessageForm({ editMode = false, cardData }: { editMo
     // Add loading state for form description
     const [loadingFormDescription, setLoadingFormDescription] = useState(false);
 
-    const logoSrc = isWinter ? "../images/logo_winter.png" : "../images/logo.png";
-
     return (
-        <main className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor pb-12`}>
-            {/* Hero Section */}
-            <section className="relative py-16 flex flex-col items-center">
-                <div className="flex flex-col items-center">
-                    <img
-                        src={logoSrc}
-                        width={250}
-                        alt="Cornell Lifted Logo"
-                        className="mx-auto mb-8 transition-transform duration-300 hover:scale-105"
-                    />
+        <div className={`${isWinter ? 'bg-[#e3eeff]' : 'bg-[#f4fbf3]'} font-tenor`}>
+            <div className="mx-auto px-4 py-10">
+                {/* Hero Section */}
+                <div className="flex flex-col items-center mb-4 max-w-3xl mx-auto">
                     <h2 className="text-cornell-red font-schoolbell text-4xl mb-2 font-bold text-center">Send a Lifted Message</h2>
                     <p className="text-lg text-center text-gray-700 mb-6">Share gratitude and appreciation with someone special</p>
                 </div>
-            </section>
-            
-            {/* Auth Section */}
-            {loading ? (
-                <section className="pb-12 pt-6">
-                    <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8 text-center">
-                        <Loading />
-                    </div>
-                </section>
-            ) : !user?.authenticated ? (
-                <>
-                    {/* Form Description Section - Show for logged out users */}
-                    <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8 relative mb-6" style={{ overflow: 'visible' }}>
-                        <SnowAccumulation />
-                        {/* Form Description from API */}
-                        {loadingFormDescription ? (
-                            <div className="mb-6 flex justify-center items-center">
-                                <Loading />
-                            </div>
-                        ) : formDescription && (
-                            <>
-                                <style>{`.prose a { text-decoration: underline; text-decoration-color: #b31b1b; }`}</style>
-                                <div className="mb-6 text-gray-700 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formDescription }} />
-                            </>
-                        )}
-                    </section>
+
+                {/* Auth Section */}
+                {loading ? (
                     <section className="pb-12 pt-6">
                         <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8 text-center">
-                            <div className="text-4xl mb-4">🔑</div>
-                            <h4 className="text-2xl font-bold text-cornell-blue mb-2">Sign In to Send Messages</h4>
-                            <p className="mb-4">Sign in with your Cornell NetID to send Lifted messages and spread gratitude across campus!</p>
-                            <a href="https://api.cornelllifted.com/login?next=/send-message" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block">Sign In with Cornell NetID</a>
+                            <Loading />
                         </div>
                     </section>
-                </>
-            ) : (
-            <>
-            {/* Main Content Section - Combined with Form Description */}
-            <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8 relative" style={{ overflow: 'visible' }}>
-                <SnowAccumulation />
-                {/* Form Description from API */}
-                {loadingFormDescription ? (
-                    <div className="mb-6 flex justify-center items-center">
-                        <Loading />
-                    </div>
-                ) : formDescription && (
+                ) : !user?.authenticated ? (
                     <>
-                        <style>{`.prose a { text-decoration: underline; text-decoration-color: #b31b1b; }`}</style>
-                        <div className="mb-6 text-gray-700 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formDescription }} />
-                    </>
-                )}
-                {/* User Banner */}
-                {user && (
-                    <div className="w-full bg-blue-100 text-cornell-blue rounded-lg p-2 mb-4 font-sm shadow-sm border border-blue-200">
-                        Hi, {user.user?.given_name}! You are signed in as {user.user?.email}
-                    </div>
-                )}
-                {/* Admin Override Button */}
-                {user?.user?.admin_write_perm && (
-                    <div className="mb-6">
-                        <button
-                            type="button"
-                            className={`bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition ${adminOverride ? 'bg-cornell-red' : ''}`}
-                            onClick={() => setAdminOverride(v => !v)}
-                        >
-                            {adminOverride ? 'Disable Admin Overrides' : 'Enable Admin Overrides'}
-                        </button>
-                        <p className="mt-2 text-sm text-gray-700">Click this to {adminOverride ? "return to normal mode" : "edit all fields.  Use this to input custom data, such as sending a Lifted message on someone's behalf."}</p>
-                    </div>
-                )}
-
-                {/* Dialogs for success/error */}
-                {dialog && dialog.type === "success" && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300">
-                        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center relative" style={{ overflow: 'visible' }}>
+                        {/* Form Description Section - Show for logged out users */}
+                        <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8 relative mb-6" style={{ overflow: 'visible' }}>
                             <SnowAccumulation />
-                            <h3 className="text-2xl font-bold text-cornell-blue mb-4">{editMode ? "Message Edited!" : "Message Sent!"}</h3>
-                            {editMode ? (
-                                <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog?.recipientEmail}</span> was edited successfully.</p>
-                            ) : (
+                            {/* Form Description from API */}
+                            {loadingFormDescription ? (
+                                <div className="mb-6 flex justify-center items-center">
+                                    <Loading />
+                                </div>
+                            ) : formDescription && (
                                 <>
-                                    <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog.recipientEmail}</span> was submitted successfully!  You can view it in your sent messages below.</p>
-                                    <p className="mb-2 text-gray-700">Your recipient was just notified that they've been Lifted, but they won't get to see your message until the last day of classes!</p>
-                                    <p className="mb-2 text-gray-700">To stay up-to-date with any last-minute reminders or changes, and to help Lift us, follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
+                                    <style>{`.prose a { text-decoration: underline; text-decoration-color: #b31b1b; }`}</style>
+                                    <div className="mb-6 text-gray-700 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formDescription }} />
                                 </>
                             )}
-                            <div className="mt-6 flex flex-col gap-3">
-                                {!editMode && (
-                                    <button
-                                        className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition"
-                                        onClick={() => window.location.reload()}
-                                    >
-                                        Send Another Message
-                                    </button>
-                                )}
-                                <a
-                                    href="/messages"
-                                    className="bg-gray-100 text-cornell-blue rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-blue hover:text-white transition text-center"
-                                >
-                                    View Your Sent Messages
-                                </a>
+                        </section>
+                        <section className="pb-12 pt-6">
+                            <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-8 text-center">
+                                <div className="text-4xl mb-4">🔑</div>
+                                <h4 className="text-2xl font-bold text-cornell-blue mb-2">Sign In to Send Messages</h4>
+                                <p className="mb-4">Sign in with your Cornell NetID to send Lifted messages and spread gratitude across campus!</p>
+                                <a href="https://api.cornelllifted.com/login?next=/send-message" className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block">Sign In with Cornell NetID</a>
                             </div>
-                        </div>
-                    </div>
-                )}
-                {dialog && dialog.type === "error" && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300">
-                        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center relative" style={{ overflow: 'visible' }}>
+                        </section>
+                    </>
+                ) : (
+                    <>
+                        {/* Main Content Section - Combined with Form Description */}
+                        <section className="max-w-5xl mx-auto bg-white rounded-xl shadow p-8 relative" style={{ overflow: 'visible' }}>
                             <SnowAccumulation />
-                            <h3 className="text-2xl font-bold text-red-700 mb-4">Error</h3>
-                            <p className="mb-2 text-gray-700">{dialog.message}</p>
-                            <div className="mt-6">
-                                <button
-                                    className="bg-cornell-red text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-blue transition"
-                                    onClick={() => setDialog(null)}
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                            {/* Form Description from API */}
+                            {loadingFormDescription ? (
+                                <div className="mb-6 flex justify-center items-center">
+                                    <Loading />
+                                </div>
+                            ) : formDescription && (
+                                <>
+                                    <style>{`.prose a { text-decoration: underline; text-decoration-color: #b31b1b; }`}</style>
+                                    <div className="mb-6 text-gray-700 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formDescription }} />
+                                </>
+                            )}
+                            {/* User Banner */}
+                            {user && (
+                                <div className="w-full bg-blue-100 text-cornell-blue rounded-lg p-2 mb-4 font-sm shadow-sm border border-blue-200">
+                                    Hi, {user.user?.given_name}! You are signed in as {user.user?.email}
+                                </div>
+                            )}
+                            {/* Admin Override Button */}
+                            {user?.user?.admin_write_perm && (
+                                <div className="mb-6">
+                                    <button
+                                        type="button"
+                                        className={`bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition ${adminOverride ? 'bg-cornell-red' : ''}`}
+                                        onClick={() => setAdminOverride(v => !v)}
+                                    >
+                                        {adminOverride ? 'Disable Admin Overrides' : 'Enable Admin Overrides'}
+                                    </button>
+                                    <p className="mt-2 text-sm text-gray-700">Click this to {adminOverride ? "return to normal mode" : "edit all fields.  Use this to input custom data, such as sending a Lifted message on someone's behalf."}</p>
+                                </div>
+                            )}
 
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                    {/* Admin Override Fields: Message Group Selector (only show if adminOverride is enabled) */}
-                    {adminOverride && (
-                        <div>
-                            <label className="block font-bold text-cornell-blue mb-1">Select Message Group</label>
-                            <MessageGroupSelector
-                                initialValue={adminMessageGroup}
-                                onChange={val => setAdminMessageGroup(val.key)}
-                                showNoneOption={false}
-                                className="mb-2"
-                            />
-                            <p className="text-sm text-gray-500">(Admin Only) Message group that the card should be placed in.</p>
-                        </div>
-                    )}
-                    {/* Sender Info */}
-                    <div>
-                        <label className="block font-bold text-cornell-blue mb-1">👤 {(adminOverride || (editMode && user?.user?.admin_write_perm)) ? "Sender's Name" : "Your Name"}</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-lg border border-gray-300 p-3 mb-2"
-                            placeholder="Your name (or 'Anonymous')"
-                            value={senderName}
-                            onChange={e => setSenderName(e.target.value)}
-                        />
-                        <p className="text-sm text-gray-500">This is your name that will appear on the card. If you want the letter to be anonymous, you can list your name as "Anonymous".</p>
-                    </div>
-                    {/* Recipient Info */}
-                    <div>
-                        <label className="block font-bold text-cornell-blue mb-1">📬 Recipient's Name</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-lg border border-gray-300 p-3 mb-2"
-                            placeholder="Recipient's name"
-                            value={recipientName}
-                            onChange={e => setRecipientName(e.target.value)}
-                        />
-                        <p className="text-sm text-gray-500">This is the recipient's name that will appear on the card.</p>
-                    </div>
+                            {/* Dialogs for success/error */}
+                            {dialog && dialog.type === "success" && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300">
+                                    <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center relative" style={{ overflow: 'visible' }}>
+                                        <SnowAccumulation />
+                                        <h3 className="text-2xl font-bold text-cornell-blue mb-4">{editMode ? "Message Edited!" : "Message Sent!"}</h3>
+                                        {editMode ? (
+                                            <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog?.recipientEmail}</span> was edited successfully.</p>
+                                        ) : (
+                                            <>
+                                                <p className="mb-2 text-gray-700">Your Lifted message to <span className="font-semibold text-cornell-red">{dialog.recipientEmail}</span> was submitted successfully!  You can view it in your sent messages below.</p>
+                                                <p className="mb-2 text-gray-700">Your recipient was just notified that they've been Lifted, but they won't get to see your message until the last day of classes!</p>
+                                                <p className="mb-2 text-gray-700">To stay up-to-date with any last-minute reminders or changes, and to help Lift us, follow <a href="https://www.instagram.com/cornelllifted">@cornelllifted</a> on Instagram.</p>
+                                            </>
+                                        )}
+                                        <div className="mt-6 flex flex-col gap-3">
+                                            {!editMode && (
+                                                <button
+                                                    className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition"
+                                                    onClick={() => window.location.reload()}
+                                                >
+                                                    Send Another Message
+                                                </button>
+                                            )}
+                                            <a
+                                                href="/messages"
+                                                className="bg-gray-100 text-cornell-blue rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-blue hover:text-white transition text-center"
+                                            >
+                                                View Your Sent Messages
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            {dialog && dialog.type === "error" && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm transition-opacity duration-300">
+                                    <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center relative" style={{ overflow: 'visible' }}>
+                                        <SnowAccumulation />
+                                        <h3 className="text-2xl font-bold text-red-700 mb-4">Error</h3>
+                                        <p className="mb-2 text-gray-700">{dialog.message}</p>
+                                        <div className="mt-6">
+                                            <button
+                                                className="bg-cornell-red text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-blue transition"
+                                                onClick={() => setDialog(null)}
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
-                    {/* Admin Override Fields (only show if adminOverride is enabled) */}
-                    {adminOverride && (
-                        <>
-                            <div>
-                                <label className="block font-bold text-cornell-blue mb-1">Sender's Email</label>
-                                <input
-                                    type="text"
-                                    className="w-full rounded-lg border border-gray-300 p-3 mb-2"
-                                    placeholder="Sender's full email (e.g. rf377@cornell.edu)"
-                                    value={adminSenderEmail}
-                                    onChange={e => setAdminSenderEmail(e.target.value)}
-                                />
-                                <p className="text-sm text-gray-500">(Admin Only) Enter the sender's FULL email (preferably Cornell so they can log in), such as rf377@cornell.edu. DO NOT enter a NetID!</p>
-                            </div>
-                            <div>
-                                <label className="block font-bold text-cornell-blue mb-1">Recipient's Email</label>
-                                <input
-                                    type="text"
-                                    className="w-full rounded-lg border border-gray-300 p-3 mb-2"
-                                    placeholder="Recipient's full email (e.g. rf377@cornell.edu)"
-                                    value={adminRecipientEmail}
-                                    onChange={e => setAdminRecipientEmail(e.target.value)}
-                                />
-                                <p className="text-sm text-gray-500">(Admin Only) Enter the recipient's FULL email (preferably Cornell so they can log in), such as rf377@cornell.edu. DO NOT enter a NetID!</p>
-                            </div>
-                            {editMode && (
-                                <div className="flex items-center mt-4 mb-1">
+                            <form className="space-y-6" onSubmit={handleSubmit}>
+                                {/* Admin Override Fields: Message Group Selector (only show if adminOverride is enabled) */}
+                                {adminOverride && (
+                                    <div>
+                                        <label className="block font-bold text-cornell-blue mb-1">Select Message Group</label>
+                                        <MessageGroupSelector
+                                            initialValue={adminMessageGroup}
+                                            onChange={val => setAdminMessageGroup(val.key)}
+                                            showNoneOption={false}
+                                            className="mb-2"
+                                        />
+                                        <p className="text-sm text-gray-500">(Admin Only) Message group that the card should be placed in.</p>
+                                    </div>
+                                )}
+                                {/* Sender Info */}
+                                <div>
+                                    <label className="block font-bold text-cornell-blue mb-1">👤 {(adminOverride || (editMode && user?.user?.admin_write_perm)) ? "Sender's Name" : "Your Name"}</label>
                                     <input
-                                        type="checkbox"
-                                        id="sendYblEmail"
-                                        checked={sendYblEmail}
-                                        onChange={e => setSendYblEmail(e.target.checked)}
-                                        className="mr-2"
+                                        type="text"
+                                        className="w-full rounded-lg border border-gray-300 p-3 mb-2"
+                                        placeholder="Your name (or 'Anonymous')"
+                                        value={senderName}
+                                        onChange={e => setSenderName(e.target.value)}
                                     />
-                                    <label htmlFor="sendYblEmail" className="font-bold text-cornell-blue">Send You've Been Lifted Email?</label>
+                                    <p className="text-sm text-gray-500">This is your name that will appear on the card. If you want the letter to be anonymous, you can list your name as "Anonymous".</p>
                                 </div>
-                            )}
-                            {editMode && (
-                                <p className="text-sm text-gray-500">(Admin Only) Send "You've been Lifted!" email (only check this if you edited the recipient email on an existing message)</p>
-                            )}
-                        </>
-                    )}
-                    {/* In edit mode, do not show PeopleSearch at all, regardless of admin status */}
-                    {editMode ? (
-                        !adminOverride && (
-                            <div>
-                                <label className="block font-bold text-cornell-blue mb-1">Recipient's Email</label>
-                                <div className="w-full rounded-lg border border-gray-300 p-3 mb-2 bg-gray-100 text-gray-700">
-                                    {cardData?.recipient_email}
+                                {/* Recipient Info */}
+                                <div>
+                                    <label className="block font-bold text-cornell-blue mb-1">📬 Recipient's Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full rounded-lg border border-gray-300 p-3 mb-2"
+                                        placeholder="Recipient's name"
+                                        value={recipientName}
+                                        onChange={e => setRecipientName(e.target.value)}
+                                    />
+                                    <p className="text-sm text-gray-500">This is the recipient's name that will appear on the card.</p>
                                 </div>
-                                <p className="text-sm text-gray-500">To change the recipient email, please email <a href="mailto:lifted@cornell.edu" className="underline text-cornell-blue">lifted@cornell.edu</a>.</p>
-                            </div>
-                        )
-                    ) : (
-                        !adminOverride && <PeopleSearch onSelect={handleSelectPerson} selectedPerson={selectedPerson} />
-                    )}
-                    {/* Message Content */}
-                    <div>
-                        <label className="block font-bold text-cornell-blue mb-1">💌 Your Message</label>
-                        <textarea
-                            className="w-full rounded-lg border border-gray-300 p-3 mb-2"
-                            placeholder="Thanks for being an inspiration to all the dining hall cashiers out there, including me! Your food at Okenshields is mid but your music is fire; you gotta teach me how to DJ one day!"
-                            value={messageContent}
-                            onChange={e => setMessageContent(e.target.value)}
-                            rows={5}
-                        />
-                        <p className="text-sm text-gray-500">Please limit your note to no more than 150 words to ensure it fits on the card.</p>
-                    </div>
-                    {/* Error messages */}
-                    {formErrors.length > 0 && (
-                        <div className="mt-3 bg-red-100 border border-red-300 rounded-lg p-4 text-red-700 mb-4 text-left">
-                            <h5 className="font-bold mb-2">Please fix the following errors:</h5>
-                            <ul className="list-disc ml-6">
-                                {formErrors.map((err, i) => <li key={i}>{err}</li>)}
-                            </ul>
-                        </div>
-                    )}
-                    {/* Submit Button */}
-                    <div className="text-center mt-6">
-                        {submitting ? (
-                            <Loading />
-                        ) : (
-                            <button
-                                className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow transition-transform duration-200 hover:scale-103 disabled:opacity-50 cursor-pointer"
-                                type="submit"
-                                disabled={submitting}
-                            >
-                                {editMode ? "Edit Message" : "Submit Message"}
-                            </button>
-                        )}
-                        <p className="mt-3 text-gray-500">Your message will be delivered on the last day of classes.</p>
-                    </div>
-                </form>
-            </section>
-            </>
-            )}
-        </main>
+
+                                {/* Admin Override Fields (only show if adminOverride is enabled) */}
+                                {adminOverride && (
+                                    <>
+                                        <div>
+                                            <label className="block font-bold text-cornell-blue mb-1">Sender's Email</label>
+                                            <input
+                                                type="text"
+                                                className="w-full rounded-lg border border-gray-300 p-3 mb-2"
+                                                placeholder="Sender's full email (e.g. rf377@cornell.edu)"
+                                                value={adminSenderEmail}
+                                                onChange={e => setAdminSenderEmail(e.target.value)}
+                                            />
+                                            <p className="text-sm text-gray-500">(Admin Only) Enter the sender's FULL email (preferably Cornell so they can log in), such as rf377@cornell.edu. DO NOT enter a NetID!</p>
+                                        </div>
+                                        <div>
+                                            <label className="block font-bold text-cornell-blue mb-1">Recipient's Email</label>
+                                            <input
+                                                type="text"
+                                                className="w-full rounded-lg border border-gray-300 p-3 mb-2"
+                                                placeholder="Recipient's full email (e.g. rf377@cornell.edu)"
+                                                value={adminRecipientEmail}
+                                                onChange={e => setAdminRecipientEmail(e.target.value)}
+                                            />
+                                            <p className="text-sm text-gray-500">(Admin Only) Enter the recipient's FULL email (preferably Cornell so they can log in), such as rf377@cornell.edu. DO NOT enter a NetID!</p>
+                                        </div>
+                                        {editMode && (
+                                            <div className="flex items-center mt-4 mb-1">
+                                                <input
+                                                    type="checkbox"
+                                                    id="sendYblEmail"
+                                                    checked={sendYblEmail}
+                                                    onChange={e => setSendYblEmail(e.target.checked)}
+                                                    className="mr-2"
+                                                />
+                                                <label htmlFor="sendYblEmail" className="font-bold text-cornell-blue">Send You've Been Lifted Email?</label>
+                                            </div>
+                                        )}
+                                        {editMode && (
+                                            <p className="text-sm text-gray-500">(Admin Only) Send "You've been Lifted!" email (only check this if you edited the recipient email on an existing message)</p>
+                                        )}
+                                    </>
+                                )}
+                                {/* In edit mode, do not show PeopleSearch at all, regardless of admin status */}
+                                {editMode ? (
+                                    !adminOverride && (
+                                        <div>
+                                            <label className="block font-bold text-cornell-blue mb-1">Recipient's Email</label>
+                                            <div className="w-full rounded-lg border border-gray-300 p-3 mb-2 bg-gray-100 text-gray-700">
+                                                {cardData?.recipient_email}
+                                            </div>
+                                            <p className="text-sm text-gray-500">To change the recipient email, please email <a href="mailto:lifted@cornell.edu" className="underline text-cornell-blue">lifted@cornell.edu</a>.</p>
+                                        </div>
+                                    )
+                                ) : (
+                                    !adminOverride && <PeopleSearch onSelect={handleSelectPerson} selectedPerson={selectedPerson} />
+                                )}
+                                {/* Message Content */}
+                                <div>
+                                    <label className="block font-bold text-cornell-blue mb-1">💌 Your Message</label>
+                                    <textarea
+                                        className="w-full rounded-lg border border-gray-300 p-3 mb-2"
+                                        placeholder="Thanks for being an inspiration to all the dining hall cashiers out there, including me! Your food at Okenshields is mid but your music is fire; you gotta teach me how to DJ one day!"
+                                        value={messageContent}
+                                        onChange={e => setMessageContent(e.target.value)}
+                                        rows={5}
+                                    />
+                                    <p className="text-sm text-gray-500">Please limit your note to no more than 150 words to ensure it fits on the card.</p>
+                                </div>
+                                {/* Error messages */}
+                                {formErrors.length > 0 && (
+                                    <div className="mt-3 bg-red-100 border border-red-300 rounded-lg p-4 text-red-700 mb-4 text-left">
+                                        <h5 className="font-bold mb-2">Please fix the following errors:</h5>
+                                        <ul className="list-disc ml-6">
+                                            {formErrors.map((err, i) => <li key={i}>{err}</li>)}
+                                        </ul>
+                                    </div>
+                                )}
+                                {/* Submit Button */}
+                                <div className="text-center mt-6">
+                                    {submitting ? (
+                                        <Loading />
+                                    ) : (
+                                        <button
+                                            className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow transition-transform duration-200 hover:scale-103 disabled:opacity-50 cursor-pointer"
+                                            type="submit"
+                                            disabled={submitting}
+                                        >
+                                            {editMode ? "Edit Message" : "Submit Message"}
+                                        </button>
+                                    )}
+                                    <p className="mt-3 text-gray-500">Your message will be delivered on the last day of classes.</p>
+                                </div>
+                            </form>
+                        </section>
+                    </>
+                )}
+            </div>
+        </div>
     );
 }
