@@ -7,9 +7,9 @@ const TiptapEditor = dynamic(async () => (await import("./TiptapEditor")).defaul
   loading: () => <div>Loading editor…</div>,
 });
 
-type Props = { messageGroup: string; type: string };
+type Props = { messageGroup: string; type: string; disableSaveButtons?: boolean };
 
-export default function RichTextEditor({ messageGroup, type }: Props) {
+export default function RichTextEditor({ messageGroup, type, disableSaveButtons = false }: Props) {
   const [html, setHtml] = useState("");
   const [jsonContent, setJsonContent] = useState<any>("");
   const [subject, setSubject] = useState("");
@@ -135,6 +135,7 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
               type="button"
               onClick={() => handleSave(false)}
               className="px-4 py-2 rounded bg-cornell-red text-white font-semibold shadow hover:bg-red-700 border border-cornell-red transition-colors duration-150"
+              disabled={disableSaveButtons}
             >
               Save
             </button>
@@ -143,6 +144,7 @@ export default function RichTextEditor({ messageGroup, type }: Props) {
                 type="button"
                 onClick={() => handleSave(true)}
                 className="px-4 py-2 rounded bg-white text-cornell-red font-semibold shadow border border-cornell-red hover:bg-gray-100 transition-colors duration-150"
+                disabled={disableSaveButtons}
               >
                 Save and Send Test Email to Yourself
               </button>

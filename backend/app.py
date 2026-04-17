@@ -12,7 +12,7 @@ import json
 import sqlite3
 import os
 import helpers
-from db.repositories import get_admin_by_netid, upsert_user_from_oidc
+from db.repositories import get_admin_by_email, upsert_user_from_oidc
 
 load_dotenv()
 
@@ -120,12 +120,19 @@ def admin_required(write_required):
     return decorator
 
 def get_admin_permissions_for_netid(netid):
+    email = f"{netid}@cornell.edu"
     with SessionLocal() as db_session:
-        admin = get_admin_by_netid(db_session, netid)
+        permissions = get_admin_by_email(db_session, email)
 
+    if permissions is None:
+        return {
+            "is_admin": False,
+            "admin_write_perm": False
+        }
+    
     return {
-        "is_admin": admin is not None,
-        "admin_write_perm": (admin.write is True) if admin is not None else False
+        "is_admin": permissions["is_admin"],
+        "admin_write_perm": permissions["admin_write_perm"]
     }
 
 def sync_admin_permissions_for_session(netid):

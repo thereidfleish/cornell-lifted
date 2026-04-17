@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import MessageGroupSelector from "@/components/MessageGroupSelector";
 import Table from "@/components/Table";
 import { useGlobal } from "@/utils/GlobalContext";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 export default function AttachmentOptions() {
     const { config, refreshConfig } = useGlobal() as any;
+    const isReadOnlyAdmin = useAdminReadOnly();
     // Current Message Group (updates config)
     const [selectedGroup, setSelectedGroup] = useState<string>(config?.attachment_message_group || "none");
     const [attachmentText, setAttachmentText] = useState<string>(config?.attachment_text || "");
@@ -136,6 +138,7 @@ export default function AttachmentOptions() {
                         showNoneOption={true}
                         onChange={(option) => setSelectedGroup(option.key)}
                         className="max-w-md mt-2"
+                        disabled={isReadOnlyAdmin}
                     />
                 </div>
                 <div>
@@ -161,6 +164,7 @@ export default function AttachmentOptions() {
                 <button
                     type="submit"
                     className="bg-cornell-blue text-white rounded px-4 py-2 font-semibold shadow hover:bg-cornell-red transition"
+                    disabled={isReadOnlyAdmin}
                 >
                     Save Attachment Config
                 </button>
@@ -208,7 +212,7 @@ export default function AttachmentOptions() {
                     <button
                         type="submit"
                         className="bg-cornell-blue text-white rounded px-4 py-2 font-semibold shadow hover:bg-cornell-red transition w-64 mt-2"
-                        disabled={attachmentsFilterGroup === "none" || !attachmentName || !attachmentCount}
+                        disabled={isReadOnlyAdmin || attachmentsFilterGroup === "none" || !attachmentName || !attachmentCount}
                     >
                         {loading ? "Adding..." : "Add Attachment"}
                     </button>
@@ -226,6 +230,7 @@ export default function AttachmentOptions() {
                             <button
                                 className="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold border border-red-300 hover:bg-red-200"
                                 onClick={() => handleDeleteAttachment(a.id)}
+                                disabled={isReadOnlyAdmin}
                             >
                                 Delete
                             </button>
@@ -271,6 +276,7 @@ export default function AttachmentOptions() {
                                     title="Delete attachment pref"
                                     className="text-red-600 hover:text-red-800 text-lg px-2"
                                     onClick={() => handleDeleteAttachmentPref(pref.id)}
+                                    disabled={isReadOnlyAdmin}
                                 >
                                     🗑️
                                 </button>

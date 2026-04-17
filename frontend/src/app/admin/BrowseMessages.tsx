@@ -6,6 +6,7 @@ import Loading from "@/components/Loading";
 import MessageModal from "@/components/messages/MessageModal";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
 import FormattedTimestamp from "@/components/FormattedTimestamp";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 
@@ -25,6 +26,7 @@ export interface Message {
 }
 
 export default function BrowseMessagesSection() {
+  const isReadOnlyAdmin = useAdminReadOnly();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -79,8 +81,12 @@ export default function BrowseMessagesSection() {
       <div className="flex gap-2">
         <button title="View message" className="p-0 bg-none border-none text-xl cursor-pointer" onClick={() => { setModalCardId(msg.id); setModalOpen(true); }}>💌</button>
         <a href={`/api/get-card-pdf/${msg.id}`} title="Download PDF" className="px-1 text-xl" target="_blank" rel="noopener noreferrer">⬇️</a>
-        <a href={`/edit-message/${msg.id}`} title="Edit message" target="_blank" className="px-1 text-xl">✍️</a>
-        <button title="Delete message" className="p-0 bg-none border-none text-xl cursor-pointer" onClick={() => { setDeleteId(msg.id); setConfirmOpen(true); }}>🗑️</button>
+        {isReadOnlyAdmin ? (
+          <span title="Edit disabled for read-only admins" className="px-1 text-xl opacity-40 cursor-not-allowed">✍️</span>
+        ) : (
+          <a href={`/edit-message/${msg.id}`} title="Edit message" target="_blank" className="px-1 text-xl">✍️</a>
+        )}
+        <button title="Delete message" className="p-0 bg-none border-none text-xl cursor-pointer" onClick={() => { setDeleteId(msg.id); setConfirmOpen(true); }} disabled={isReadOnlyAdmin}>🗑️</button>
       </div>
     ),
     created_timestamp: msg.created_timestamp,

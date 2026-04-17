@@ -105,3 +105,20 @@ h3, h4, h5, p, .btn {
     color: #2563eb !important;
     text-decoration: underline !important;
 }
+
+/* Shared disabled styling for read-only admin dashboard controls */
+.admin-dashboard.admin-readonly :is(button, input, textarea, select):disabled {
+    cursor: not-allowed;
+}
+
+.admin-dashboard.admin-readonly :is(input, textarea, select):disabled {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    color: #6b7280;
+    opacity: 1;
+}
+
+.admin-dashboard.admin-readonly button:disabled {
+    box-shadow: none;
+    opacity: 0.5;
+}

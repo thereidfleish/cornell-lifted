@@ -46,6 +46,7 @@ function AdminDashboardContent() {
 
   // Check admin status (user?.user?.is_admin is typical)
   const isAdmin = user?.user?.is_admin;
+  const hasWritePerm = user?.user?.admin_write_perm;
 
   // Update URL when tab changes
   const handleTabChange = (tab: string) => {
@@ -107,7 +108,7 @@ function AdminDashboardContent() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className={`admin-dashboard flex min-h-screen ${hasWritePerm ? "" : "admin-readonly"}`}>
       <aside className="w-64 bg-gray-100 border-r border-gray-200 p-6 flex flex-col gap-8">
         {sidebarSections.map((section) => (
           <div key={section.title}>

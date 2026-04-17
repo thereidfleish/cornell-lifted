@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
 import Table, { TableHeader } from "@/components/Table";
 import MessageGroupSelector from "@/components/MessageGroupSelector";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 interface HiddenCardOverride {
   id: number;
@@ -17,6 +18,7 @@ const headers: TableHeader[] = [
 ];
 
 export default function HiddenCardOverridesSection() {
+  const isReadOnlyAdmin = useAdminReadOnly();
   const [overrides, setOverrides] = useState<HiddenCardOverride[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +115,7 @@ export default function HiddenCardOverridesSection() {
         title="Remove override"
         className="text-red-600 hover:text-red-800 text-lg px-2"
         onClick={() => openDeleteDialog(override.id)}
+        disabled={isReadOnlyAdmin}
       >
         🗑️
       </button>
@@ -144,7 +147,7 @@ export default function HiddenCardOverridesSection() {
         <button
           type="submit"
           className="bg-cornell-blue text-white rounded px-4 py-2 font-semibold shadow hover:bg-cornell-red transition"
-          disabled={submitting}
+          disabled={submitting || isReadOnlyAdmin}
         >
           {submitting ? "Adding..." : "Add Override"}
         </button>

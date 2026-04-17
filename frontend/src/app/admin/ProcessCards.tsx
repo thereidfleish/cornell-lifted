@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 
 import Table, { TableHeader } from "@/components/Table";
 import MessageGroupSelector from "@/components/MessageGroupSelector";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 const tableHeaders: TableHeader[] = [
     { key: "message_group", label: "Message Group" },
@@ -12,6 +13,7 @@ const tableHeaders: TableHeader[] = [
 ];
 
 export default function ProcessCards() {
+    const isReadOnlyAdmin = useAdminReadOnly();
     const [messageGroup, setMessageGroup] = useState<string>("");
     const [processPptxPdf, setProcessPptxPdf] = useState<boolean>(false);
     const [processAlphabetical, setProcessAlphabetical] = useState<boolean>(false);
@@ -139,12 +141,14 @@ export default function ProcessCards() {
                     initialValue={messageGroup}
                     onChange={handleMessageGroupChange}
                     className="min-w-[200px]"
+                    disabled={isReadOnlyAdmin}
                 />
                 <label className="flex items-center gap-2">
                     <input
                         type="checkbox"
                         checked={processPptxPdf}
                         onChange={e => setProcessPptxPdf(e.target.checked)}
+                        disabled={isReadOnlyAdmin}
                     />
                     Process PPTX/PDF
                 </label>
@@ -153,12 +157,13 @@ export default function ProcessCards() {
                         type="checkbox"
                         checked={processAlphabetical}
                         onChange={e => setProcessAlphabetical(e.target.checked)}
+                        disabled={isReadOnlyAdmin}
                     />
                     Sort Alphabetically
                 </label>
                 <button
                     className="bg-cornell-blue text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-cornell-red transition"
-                    disabled={processing}
+                    disabled={processing || isReadOnlyAdmin}
                     onClick={handleProcessCards}
                 >
                     {processing ? "Processing..." : `Process ${messageGroup ? messageGroup : "Cards"}`}

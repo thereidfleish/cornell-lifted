@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGlobal } from "@/utils/GlobalContext";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 export default function Impersonate() {
+	const isReadOnlyAdmin = useAdminReadOnly();
 	const [netid, setNetid] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [statusMsg, setStatusMsg] = useState("");
@@ -47,11 +49,12 @@ export default function Impersonate() {
 					value={netid}
 					onChange={e => setNetid(e.target.value)}
 					required
+					disabled={isReadOnlyAdmin}
 				/>
 				<button
 					type="submit"
 					className="bg-cornell-blue text-white font-semibold py-2 px-6 rounded-lg shadow hover:bg-cornell-red transition"
-					disabled={loading || !netid}
+					disabled={loading || !netid || isReadOnlyAdmin}
 				>
 					{loading ? "Impersonating..." : "Impersonate"}
 				</button>

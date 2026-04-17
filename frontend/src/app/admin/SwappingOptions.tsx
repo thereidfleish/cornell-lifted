@@ -4,6 +4,7 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 // Removed react-icons import, using emoji instead
 import { useGlobal } from "@/utils/GlobalContext";
 import MessageGroupSelector from "@/components/MessageGroupSelector";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -29,6 +30,7 @@ type SwapEntry = {
 
 export default function SwappingOptions() {
 	const { config } = useGlobal() as any;
+	const isReadOnlyAdmin = useAdminReadOnly();
 	const [swapPrefs, setSwapPrefs] = useState<SwapPref[]>([]);
 	const [swapping, setSwapping] = useState<SwapEntry[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -137,6 +139,7 @@ export default function SwappingOptions() {
 										type="checkbox"
 										checked={entry.enabled !== false}
 										onChange={(e) => handleSwapEntryChange(index, { enabled: e.target.checked })}
+										disabled={isReadOnlyAdmin}
 									/>
 									<span className="font-semibold">Enabled</span>
 								</label>
@@ -165,6 +168,7 @@ export default function SwappingOptions() {
 									className="px-3 py-2 rounded bg-red-100 text-red-700 hover:bg-red-200"
 									onClick={() => handleRemoveSwapGroup(index)}
 									title="Remove this swapping group"
+									disabled={isReadOnlyAdmin}
 								>
 									🗑️
 								</button>
@@ -224,6 +228,7 @@ export default function SwappingOptions() {
 					type="button"
 					className="bg-gray-200 text-cornell-blue font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition"
 					onClick={handleAddSwapGroup}
+					disabled={isReadOnlyAdmin}
 				>
 					Add Swapping Group
 				</button>
@@ -232,7 +237,7 @@ export default function SwappingOptions() {
 				type="button"
 				className="bg-cornell-blue text-white font-semibold py-2 px-6 rounded-lg shadow hover:bg-cornell-red transition mb-4"
 				onClick={handleUpdateConfig}
-				disabled={loading}
+				disabled={loading || isReadOnlyAdmin}
 			>
 				{loading ? "Saving..." : "Save"}
 			</button>
@@ -283,6 +288,7 @@ export default function SwappingOptions() {
 									title="Delete"
 									onClick={() => handleDeleteSwapPref(pref.id)}
 									style={{ lineHeight: 1 }}
+									disabled={isReadOnlyAdmin}
 								>
 									<span style={{ fontSize: "1rem" }}>🗑️</span>
 								</button>

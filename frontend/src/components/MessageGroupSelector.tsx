@@ -8,9 +8,10 @@ type MessageGroupSelectorProps = {
     onChange?: (selected: { key: string; label: string }) => void;
     className?: string;
     dropdown?: boolean;
+    disabled?: boolean;
 };
 
-export default function MessageGroupSelector({ initialValue = "", showNoneOption = false, showAllTimeOption = false, onChange, className = "", dropdown = false }: MessageGroupSelectorProps) {
+export default function MessageGroupSelector({ initialValue = "", showNoneOption = false, showAllTimeOption = false, onChange, className = "", dropdown = false, disabled = false }: MessageGroupSelectorProps) {
     const { config } = useGlobal();
     const [selected, setSelected] = useState<string>(initialValue);
 
@@ -61,6 +62,7 @@ export default function MessageGroupSelector({ initialValue = "", showNoneOption
                     className="border border-cornell-blue rounded-lg p-3 bg-white text-gray-800"
                     value={selected}
                     onChange={handleChange}
+                    disabled={disabled}
                     style={{ maxHeight: 200, width: 'fit-content' }}
                 >
                     {options.map(opt => (
@@ -70,6 +72,7 @@ export default function MessageGroupSelector({ initialValue = "", showNoneOption
             ) : (
                 <fieldset
                     className="space-y-2 border border-cornell-blue rounded-lg p-3"
+                    disabled={disabled}
                     style={{ maxHeight: 200, overflowY: 'auto', width: 'fit-content' }}
                 >
                     {options.map(opt => (
@@ -80,6 +83,7 @@ export default function MessageGroupSelector({ initialValue = "", showNoneOption
                                 value={opt.key}
                                 checked={selected === opt.key}
                                 onChange={handleChange}
+                                disabled={disabled}
                                 className="accent-cornell-red"
                             />
                             <span className="text-gray-800">{opt.label}</span>

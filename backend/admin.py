@@ -476,15 +476,11 @@ def end_impersonate():
 
 ### Admins
 
-def fetch_admins_from_db():
-    admins = list(reversed(db_call(list_admins)))
-    return admins
-
 @admin.route("/api/admin/get-admins")
 @login_required
 @admin_required(write_required=False)
 def get_admins():
-    admins = fetch_admins_from_db()
+    admins = list(reversed(db_call(list_admins)))
     return jsonify({"admins": admins})
 
 @admin.post("/api/admin/add-admin")
@@ -492,17 +488,28 @@ def get_admins():
 @admin_required(write_required=True)
 def add_admin():
     netID = request.form["admin_netid"]
+    email = f"{netID}@cornell.edu"
     write_perm = True if request.form.get("admin_write_perm") else False
-    db_call(add_admin_repo, netID, write_perm)
-    admins = fetch_admins_from_db()
+    db_call(add_admin_repo, email, write_perm)
+    admins = list(reversed(db_call(list_admins)))
     return jsonify({"admins": admins})
 
-@admin.post("/api/admin/remove-admin/<id>")
+@admin.post("/api/admin/remove-admin/<email>")
 @login_required
 @admin_required(write_required=True)
-def remove_admin(id):
-    db_call(delete_admin, id)
-    admins = fetch_admins_from_db()
+def remove_admin(email):
+    db_call(delete_admin, email)
+    admins = list(reversed(db_call(list_admins)))
+    return jsonify({"admins": admins})
+
+@admin.post("/api/admin/update-admin-write-access")
+@login_required
+@admin_required(write_required=True)
+def update_admin_write_access():
+    email = request.form["email"]
+    write_perm = request.form.get("admin_write_perm") == "true"
+    db_call(add_admin_repo, email, write_perm)
+    admins = list(reversed(db_call(list_admins)))
     return jsonify({"admins": admins})
 
 ### Hidden Card Overrides

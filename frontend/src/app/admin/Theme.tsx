@@ -1,9 +1,11 @@
 "use client"
 import React, { useState } from "react";
 import { useGlobal } from "@/utils/GlobalContext";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 export default function ThemeSection() {
   const { config, refreshConfig } = useGlobal();
+  const isReadOnlyAdmin = useAdminReadOnly();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -49,7 +51,7 @@ export default function ThemeSection() {
         <div className="flex gap-4">
           <button
             onClick={() => handleThemeChange("fall")}
-            disabled={saving || currentTheme === "fall"}
+            disabled={saving || currentTheme === "fall" || isReadOnlyAdmin}
             className={`flex-1 py-4 px-6 rounded-lg border-2 transition-all ${
               currentTheme === "fall"
                 ? "border-cornell-blue bg-blue-50 text-cornell-blue font-semibold"
@@ -62,7 +64,7 @@ export default function ThemeSection() {
 
           <button
             onClick={() => handleThemeChange("spring")}
-            disabled={saving || currentTheme === "spring"}
+            disabled={saving || currentTheme === "spring" || isReadOnlyAdmin}
             className={`flex-1 py-4 px-6 rounded-lg border-2 transition-all ${
               currentTheme === "spring"
                 ? "border-cornell-blue bg-blue-50 text-cornell-blue font-semibold"

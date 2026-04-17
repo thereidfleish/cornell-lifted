@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Table, { TableHeader } from "@/components/Table";
 import { useGlobal } from "@/utils/GlobalContext";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 const tableHeaders: TableHeader[] = [
     { key: "name", label: "Message Group Name" },
@@ -12,6 +13,7 @@ const tableHeaders: TableHeader[] = [
 
 export default function Essentials() {
     const { config, refreshConfig } = useGlobal() as any;
+    const isReadOnlyAdmin = useAdminReadOnly();
     const [googleSlidesIds, setGoogleSlidesIds] = useState<Record<string, string>>({});
     const [showModal, setShowModal] = useState<string | null>(null);
     const [slidesUrl, setSlidesUrl] = useState("");
@@ -152,6 +154,7 @@ export default function Essentials() {
                     type="checkbox"
                     checked={config?.hidden_cards?.includes(key) || false}
                     onChange={e => handleHideChange(key, e.target.checked)}
+                    disabled={isReadOnlyAdmin}
                 />
             ),
             actions: (
@@ -175,6 +178,7 @@ export default function Essentials() {
                     <button
                         onClick={() => openSlidesModal(key)}
                         className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded shadow border border-gray-300"
+                        disabled={isReadOnlyAdmin}
                     >
                         {hasSlides ? "Update" : "Set"} Google Slides
                     </button>
@@ -186,6 +190,7 @@ export default function Essentials() {
                     className="text-red-600 text-xl"
                     title="Delete message group"
                     onClick={() => handleDelete(key)}
+                    disabled={isReadOnlyAdmin}
                 >
                     🗑️
                 </button>
@@ -246,7 +251,7 @@ export default function Essentials() {
                 <button
                     type="submit"
                     className="bg-cornell-blue text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-cornell-red transition"
-                    disabled={adding}
+                    disabled={adding || isReadOnlyAdmin}
                 >
                     {adding ? "Adding..." : "Add Message Group"}
                 </button>
@@ -288,6 +293,7 @@ export default function Essentials() {
                     <button
                         type="submit"
                         className="bg-cornell-blue text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-cornell-red transition w-fit"
+                        disabled={isReadOnlyAdmin}
                     >
                         Save Coming Soon Text
                     </button>
@@ -331,7 +337,7 @@ export default function Essentials() {
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={saving}
+                                    disabled={saving || isReadOnlyAdmin}
                                     className="px-4 py-2 rounded bg-cornell-blue text-white hover:bg-cornell-red disabled:opacity-50"
                                 >
                                     {saving ? "Saving..." : "Save"}

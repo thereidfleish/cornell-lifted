@@ -6,14 +6,6 @@ class Base(DeclarativeBase):
     pass
 
 
-class Admin(Base):
-    __tablename__ = "admins"
-    __table_args__ = {"schema": "lifted"}
-
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    write: Mapped[bool] = mapped_column(Boolean, nullable=False)
-
-
 class Message(Base):
     __tablename__ = "messages"
     __table_args__ = {"schema": "lifted"}
@@ -50,6 +42,8 @@ class LiftedUser(Base):
     affiliation: Mapped[str | None] = mapped_column(Text, nullable=True)
     clicked_quick_link_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     updated_at: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    admin_write_perm: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
 
 
 class HiddenCardOverride(Base):

@@ -21,9 +21,10 @@ export interface Person {
 export interface PeopleSearchProps {
   onSelect: (person: Person) => void;
   selectedPerson?: Person | null;
+  disabled?: boolean;
 }
 
-export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchProps) {
+export default function PeopleSearch({ onSelect, selectedPerson, disabled = false }: PeopleSearchProps) {
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<Person[]>([]);
   const [searchStatus, setSearchStatus] = useState<string>("");
@@ -93,6 +94,9 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
   ];
 
   const handleRowSelection = (event: any) => {
+    if (disabled) {
+      return;
+    }
     const selectedRows = event.api.getSelectedRows();
     if (selectedRows.length > 0) {
       onSelect(selectedRows[0]);
@@ -128,6 +132,7 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
         placeholder="Search by name or NetID..."
         value={searchInput}
         onChange={e => setSearchInput(e.target.value)}
+        disabled={disabled}
       />
       <p className="text-sm text-gray-500">Search for a name or NetID above, then select it in the table below.</p>
       {selectedPerson && (
@@ -148,6 +153,7 @@ export default function PeopleSearch({ onSelect, selectedPerson }: PeopleSearchP
                   type="button"
                   className="bg-cornell-blue text-white rounded-full px-5 py-2 font-semibold shadow hover:bg-cornell-red transition"
                   onClick={() => setExpandedSearch(true)}
+                  disabled={disabled}
                 >
                   Expand Search
                 </button>

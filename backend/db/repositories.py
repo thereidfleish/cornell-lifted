@@ -2,7 +2,6 @@ import json
 from datetime import datetime, timezone
 from sqlalchemy import select, func, distinct, update, text, insert, delete, or_
 from db.models import (
-    Admin,
     Emails,
     Message,
     LiftedUser,
@@ -21,10 +20,22 @@ def rows_to_dicts(result):
     return [dict(row) for row in result.mappings().all()]
 
 
-def get_admin_by_netid(db_session, netid):
-    return db_session.execute(
-        select(Admin).where(Admin.id == netid).limit(1)
-    ).scalar_one_or_none()
+def get_admin_by_email(db_session, email):
+    """Get admin permissions for a user by email.
+    Returns dict with is_admin and admin_write_perm, or None if user doesn't exist."""
+    user = db_session.execute(
+        select(LiftedUser.is_admin, LiftedUser.admin_write_perm)
+        .where(LiftedUser.email == email)
+        .limit(1)
+    ).mappings().first()
+    
+    if user is None:
+        return None
+    
+    return {
+        "is_admin": user["is_admin"],
+        "admin_write_perm": user["admin_write_perm"]
+    }
 
 
 def get_user_by_uuid(db_session, user_uuid):
@@ -707,20 +718,52 @@ def create_email_open_record(to_email, subject, db_session):
 
 
 def list_admins(db_session):
+    """List all admin users with their permissions."""
     return rows_to_dicts(db_session.execute(
-        select(Admin.id, Admin.write)
+        select(LiftedUser.email, LiftedUser.is_admin, LiftedUser.admin_write_perm)
+        .where((LiftedUser.is_admin == True) | (LiftedUser.admin_write_perm == True))
     ))
 
 
-def add_admin(netid, write_perm, db_session):
-    db_session.execute(insert(Admin).values(id=netid, write=bool(write_perm)))
+def add_admin(email, write_perm, db_session):
+    """Add or update admin permissions for a user by email."""
+    # Check if user exists
+    user = db_session.execute(
+        select(LiftedUser).where(LiftedUser.email == email).limit(1)
+    ).scalar_one_or_none()
+    
+    if user is None:
+        # Create new user with admin permissions
+        new_user = LiftedUser(
+            email=email,
+            is_admin=True,
+            admin_write_perm=bool(write_perm),
+            updated_at=datetime.now(timezone.utc)
+        )
+        db_session.add(new_user)
+    else:
+        # Update existing user's admin permissions
+        user.is_admin = True
+        user.admin_write_perm = bool(write_perm)
+        user.updated_at = datetime.now(timezone.utc)
+    
     db_session.commit()
 
 
-def delete_admin(netid, db_session):
-    result = db_session.execute(delete(Admin).where(Admin.id == netid))
+def delete_admin(email, db_session):
+    """Remove admin permissions from a user by email."""
+    user = db_session.execute(
+        select(LiftedUser).where(LiftedUser.email == email).limit(1)
+    ).scalar_one_or_none()
+    
+    if user is None:
+        return False
+    
+    user.is_admin = False
+    user.admin_write_perm = False
+    user.updated_at = datetime.now(timezone.utc)
     db_session.commit()
-    return result.rowcount > 0
+    return True
 
 
 def list_hidden_card_overrides_desc(db_session):

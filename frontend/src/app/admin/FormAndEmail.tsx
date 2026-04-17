@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import MessageGroupSelector from "@/components/MessageGroupSelector";
 import RichTextEditor from "@/components/RichTextEditor";
 import { useGlobal } from "@/utils/GlobalContext";
+import useAdminReadOnly from "./useAdminReadOnly";
 
 export default function FormAndEmail() {
   const { config, refreshConfig } = useGlobal() as any;
+  const isReadOnlyAdmin = useAdminReadOnly();
   const [selected, setSelected] = useState<string>(config?.form_message_group || "none");
   const [statusMsg, setStatusMsg] = useState<string>("");
 
@@ -45,6 +47,7 @@ export default function FormAndEmail() {
           showNoneOption={true}
           onChange={handleChange}
           className="max-w-md"
+          disabled={isReadOnlyAdmin}
         />
       </div>
 
@@ -66,7 +69,7 @@ export default function FormAndEmail() {
               <p className="text-sm mb-2">This is the description text shown at the top of the form for the selected message group.</p>
               <div className="border rounded p-2 bg-white">
                 <React.Suspense fallback={<div>Loading editor...</div>}>
-                  <RichTextEditor messageGroup={rtMessageGroup} type="form" />
+                  <RichTextEditor messageGroup={rtMessageGroup} type="form" disableSaveButtons={isReadOnlyAdmin} />
                 </React.Suspense>
               </div>
             </div>
@@ -75,7 +78,7 @@ export default function FormAndEmail() {
               <p className="text-sm mb-2">This is the email text sent to recipients when they are Lifted for the selected message group.</p>
               <div className="border rounded p-2 bg-white">
                 <React.Suspense fallback={<div>Loading editor...</div>}>
-                  <RichTextEditor messageGroup={rtMessageGroup} type="recipient" />
+                  <RichTextEditor messageGroup={rtMessageGroup} type="recipient" disableSaveButtons={isReadOnlyAdmin} />
                 </React.Suspense>
               </div>
             </div>
