@@ -297,6 +297,8 @@ export default function SwappingOptions() {
 					pagination={swapPrefs.length > 100}
 					paginationPageSize={100}
 					defaultColDef={{ cellStyle: { lineHeight: "1.5", padding: "8px" } }}
+					enableCellTextSelection={true}
+					ensureDomOrder={true}
 				/>
 			</div>
 		</div>

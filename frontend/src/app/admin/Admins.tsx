@@ -10,6 +10,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface Admin {
   email: string;
+  name?: string | null;
   admin_write_perm: boolean;
 }
 
@@ -135,6 +136,11 @@ export default function AdminsSection() {
   // AG Grid column definitions
   const columnDefs: ColDef<Admin>[] = [
     {
+      headerName: "Name",
+      field: "name",
+      valueGetter: (params) => params.data?.name || "",
+    },
+    {
       headerName: "Email",
       field: "email",
     },
@@ -219,7 +225,8 @@ export default function AdminsSection() {
               rowData={admins}
               columnDefs={columnDefs}
               theme={themeQuartz}
-              suppressCellFocus={true}
+              enableCellTextSelection={true}
+              ensureDomOrder={true}
             />
           </div>
           <DeleteConfirmation

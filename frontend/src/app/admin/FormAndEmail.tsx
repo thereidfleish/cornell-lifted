@@ -3,12 +3,16 @@ import MessageGroupSelector from "@/components/MessageGroupSelector";
 import RichTextEditor from "@/components/RichTextEditor";
 import { useGlobal } from "@/utils/GlobalContext";
 import useAdminReadOnly from "./useAdminReadOnly";
+import { useRichTextDocument } from "./useRichTextDocument";
 
 export default function FormAndEmail() {
   const { config, refreshConfig } = useGlobal() as any;
   const isReadOnlyAdmin = useAdminReadOnly();
   const [selected, setSelected] = useState<string>(config?.form_message_group || "none");
   const [statusMsg, setStatusMsg] = useState<string>("");
+  const [rtMessageGroup, setRTMessageGroup] = useState<string>("");
+  const formDocument = useRichTextDocument(rtMessageGroup, "form");
+  const recipientDocument = useRichTextDocument(rtMessageGroup, "recipient");
 
   async function handleChange(option: { key: string; label: string }) {
     setSelected(option.key);
@@ -29,8 +33,6 @@ export default function FormAndEmail() {
       return () => clearTimeout(timer);
     }
   }, [statusMsg]);
-
-  const [rtMessageGroup, setRTMessageGroup] = useState<string>("");
 
   return (
     <div className="space-y-8">
@@ -69,7 +71,16 @@ export default function FormAndEmail() {
               <p className="text-sm mb-2">This is the description text shown at the top of the form for the selected message group.</p>
               <div className="border rounded p-2 bg-white">
                 <React.Suspense fallback={<div>Loading editor...</div>}>
-                  <RichTextEditor messageGroup={rtMessageGroup} type="form" disableSaveButtons={isReadOnlyAdmin} />
+                  <RichTextEditor
+                    type="form"
+                    disableSaveButtons={isReadOnlyAdmin}
+                    initialContent={formDocument.initialContent}
+                    isLoading={formDocument.loading}
+                    previewHtml={formDocument.previewHtml}
+                    previewLoading={formDocument.previewLoading}
+                    onContentChange={formDocument.setContent}
+                    onSave={formDocument.saveContent}
+                  />
                 </React.Suspense>
               </div>
             </div>
@@ -78,7 +89,16 @@ export default function FormAndEmail() {
               <p className="text-sm mb-2">This is the email text sent to recipients when they are Lifted for the selected message group.</p>
               <div className="border rounded p-2 bg-white">
                 <React.Suspense fallback={<div>Loading editor...</div>}>
-                  <RichTextEditor messageGroup={rtMessageGroup} type="recipient" disableSaveButtons={isReadOnlyAdmin} />
+                  <RichTextEditor
+                    type="recipient"
+                    disableSaveButtons={isReadOnlyAdmin}
+                    initialContent={recipientDocument.initialContent}
+                    isLoading={recipientDocument.loading}
+                    previewHtml={recipientDocument.previewHtml}
+                    previewLoading={recipientDocument.previewLoading}
+                    onContentChange={recipientDocument.setContent}
+                    onSave={recipientDocument.saveContent}
+                  />
                 </React.Suspense>
               </div>
             </div>

@@ -232,6 +232,28 @@ def send_email(message_group, type, to, cc=None, bcc=None, user=None):
     postmark.emails.send(**payload)
 
 
+def send_custom_email(subject, raw_html_content, to, cc=None, bcc=None, message_group=None):
+    token = os.getenv("SENDGRID_KEY")
+
+    html_content = process_html_for_email(raw_html_content, message_group)
+
+    postmark = PostmarkClient(server_token=token)
+    payload = {
+        "From": "Cornell Lifted <hello@cornelllifted.com>",
+        "To": ",".join(to),
+        "Subject": subject,
+        "HtmlBody": html_content,
+        "MessageStream": "outbound",
+    }
+
+    if cc:
+        payload["Cc"] = ",".join(cc)
+    if bcc:
+        payload["Bcc"] = ",".join(bcc)
+
+    postmark.emails.send(**payload)
+
+
 college_dict = {
         "AG": "CALS",
         "AR": "Architecture, Art and Planning",

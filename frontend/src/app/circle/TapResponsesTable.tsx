@@ -127,6 +127,8 @@ const TapResponsesTable: React.FC<TapResponsesTableProps> = ({ refreshKey, showD
 					<AgGridReact
 						columnDefs={columnDefs as any}
 						rowData={tableData}
+						enableCellTextSelection={true}
+						ensureDomOrder={true}
 					/>
 				)}
 			</div>

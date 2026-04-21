@@ -167,7 +167,8 @@ export default function PeopleSearch({ onSelect, selectedPerson, disabled = fals
                   theme={themeQuartz}
                   rowSelection="single"
                   onSelectionChanged={handleRowSelection}
-                  suppressCellFocus={true}
+                  enableCellTextSelection={true}
+                  ensureDomOrder={true}
                 />
               </div>
             )}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
 const TiptapEditor = dynamic(async () => (await import("./TiptapEditor")).default, {
@@ -7,100 +7,62 @@ const TiptapEditor = dynamic(async () => (await import("./TiptapEditor")).defaul
   loading: () => <div>Loading editor…</div>,
 });
 
-type Props = { messageGroup: string; type: string; disableSaveButtons?: boolean };
+type RichTextContent = {
+  html: string;
+  subject: string;
+};
 
-export default function RichTextEditor({ messageGroup, type, disableSaveButtons = false }: Props) {
+type RichTextEditorProps = {
+  type: string;
+  disableSaveButtons?: boolean;
+  initialContent?: RichTextContent | null;
+  isLoading?: boolean;
+  previewHtml?: string;
+  previewLoading?: boolean;
+  onContentChange?: (content: RichTextContent) => void;
+  onSave?: (content: RichTextContent, sendEmail: boolean) => void | Promise<void>;
+};
+
+export default function RichTextEditor({
+  type,
+  disableSaveButtons = false,
+  initialContent,
+  isLoading = false,
+  previewHtml,
+  previewLoading = false,
+  onContentChange,
+  onSave,
+}: RichTextEditorProps) {
   const [html, setHtml] = useState("");
   const [jsonContent, setJsonContent] = useState<any>("");
   const [subject, setSubject] = useState("");
-  const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
-  const [previewHtml, setPreviewHtml] = useState("");
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const previewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`/api/admin/get-rich-text/${messageGroup}/${type}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r)))
-      .then((data) => {
-        const htmlContent = data.html || "";
-        const loadedJsonContent = data.json ?? htmlContent;
-        setJsonContent(loadedJsonContent);
-        setHtml(htmlContent);
-        setSubject(data.subject || "");
-        
-        // Load initial preview for email types
-        if (type !== "form" && htmlContent) {
-          updatePreview(htmlContent);
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [messageGroup, type]);
+    const htmlContent = initialContent?.html || "";
+    setHtml(htmlContent);
+    setJsonContent(htmlContent);
+    setSubject(initialContent?.subject || "");
+  }, [initialContent, type]);
+
+  useEffect(() => {
+    if (onContentChange) {
+      onContentChange({ html, subject });
+    }
+  }, [html, subject, onContentChange]);
 
   const handleSave = async (sendEmail = false) => {
-    const currentHtml = html;
+    if (!onSave) return;
+
     setStatus("Saving…");
-    const res = await fetch(
-      `/api/admin/save-rich-text/${messageGroup}/${type}?send_email=${sendEmail}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html: currentHtml, subject }),
-      }
-    );
-    setStatus(res.ok ? "Saved successfully!" : "Failed to save.");
-    setTimeout(() => setStatus(""), 2000);
-    
-    // Refresh preview after saving
-    if (res.ok && type !== "form") {
-      updatePreview(currentHtml);
-    }
-  };
-
-  // Function to fetch live preview
-  const updatePreview = async (content: string) => {
-    if (type === "form" || !content) return;
-    
-    setPreviewLoading(true);
     try {
-      const res = await fetch("/api/admin/preview-email-live", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html: content }),
-      });
-      
-      if (res.ok) {
-        const previewHtmlText = await res.text();
-        setPreviewHtml(previewHtmlText);
-      }
-    } catch (err) {
-      console.error("Preview error:", err);
-    } finally {
-      setPreviewLoading(false);
+      await onSave({ html, subject }, sendEmail);
+      setStatus("Saved successfully!");
+    } catch {
+      setStatus("Failed to save.");
     }
+    setTimeout(() => setStatus(""), 2000);
   };
-
-  // Debounced preview update for live editing (only for email types)
-  useEffect(() => {
-    if (type === "form" || !html) return;
-    
-    // Clear previous timeout
-    if (previewTimeoutRef.current) {
-      clearTimeout(previewTimeoutRef.current);
-    }
-    
-    // Set new timeout to refresh preview after 1 second of no edits
-    previewTimeoutRef.current = setTimeout(() => {
-      updatePreview(html);
-    }, 1000);
-    
-    return () => {
-      if (previewTimeoutRef.current) {
-        clearTimeout(previewTimeoutRef.current);
-      }
-    };
-  }, [html, type]);
 
   return (
     <div className="w-full">
@@ -124,37 +86,39 @@ export default function RichTextEditor({ messageGroup, type, disableSaveButtons 
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Editor Section */}
         <div className="flex-1">
-          {loading ? (
+          {isLoading ? (
             <div>Loading…</div>
           ) : (
             <TiptapEditor value={jsonContent} onChange={setJsonContent} onHtmlChange={setHtml} />
           )}
 
-          <div className="flex gap-2 mt-4">
-            <button
-              type="button"
-              onClick={() => handleSave(false)}
-              className="px-4 py-2 rounded bg-cornell-red text-white font-semibold shadow hover:bg-red-700 border border-cornell-red transition-colors duration-150"
-              disabled={disableSaveButtons}
-            >
-              Save
-            </button>
-            {type !== "form" && (
+          {onSave && (
+            <div className="flex gap-2 mt-4">
               <button
                 type="button"
-                onClick={() => handleSave(true)}
-                className="px-4 py-2 rounded bg-white text-cornell-red font-semibold shadow border border-cornell-red hover:bg-gray-100 transition-colors duration-150"
+                onClick={() => handleSave(false)}
+                className="px-4 py-2 rounded bg-cornell-red text-white font-semibold shadow hover:bg-red-700 border border-cornell-red transition-colors duration-150"
                 disabled={disableSaveButtons}
               >
-                Save and Send Test Email to Yourself
+                Save
               </button>
-            )}
-          </div>
+              {type !== "form" && (
+                <button
+                  type="button"
+                  onClick={() => handleSave(true)}
+                  className="px-4 py-2 rounded bg-white text-cornell-red font-semibold shadow border border-cornell-red hover:bg-gray-100 transition-colors duration-150"
+                  disabled={disableSaveButtons}
+                >
+                  Save and Send Test Email to Yourself
+                </button>
+              )}
+            </div>
+          )}
           {status && <div className="mt-2 text-sm text-green-600">{status}</div>}
         </div>
 
         {/* Live Preview Section - Only for email types */}
-        {type !== "form" && !loading && (
+        {type !== "form" && !isLoading && previewHtml !== undefined && (
           <div className="flex-1 lg:max-w-[50%]">
             <div className="sticky top-4">
               <h4 className="font-semibold mb-2 text-gray-700 flex items-center gap-2">

@@ -33,7 +33,7 @@ const SwapCards: React.FC<SwapCardsProps> = ({ message_group }) => {
 			setStatusMsg("Cards swapped successfully! Reloading...");
 			setTimeout(() => window.location.reload(), 1200);
 		} else {
-			setStatusMsg("Error swapping cards. Please try again or contact support.");
+			setStatusMsg("Error swapping cards. Please try again or contact lifted@cornell.edu.");
 			setLoading(false);
 		}
 	};

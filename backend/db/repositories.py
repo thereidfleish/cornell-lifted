@@ -98,6 +98,7 @@ def _upsert_lifted_user(email, given_name, full_name, affiliation, db_session):
                 given_name=resolved_given_name,
                 full_name=resolved_full_name,
                 affiliation=resolved_affiliation,
+                clicked_quick_link_count=func.coalesce(LiftedUser.clicked_quick_link_count, 0),
                 updated_at=now_utc
             )
         )
@@ -110,6 +111,7 @@ def _upsert_lifted_user(email, given_name, full_name, affiliation, db_session):
                 given_name=resolved_given_name,
                 full_name=resolved_full_name,
                 affiliation=resolved_affiliation,
+                clicked_quick_link_count=0,
                 updated_at=now_utc,
             )
             .returning(LiftedUser.id)
@@ -720,13 +722,20 @@ def create_email_open_record(to_email, subject, db_session):
 def list_admins(db_session):
     """List all admin users with their permissions."""
     return rows_to_dicts(db_session.execute(
-        select(LiftedUser.email, LiftedUser.is_admin, LiftedUser.admin_write_perm)
+        select(
+            LiftedUser.email,
+            LiftedUser.full_name.label("name"),
+            LiftedUser.is_admin,
+            LiftedUser.admin_write_perm,
+        )
         .where((LiftedUser.is_admin == True) | (LiftedUser.admin_write_perm == True))
     ))
 
 
 def add_admin(email, write_perm, db_session):
     """Add or update admin permissions for a user by email."""
+    now_utc = datetime.now(timezone.utc)
+
     # Check if user exists
     user = db_session.execute(
         select(LiftedUser).where(LiftedUser.email == email).limit(1)
@@ -738,14 +747,17 @@ def add_admin(email, write_perm, db_session):
             email=email,
             is_admin=True,
             admin_write_perm=bool(write_perm),
-            updated_at=datetime.now(timezone.utc)
+            clicked_quick_link_count=0,
+            updated_at=now_utc,
         )
         db_session.add(new_user)
     else:
         # Update existing user's admin permissions
         user.is_admin = True
         user.admin_write_perm = bool(write_perm)
-        user.updated_at = datetime.now(timezone.utc)
+        if user.clicked_quick_link_count is None:
+            user.clicked_quick_link_count = 0
+        user.updated_at = now_utc
     
     db_session.commit()
 

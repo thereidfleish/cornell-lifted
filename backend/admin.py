@@ -31,6 +31,12 @@ from app import admin_required, update_lifted_config, load_user, sync_admin_perm
 
 admin = Blueprint('admin', __name__, static_folder='static')
 
+
+def parse_email_csv(value):
+    if not value:
+        return []
+    return [email.strip() for email in value.split(",") if email.strip()]
+
 @admin.route("/api/admin/logs")
 @login_required
 @admin_required(write_required=False)
@@ -225,14 +231,43 @@ def preview_email_live():
     """Return the full rendered email HTML for live preview with provided HTML content"""
     data = request.get_json()
     html_content = data.get("html", "")
-    message_group = data.get("message_group", None)
     
     if not html_content:
         return "<html><body><p>No content provided</p></body></html>", 200, {'Content-Type': 'text/html; charset=utf-8'}
     
     # Use the same email template wrapper as actual emails
-    full_email_html = helpers.process_html_for_email(html_content, message_group)
+    full_email_html = helpers.process_html_for_email(html_content)
     return full_email_html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+
+@admin.post("/api/admin/send-custom-email")
+@login_required
+@admin_required(write_required=True)
+def send_custom_email():
+    data = request.get_json() or {}
+
+    to = parse_email_csv(data.get("to", ""))
+    cc = parse_email_csv(data.get("cc", ""))
+    bcc = parse_email_csv(data.get("bcc", ""))
+    subject = (data.get("subject") or "").strip()
+    html = data.get("html") or ""
+
+    if not to:
+        return jsonify({"status": "At least one recipient is required."}), 400
+    if not subject:
+        return jsonify({"status": "Subject is required."}), 400
+    if not html:
+        return jsonify({"status": "Email body is required."}), 400
+
+    helpers.send_custom_email(
+        subject=subject,
+        raw_html_content=html,
+        to=to,
+        cc=cc,
+        bcc=bcc,
+    )
+
+    return jsonify({"status": "Custom email sent successfully!"})
 
 ### Attachments
 

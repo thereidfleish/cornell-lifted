@@ -14,6 +14,7 @@ import AttachmentOptions from "./AttachmentOptions";
 import SwappingOptions from "./SwappingOptions";
 import Impersonate from "./Impersonate";
 import ThemeSection from "./Theme";
+import CustomEmailer from "./CustomEmailer";
 
 const sidebarSections = [
   {
@@ -26,7 +27,7 @@ const sidebarSections = [
   },
   {
     title: "Advanced",
-    items: ["Theme", "Impersonation", "Admins", "Logs"],
+    items: ["Theme", "Impersonation", "Admins", "Custom Emailer", "Logs"],
   },
 ];
 
@@ -39,7 +40,7 @@ const fromSlug = (slug: string) =>
 function AdminDashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user } = useGlobal() as any;
+  const { user, loading } = useGlobal() as any;
 
   const tabParam = searchParams?.get("tab");
   const [activeTab, setActiveTab] = useState(() => tabParam ? fromSlug(tabParam) : "Message Groups");
@@ -88,11 +89,42 @@ function AdminDashboardContent() {
     if (activeTab === "Theme") {
       return <ThemeSection />;
     }
+    if (activeTab === "Custom Emailer") {
+      return <CustomEmailer />;
+    }
     return (
       <div className="bg-white rounded-xl shadow p-6">
         <h2 className="text-xl font-semibold mb-4">{activeTab}</h2>
         <div className="text-gray-700">Content for {activeTab} goes here.</div>
       </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <main className="flex-1 p-8">
+        <h1 className="text-4xl font-bold mb-4">Admin Dashboard</h1>
+        <div className="text-gray-500">Loading...</div>
+      </main>
+    );
+  }
+
+  if (!user?.authenticated) {
+    return (
+      <main className="flex-1 p-8">
+        <h1 className="text-4xl font-bold mb-4">Admin Dashboard</h1>
+        <div className="bg-white rounded-xl shadow p-8 max-w-xl">
+          <div className="text-4xl mb-4">🔑</div>
+          <h2 className="text-2xl font-bold text-cornell-blue mb-2">Sign in to access the admin dashboard</h2>
+          <p className="mb-4 text-gray-700">Sign in with your Cornell NetID to view the admin tools.</p>
+          <a
+            href="https://api.cornelllifted.com/login?next=/admin"
+            className="bg-cornell-red text-white rounded-full px-6 py-3 font-semibold shadow inline-block"
+          >
+            Sign In with Cornell NetID
+          </a>
+        </div>
+      </main>
     );
   }
 
