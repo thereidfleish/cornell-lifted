@@ -5,6 +5,7 @@ import { useGlobal } from "@/utils/GlobalContext";
 import AdminLogsPage from "./Logs";
 import AdminsSection from "./Admins";
 import HiddenCardOverridesSection from "./HiddenCardOverrides";
+import OtherSection from "./Other";
 import BrowseMessagesSection from "./BrowseMessages";
 import ProcessCards from "./ProcessCards";
 
@@ -19,7 +20,7 @@ import CustomEmailer from "./CustomEmailer";
 const sidebarSections = [
   {
     title: "Lifted Config",
-    items: ["Message Groups", "Form and Email", "Attachments", "Swapping", "Hidden Card Overrides"],
+    items: ["Message Groups", "Form and Email", "Attachments", "Swapping", "Hidden Card Overrides", "Other"],
   },
   {
     title: "Messages",
@@ -76,6 +77,9 @@ function AdminDashboardContent() {
     }
     if (activeTab === "Hidden Card Overrides") {
       return <HiddenCardOverridesSection />;
+    }
+    if (activeTab === "Other") {
+      return <OtherSection />;
     }
     if (activeTab === "Browse") {
       return <BrowseMessagesSection />;

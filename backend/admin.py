@@ -104,6 +104,19 @@ def update_coming_soon_text():
     update_lifted_config(current_app.config["lifted_config"])
     return jsonify({"status": "Coming soon text updated successfully!"})
 
+@admin.post("/api/admin/update-other-texts")
+@login_required
+@admin_required(write_required=True)
+def update_other_texts():
+    request_data = json.loads(request.data)
+
+    current_app.config["lifted_config"]["coming_soon_text_p"] = request_data.get("coming_soon_text_p", "")
+    current_app.config["lifted_config"]["homepage_event_date_text"] = request_data.get("homepage_event_date_text", "")
+    current_app.config["lifted_config"]["homepage_form_open_text"] = request_data.get("homepage_form_open_text", "")
+
+    update_lifted_config(current_app.config["lifted_config"])
+    return jsonify({"status": "Other text settings updated successfully!"})
+
 # NEED TO IMPLEMENT MESSAGE DELETING!!!!
 @admin.route("/api/admin/remove-message-group/<message_group>")
 @login_required
@@ -282,6 +295,10 @@ def get_attachment_prefs(message_group):
 @login_required
 @admin_required(write_required=True)
 def update_attachment_message_group():
+    attachment_message_group = request.form.get("attachment-message-group", "none")
+    attachment_text = request.form.get("attachment-text", "")
+    attachment_deadline = request.form.get("attachment-deadline", "")
+
     current_app.config["lifted_config"]["attachment_message_group"] = attachment_message_group
     current_app.config["lifted_config"]["attachment_text"] = attachment_text
     current_app.config["lifted_config"]["attachment_deadline"] = attachment_deadline
@@ -320,6 +337,7 @@ def get_swap_prefs():
 def update_swapping_config():
     request_data = json.loads(request.data)
     swapping = request_data.get("swapping", [])
+    auto_swap_if_pref_exists = request_data.get("auto_swap_if_pref_exists", True)
 
     normalized_swapping = []
     for entry in swapping:
@@ -335,6 +353,7 @@ def update_swapping_config():
         })
 
     current_app.config["lifted_config"]["swapping"] = normalized_swapping
+    current_app.config["lifted_config"]["auto_swap_if_pref_exists"] = auto_swap_if_pref_exists
 
     update_lifted_config(current_app.config["lifted_config"])
     return jsonify({"status": "Swapping config updated successfully!"})

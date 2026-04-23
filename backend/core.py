@@ -624,7 +624,7 @@ def send_message():
             affiliation=person_affiliation,
         )
 
-        if get_swap_entry_for_group(message_group):
+        if current_app.config["lifted_config"].get("auto_swap_if_pref_exists", True) and get_swap_entry_for_group(message_group):
             # Check to see if the user wants their messages in a different message group
             swap_pref = db_call(get_swap_pref, recipient_email, message_group)
 

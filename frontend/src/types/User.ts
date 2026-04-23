@@ -13,11 +13,14 @@ export type User = {
 
 export type LiftedConfig = {
   theme: string;
+  auto_swap_if_pref_exists?: boolean;
   message_group_list_map: {
     [key: string]: string;
   };
   hidden_cards: string[];
   coming_soon_text_p: string;
+  homepage_event_date_text: string;
+  homepage_form_open_text: string;
   form_message_group: string;
   attachment_message_group: string;
   swapping: {

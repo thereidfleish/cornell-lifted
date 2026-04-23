@@ -33,6 +33,7 @@ export default function SwappingOptions() {
 	const isReadOnlyAdmin = useAdminReadOnly();
 	const [swapPrefs, setSwapPrefs] = useState<SwapPref[]>([]);
 	const [swapping, setSwapping] = useState<SwapEntry[]>([]);
+	const [autoSwapIfPrefExists, setAutoSwapIfPrefExists] = useState<boolean>(true);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [statusMsg, setStatusMsg] = useState<string>("");
 	const [selectedEventFilter, setSelectedEventFilter] = useState<string>("");
@@ -40,6 +41,7 @@ export default function SwappingOptions() {
 
 	useEffect(() => {
 		fetchSwapPrefs();
+		setAutoSwapIfPrefExists(config?.auto_swap_if_pref_exists ?? true);
 		setSwapping(
 			(config?.swapping || []).map((entry: any) => ({
 				from: entry.from,
@@ -70,6 +72,7 @@ export default function SwappingOptions() {
 		setLoading(true);
 		const payload = {
 			swapping: swapping.filter((entry) => entry.from && entry.to),
+			auto_swap_if_pref_exists: autoSwapIfPrefExists,
 		};
 		const res = await fetch("/api/admin/update-swapping-config", {
 			method: "POST",
@@ -224,14 +227,26 @@ export default function SwappingOptions() {
 						</div>
 					))}
 				</div>
-				<button
-					type="button"
-					className="bg-gray-200 text-cornell-blue font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition"
-					onClick={handleAddSwapGroup}
-					disabled={isReadOnlyAdmin}
-				>
-					Add Swapping Group
-				</button>
+				<div className="mt-4 flex flex-col items-start gap-3">
+					<button
+						type="button"
+						className="bg-gray-200 text-cornell-blue font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition"
+						onClick={handleAddSwapGroup}
+						disabled={isReadOnlyAdmin}
+					>
+						Add Swapping Group
+					</button>
+					<label className="inline-flex items-center gap-2">
+						<input
+							type="checkbox"
+							checked={autoSwapIfPrefExists}
+							onChange={(e) => setAutoSwapIfPrefExists(e.target.checked)}
+							disabled={isReadOnlyAdmin}
+						/>
+						<span className="font-semibold">Auto-swap messages when a swap pref exists</span>
+					</label>
+					<p className="text-sm text-gray-600">Check to always honor swap preferences.  For example, if a recipient has a swap preference for physical Lifted, and they receive an eLifted, it will be auto-swapped to physical Lifted.</p>
+				</div>
 			</form>
 			<button
 				type="button"

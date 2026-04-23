@@ -55,7 +55,7 @@ export default function Home() {
         <div className="flex-2 flex flex-col justify-center items-center lg:items-start lg:pl-20 text-center lg:text-left">
           <h1 className="text-cornell-red font-schoolbell text-4xl font-bold mb-4">Spread Gratitude Across Cornell</h1>
           <p className="text-xl text-gray-700 mb-6">Join Cornell's gratitude movement that transforms campus with thousands of thank-you messages.</p>
-          <p className="text-xl font-bold mb-6">Tuesday, May 5th, 2026 on the Arts Quad</p>
+          <p className="text-xl font-bold mb-6">{config?.homepage_event_date_text}</p>
           <div className="flex flex-row flex-wrap items-center justify-center gap-3 text-center">
             {formOpen && (
               <a className="bg-cornell-red text-white text-lg rounded-full px-6 py-3 font-semibold shadow inline-block text-center" href="/send-message">Send a Lifted Message</a>
@@ -66,7 +66,7 @@ export default function Home() {
               <p className="mt-3 text-cornell-red">The Lifted submission form is now closed. Keep an eye out for the next semester's Lifted event!</p>
             )}
           {formOpen && (
-            <p className="mt-3 text-cornell-red">The form will close on <strong>Thursday, April 23rd at 11:59 PM</strong>! Any messages submitted after will only be sent virtually to your recipient.</p>
+            <p className="mt-3 text-cornell-red" dangerouslySetInnerHTML={{ __html: config?.homepage_form_open_text || '' }} />
           )}
 
         </div>
