@@ -6,7 +6,7 @@ from flask import current_app
 from postmarker.core import PostmarkClient
 from app import SessionLocal
 from db.repositories import get_lifted_stats as get_lifted_stats_repo
-from db.repositories import insert_log, create_email_open_record
+from db.repositories import insert_log, create_email_open_record, get_user_by_email
 
 def log(user_email, user_name, log_type, error_code, log_content):
     with SessionLocal() as db_session:
@@ -56,14 +56,17 @@ def create_csv(cards, output_path):
         # Write data rows
         writer.writerows(cards)
 
-def get_lifted_stats():
-    with SessionLocal() as db_session:
+def get_lifted_stats(db_session=None):
+    if db_session is not None:
         return get_lifted_stats_repo(db_session)
+
+    with SessionLocal() as local_db_session:
+        return get_lifted_stats_repo(local_db_session)
 
 def normalize_rich_text_html(html_content):
     return html_content.replace("<p><br></p>", "<p>&nbsp;</p>").replace("<p></p>", "<p>&nbsp;</p>")
 
-def process_html_for_email(html_content, message_group=None, tracking_url=None):
+def process_html_for_email(html_content, message_group=None, tracking_url=None, stats=None):
     """
     Process HTML content and wrap it in a beautiful email template
     similar to the Cornell Lifted website design
@@ -74,7 +77,7 @@ def process_html_for_email(html_content, message_group=None, tracking_url=None):
     html_content = normalize_rich_text_html(html_content)
 
     # Get current stats for the email
-    stats = get_lifted_stats()
+    stats = stats or get_lifted_stats()
     
     # Determine if winter theme should be used based on theme config
     is_winter = False
@@ -189,31 +192,14 @@ def send_email(message_group, type, to, cc=None, bcc=None, user=None):
     with open(f"{dir_path}.txt", "r", encoding="utf-8") as file:
         subject = file.read()
 
-    given_name = "there"
-    user_uuid = None
-    user_email = None
-    if user:
-        given_name = user.get("given_name") or "there"
-        user_uuid = user.get("id")
-        user_email = user.get("email")
-
     with open(f"{dir_path}.html", "r", encoding="utf-8") as file:
         raw_html_content = file.read()
-
-        if user_uuid:
-            raw_html_content = raw_html_content.replace("?user=", f"?user={user_uuid}")
-
-        raw_html_content = raw_html_content.replace("{{name}}", given_name)
-
-        tracking_url = None
-        if user_email:
-            with SessionLocal() as db_session:
-                email_open_record = create_email_open_record(user_email, subject, db_session)
-            if email_open_record:
-                encoded_open_id = quote_plus(str(email_open_record["id"]))
-                tracking_url = f"https://cornelllifted.com/api/email-open?email_open_id={encoded_open_id}"
-
-        html_content = process_html_for_email(raw_html_content, message_group, tracking_url=tracking_url)
+        html_content = build_email_html(
+            subject=subject,
+            raw_html_content=raw_html_content,
+            message_group=message_group,
+            user=user,
+        )
 
     postmark = PostmarkClient(server_token=token)
     payload = {
@@ -232,10 +218,71 @@ def send_email(message_group, type, to, cc=None, bcc=None, user=None):
     postmark.emails.send(**payload)
 
 
-def send_custom_email(subject, raw_html_content, to, cc=None, bcc=None, message_group=None):
+def _replace_user_tokens(raw_html_content, user=None):
+    given_name = "there"
+    user_uuid = None
+
+    if user:
+        given_name = user.get("given_name") or "there"
+        user_uuid = user.get("id")
+
+    rendered_html = raw_html_content
+    if user_uuid:
+        rendered_html = rendered_html.replace("?user=", f"?user={user_uuid}")
+
+    return rendered_html.replace("{{name}}", given_name)
+
+
+def _tracking_url_for_email(subject, user=None, db_session=None):
+    user_email = (user or {}).get("email")
+    if not user_email:
+        return None
+
+    if db_session is not None:
+        email_open_record = create_email_open_record(user_email, subject, db_session)
+    else:
+        with SessionLocal() as local_db_session:
+            email_open_record = create_email_open_record(user_email, subject, local_db_session)
+
+    if not email_open_record:
+        return None
+
+    encoded_open_id = quote_plus(str(email_open_record["id"]))
+    return f"https://cornelllifted.com/api/email-open?email_open_id={encoded_open_id}"
+
+
+def build_email_html(subject, raw_html_content, message_group=None, user=None, db_session=None, stats=None):
+    rendered_raw_html = _replace_user_tokens(raw_html_content, user=user)
+    tracking_url = _tracking_url_for_email(subject, user=user, db_session=db_session)
+    return process_html_for_email(rendered_raw_html, message_group, tracking_url=tracking_url, stats=stats)
+
+
+def _resolve_custom_email_user(to, user=None, db_session=None):
+    if user:
+        return user
+
+    if len(to) != 1:
+        return None
+
+    if db_session is not None:
+        return get_user_by_email(db_session, to[0])
+
+    with SessionLocal() as local_db_session:
+        return get_user_by_email(local_db_session, to[0])
+
+
+def send_custom_email(subject, raw_html_content, to, cc=None, bcc=None, message_group=None, user=None, db_session=None, stats=None):
     token = os.getenv("SENDGRID_KEY")
 
-    html_content = process_html_for_email(raw_html_content, message_group)
+    resolved_user = _resolve_custom_email_user(to, user=user, db_session=db_session)
+    html_content = build_email_html(
+        subject=subject,
+        raw_html_content=raw_html_content,
+        message_group=message_group,
+        user=resolved_user,
+        db_session=db_session,
+        stats=stats,
+    )
 
     postmark = PostmarkClient(server_token=token)
     payload = {

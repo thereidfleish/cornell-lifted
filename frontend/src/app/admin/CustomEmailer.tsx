@@ -8,6 +8,7 @@ export default function CustomEmailer() {
   const [to, setTo] = useState("");
   const [cc, setCc] = useState("");
   const [bcc, setBcc] = useState("");
+  const [sendIndividually, setSendIndividually] = useState(false);
   const draftDocument = useRichTextDocument("_custom_emailer", "draft");
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
@@ -27,6 +28,7 @@ export default function CustomEmailer() {
           to,
           cc,
           bcc,
+          send_individually: sendIndividually,
           subject: draftDocument.content.subject,
           html: draftDocument.content.html,
         }),
@@ -49,42 +51,49 @@ export default function CustomEmailer() {
     <section className="mb-8 space-y-6">
       <h5 className="font-bold text-lg mb-2">Custom Emailer</h5>
       <p className="text-gray-700">
-        Compose and send a custom email using the same Lifted email template and live preview. Recipients support comma-separated emails.
+        Compose and send a custom email using the same Lifted email template and live preview. Recipients support comma-separated or line-separated emails.
       </p>
 
       <form className="space-y-4" onSubmit={handleSendEmail}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block font-medium text-gray-700 mb-1">To (comma-separated)</label>
-            <input
-              type="text"
-              className="border rounded px-3 py-2 w-full"
-              placeholder="a@cornell.edu, b@cornell.edu"
+            <label className="block font-medium text-gray-700 mb-1">To (comma or line-separated)</label>
+            <textarea
+              className="border rounded px-3 py-2 w-full min-h-28"
+              placeholder="a@cornell.edu\nb@cornell.edu"
               value={to}
               onChange={(e) => setTo(e.target.value)}
             />
           </div>
           <div>
-            <label className="block font-medium text-gray-700 mb-1">CC (comma-separated)</label>
-            <input
-              type="text"
-              className="border rounded px-3 py-2 w-full"
+            <label className="block font-medium text-gray-700 mb-1">CC (comma or line-separated)</label>
+            <textarea
+              className="border rounded px-3 py-2 w-full min-h-28"
               placeholder="optional"
               value={cc}
               onChange={(e) => setCc(e.target.value)}
             />
           </div>
           <div>
-            <label className="block font-medium text-gray-700 mb-1">BCC (comma-separated)</label>
-            <input
-              type="text"
-              className="border rounded px-3 py-2 w-full"
+            <label className="block font-medium text-gray-700 mb-1">BCC (comma or line-separated)</label>
+            <textarea
+              className="border rounded px-3 py-2 w-full min-h-28"
               placeholder="optional"
               value={bcc}
               onChange={(e) => setBcc(e.target.value)}
             />
           </div>
         </div>
+
+        <label className="flex items-center gap-2 text-gray-700">
+          <input
+            type="checkbox"
+            checked={sendIndividually}
+            onChange={(e) => setSendIndividually(e.target.checked)}
+            disabled={isReadOnlyAdmin || sending}
+          />
+          Send one recipient at a time (0.5s delay, enables per-user personalization)
+        </label>
 
         <div className="border rounded p-2 bg-white">
           <React.Suspense fallback={<div>Loading editor...</div>}>

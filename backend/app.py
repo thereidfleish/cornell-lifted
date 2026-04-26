@@ -184,4 +184,4 @@ if __name__ == '__main__':
     if app.debug:
         app.run(host='127.0.0.1', debug=app.debug, ssl_context=('cert.pem', 'key.pem'))
     else:
-        serve(app, host='0.0.0.0', port=5000, url_scheme='https', threads=100)
+        serve(app, host='0.0.0.0', port=5000, url_scheme='https', threads=500)

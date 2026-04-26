@@ -55,6 +55,27 @@ def get_user_by_uuid(db_session, user_uuid):
     return dict(user) if user is not None else None
 
 
+def get_user_by_email(db_session, email):
+    normalized_email = (email or "").strip().lower()
+    if not normalized_email:
+        return None
+
+    user = db_session.execute(
+        select(
+            LiftedUser.id,
+            LiftedUser.email,
+            LiftedUser.given_name,
+            LiftedUser.full_name,
+            LiftedUser.affiliation,
+            LiftedUser.updated_at,
+        )
+        .where(LiftedUser.email == normalized_email)
+        .limit(1)
+    ).mappings().first()
+
+    return dict(user) if user is not None else None
+
+
 def increment_clicked_quick_link_count(user_uuid, db_session):
     if not user_uuid:
         return False

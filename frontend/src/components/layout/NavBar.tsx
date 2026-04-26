@@ -10,7 +10,7 @@ function NavLinks({ user, className = "", onClick }: { user: User; className?: s
     return (
         <>
             <Link href="/faqs" className={navLinkClass} onClick={onClick}>FAQs</Link>
-            <Link href="/popped" className={navLinkClass} onClick={onClick}>Popped</Link>
+            <Link href="/popped" prefetch={false} className={navLinkClass} onClick={onClick}>Popped</Link>
             <Link href="/blog" className={navLinkClass} onClick={onClick}>Blog</Link>
             { user?.user?.is_admin && (
                 <Link href="/admin" className={navLinkClass} onClick={onClick}>Admin</Link>

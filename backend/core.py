@@ -766,6 +766,8 @@ def swap_messages():
 
 @core.get("/api/analytics")
 def get_analytics():
+    # print("getting analytics")
+    # return jsonify("success")
     """Get analytics data for Lifted messages"""
     semester = request.args.get("semester", "all")
     analytics_data = db_call(get_analytics_payload, semester)

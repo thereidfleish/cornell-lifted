@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 import os
 import mimetypes
+import time
 import helpers
 from db.repositories import (
     get_cards_with_attachments,
@@ -27,7 +28,7 @@ from db.repositories import (
     delete_hidden_card_override,
 )
 
-from app import admin_required, update_lifted_config, load_user, sync_admin_permissions_for_session, clear_admin_permissions_from_session, db_call
+from app import admin_required, update_lifted_config, load_user, sync_admin_permissions_for_session, clear_admin_permissions_from_session, db_call, SessionLocal
 
 admin = Blueprint('admin', __name__, static_folder='static')
 
@@ -35,7 +36,10 @@ admin = Blueprint('admin', __name__, static_folder='static')
 def parse_email_csv(value):
     if not value:
         return []
-    return [email.strip() for email in value.split(",") if email.strip()]
+    normalized = value.replace("\r\n", "\n").replace("\r", "\n")
+    for delimiter in ["\n", ";"]:
+        normalized = normalized.replace(delimiter, ",")
+    return [email.strip() for email in normalized.split(",") if email.strip()]
 
 @admin.route("/api/admin/logs")
 @login_required
@@ -262,6 +266,7 @@ def send_custom_email():
     to = parse_email_csv(data.get("to", ""))
     cc = parse_email_csv(data.get("cc", ""))
     bcc = parse_email_csv(data.get("bcc", ""))
+    send_individually = bool(data.get("send_individually", False))
     subject = (data.get("subject") or "").strip()
     html = data.get("html") or ""
 
@@ -271,6 +276,38 @@ def send_custom_email():
         return jsonify({"status": "Subject is required."}), 400
     if not html:
         return jsonify({"status": "Email body is required."}), 400
+
+    if send_individually:
+        total = len(to)
+        next_progress = 5
+        stats = helpers.get_lifted_stats()
+
+        print(f"[custom-email] Starting individual send for {total} recipient(s)", flush=True)
+
+        for index, recipient in enumerate(to, start=1):
+            with SessionLocal() as db_session:
+                helpers.send_custom_email(
+                    subject=subject,
+                    raw_html_content=html,
+                    to=[recipient],
+                    cc=cc,
+                    bcc=bcc,
+                    db_session=db_session,
+                    stats=stats,
+                )
+
+            percent_complete = (index * 100) // total
+            while percent_complete >= next_progress:
+                print(
+                    f"[custom-email] Progress: {next_progress}% ({index}/{total})",
+                    flush=True,
+                )
+                next_progress += 5
+
+            # if index < total:
+            #     time.sleep(2)
+
+        return jsonify({"status": f"Custom email sent individually to {total} recipient(s)!"})
 
     helpers.send_custom_email(
         subject=subject,
