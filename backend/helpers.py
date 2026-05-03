@@ -47,13 +47,11 @@ def process_attachment_prefs_to_dict(attachment_prefs):
     return dict
 
 def create_csv(cards, output_path):
+    fieldnames = list(cards[0].keys())
     with open(output_path + ".csv", 'w', newline="", encoding="utf-8") as csvfile:
-        writer = csv.writer(csvfile)
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction="ignore")
 
-        # Write header row (optional)
-        writer.writerow(cards[0].keys())
-
-        # Write data rows
+        writer.writeheader()
         writer.writerows(cards)
 
 def get_lifted_stats(db_session=None):

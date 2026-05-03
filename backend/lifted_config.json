@@ -37,15 +37,15 @@
     "homepage_event_date_text": "Tuesday, May 5th, 2026 on the Arts Quad",
     "homepage_form_open_text": "The eLifted form will close on <strong>Monday, May 4th at 11:59 PM</strong>!",
     "form_message_group": "sp_26_e",
-    "attachment_message_group": "sp_26_p",
+    "attachment_message_group": "none",
     "attachment_text": "You'll receive this alongside your cards! If you only want your cards, leave this blank.",
     "attachment_deadline": "Monday, April 27th at 11:59 PM",
-    "auto_swap_if_pref_exists": true,
+    "auto_swap_if_pref_exists": false,
     "swapping": [
         {
             "from": "sp_26_p",
             "to": "sp_26_e",
-            "enabled": true,
+            "enabled": false,
             "text": "You can receive virtual cards as a PDF on the last day of classes instead. If you're not sure you'll make it on the last day of classes, please choose this option. Otherwise, if you don't pick up your physical cards, you won't be able to view them virtually.",
             "title": "Can't make it before 7 PM on the last day of classes?",
             "button_text": "Request Virtual Cards",
@@ -55,7 +55,7 @@
         {
             "from": "sp_26_e",
             "to": "sp_26_p",
-            "enabled": true,
+            "enabled": false,
             "text": "You can receive physical cards instead, which will be available for pick up on the <b>Arts Quad until 7 PM on the last day of classes (Tuesday, May 5th)</b>.  You can also choose to receive a balloon, flower, or pinwheel alongside your cards!",
             "title": "Want to receive physical cards?",
             "button_text": "Request Physical Cards",

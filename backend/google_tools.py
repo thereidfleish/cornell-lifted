@@ -275,6 +275,11 @@ def cards_to_pdf(presentation_id, cards, output_filepath, message_group=None):
     if len(cards) == 0:
         raise ValueError("Must provide at least one card")
 
+    # Ensure output directory exists before any progress/log file writes.
+    output_dir = os.path.dirname(output_filepath)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+
     # Create fresh API clients for this request to avoid SSL connection issues
     slides, drive = _get_fresh_clients()
 
@@ -531,7 +536,6 @@ def cards_to_pdf(presentation_id, cards, output_filepath, message_group=None):
             _, done = pdf_downloader.next_chunk()
         
         # Save PDF
-        os.makedirs(os.path.dirname(output_filepath), exist_ok=True)
         with open(output_filepath + ".pdf", "wb") as f:
             f.write(pdf_fh.getvalue())
         
