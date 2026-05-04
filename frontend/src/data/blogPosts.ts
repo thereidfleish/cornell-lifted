@@ -5,7 +5,7 @@ export const blogPosts: BlogPost[] = [
         id: "celebrating-our-10th-anniversary",
         title: "Celebrating Our 10th Anniversary",
         date: "April 13, 2026",
-        coverImageUrl: "/images/blog/celebrating-our-10th-anniversary/cover.jpg",
+        coverImageUrl: "/images/blog/celebrating-our-10th-anniversary/cover.png",
         body: [
             {
                 type: "header",
